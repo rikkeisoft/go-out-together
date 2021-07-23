@@ -1,14 +1,14 @@
 import Head from 'next/head';
-import AuthLayout from "../layouts/AuthLayout";
+import MainLayout from "../layouts/MainLayout";
 
 export default function Home() {
     return (
-        <AuthLayout>
+        <MainLayout>
             <Head>
                 <title>Home</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <div className="text-blue-600">This is home page</div>
-        </AuthLayout>
+        </MainLayout>
     );
 }
