@@ -1,12 +1,8 @@
 import React, { memo } from "react";
-import classNames from "classnames/bind";
 import PropTypes from "prop-types";
-import styles from "./AuthLayout.module.css";
-
-const cx = classNames.bind(styles);
 
 const AuthLayout = memo(({ children }) => {
-    return <div className={cx("auth-layout")}>{children}</div>;
+    return <div className="container mx-auto">{children}</div>;
 });
 
 AuthLayout.propTypes = {
