@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 const Component = memo(({}) => {
     return <div className="">
-
+        
     </div>;
 });
 
