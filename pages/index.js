@@ -6,8 +6,9 @@ export default function Home() {
         <AuthLayout>
             <Head>
                 <title>Home</title>
+                <link rel="icon" href="/favicon.ico" />
             </Head>
-            This is home page
+            <div className="text-blue-600">This is home page</div>
         </AuthLayout>
     );
 }
