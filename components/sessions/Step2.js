@@ -4,13 +4,14 @@ import PropTypes from "prop-types";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { ErrorMessage } from '@hookform/error-message';
+import { ErrorMessage } from "@hookform/error-message";
 import AuthLayout from "../../layouts/AuthLayout";
 import FormCard from "../common/FormCard";
 import Field from "../common/Field";
 import Label from "../common/Label";
 import TextField from "../common/TextField";
 import TextArea from "../common/TextArea";
+import SelectBox from "../common/SelectBox";
 import ErrorText from "../common/ErrorText";
 import Button from "../common/Button";
 
@@ -28,7 +29,7 @@ const defaultValues = {
     addresses: "",
 };
 
-const Step2 = memo(({nextStep}) => {
+const Step2 = memo(({ nextStep }) => {
     const methods = useForm({
         resolver: yupResolver(schema),
         defaultValues: defaultValues,
@@ -70,7 +71,24 @@ const Step2 = memo(({nextStep}) => {
 
                         <Field>
                             <Label htmlFor="timeLimit">Giới hạn thời gian vote:</Label>
-                            <TextField id="timeLimit" name="timeLimit" />
+                            <SelectBox
+                                id="timeLimit"
+                                name="timeLimit"
+                                data={[
+                                    {
+                                        label: "10 phút",
+                                        value: 10,
+                                    },
+                                    {
+                                        label: "15 phút",
+                                        value: 15,
+                                    },
+                                    {
+                                        label: "20 phút",
+                                        value: 20,
+                                    },
+                                ]}
+                            />
                             <ErrorMessage
                                 errors={methods.formState.errors}
                                 name="timeLimit"
@@ -107,4 +125,3 @@ Step2.propTypes = {
 Step2.defaultProps = {};
 
 export default Step2;
-
