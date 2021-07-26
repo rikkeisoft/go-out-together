@@ -1,13 +1,13 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import urls from "../consts/urls";
-import MainLayout from "../layouts/MainLayout";
-import BackgroundImage from "../components/common/BackgroundImage";
-import Container from "../components/common/Container";
-import TitleText from "../components/common/TitleText";
-import Button from "../components/common/Button";
-import Center from "../components/common/Center";
-import homeBgSrc from "../public/assets/images/homeBg.svg";
+import urls from "consts/urls";
+import MainLayout from "layouts/MainLayout";
+import BackgroundImage from "components/common/BackgroundImage";
+import Container from "components/common/Container";
+import TitleText from "components/common/TitleText";
+import Button from "components/common/Button";
+import Center from "components/common/Center";
+import homeBgSrc from "public/assets/images/homeBg.svg";
 
 export default function Home() {
     const router = useRouter();
@@ -29,7 +29,7 @@ export default function Home() {
                             type="button"
                             variant="primary"
                             onClick={() => {
-                                router.push(urls.SESSIONS);
+                                router.push(urls.SESSIONS_CREATE);
                             }}
                         >
                             Thử ngay
