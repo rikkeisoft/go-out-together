@@ -4,15 +4,16 @@ import PropTypes from "prop-types";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { ErrorMessage } from '@hookform/error-message';
-import AuthLayout from "../../layouts/AuthLayout";
-import FormCard from "../common/FormCard";
-import Field from "../common/Field";
-import Label from "../common/Label";
-import TextField from "../common/TextField";
-import TextArea from "../common/TextArea";
-import ErrorText from "../common/ErrorText";
-import Button from "../common/Button";
+import { ErrorMessage } from "@hookform/error-message";
+import MainLayout from "layouts/MainLayout";
+import FormCard from "components/common/FormCard";
+import Field from "components/common/Field";
+import Label from "components/common/Label";
+import TextField from "components/common/TextField";
+import SelectBox from "components/common/SelectBox";
+import ErrorText from "components/common/ErrorText";
+import ButtonGroup from "components/common/ButtonGroup";
+import Button from "components/common/Button";
 
 const schema = yup.object().shape({
     title: yup.string().required("Nhập vào tiêu đề"),
@@ -21,26 +22,19 @@ const schema = yup.object().shape({
     addresses: yup.string().required("Chọn địa điểm"),
 });
 
-const defaultValues = {
-    title: "",
-    content: "",
-    timeLimit: "",
-    addresses: "",
-};
-
-const Step2 = memo(({nextStep}) => {
+const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
     const methods = useForm({
         resolver: yupResolver(schema),
-        defaultValues: defaultValues,
+        defaultValues: formData,
     });
 
     const onSubmit = (data) => {
-        console.log(data);
+        setFormData(Object.assign({}, formData, data));
         nextStep();
     };
 
     return (
-        <AuthLayout>
+        <MainLayout>
             <Head>
                 <title>Bước 2</title>
                 <link rel="icon" href="/favicon.ico" />
@@ -70,7 +64,24 @@ const Step2 = memo(({nextStep}) => {
 
                         <Field>
                             <Label htmlFor="timeLimit">Giới hạn thời gian vote:</Label>
-                            <TextField id="timeLimit" name="timeLimit" />
+                            <SelectBox
+                                id="timeLimit"
+                                name="timeLimit"
+                                data={[
+                                    {
+                                        label: "10 phút",
+                                        value: 10,
+                                    },
+                                    {
+                                        label: "15 phút",
+                                        value: 15,
+                                    },
+                                    {
+                                        label: "20 phút",
+                                        value: 20,
+                                    },
+                                ]}
+                            />
                             <ErrorMessage
                                 errors={methods.formState.errors}
                                 name="timeLimit"
@@ -88,23 +99,35 @@ const Step2 = memo(({nextStep}) => {
                             />
                         </Field>
 
-                        <div className="text-center">
+                        <ButtonGroup>
+                            <Button
+                                type="button"
+                                variant="danger"
+                                onClick={() => {
+                                    prevStep();
+                                }}
+                            >
+                                Trước đó
+                            </Button>
+
                             <Button type="submit" variant="primary">
                                 Tiếp theo
                             </Button>
-                        </div>
+                        </ButtonGroup>
                     </form>
                 </FormProvider>
             </FormCard>
-        </AuthLayout>
+        </MainLayout>
     );
 });
 
 Step2.propTypes = {
+    formData: PropTypes.object,
+    setFormData: PropTypes.func,
+    prevStep: PropTypes.func,
     nextStep: PropTypes.func,
 };
 
 Step2.defaultProps = {};
 
 export default Step2;
-

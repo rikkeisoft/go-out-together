@@ -1,37 +1,36 @@
 import { memo } from "react";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import PropTypes from "prop-types";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { ErrorMessage } from '@hookform/error-message';
-import AuthLayout from "../../layouts/AuthLayout";
-import FormCard from "../common/FormCard";
-import Field from "../common/Field";
-import Label from "../common/Label";
-import TextField from "../common/TextField";
-import TextArea from "../common/TextArea";
-import ErrorText from "../common/ErrorText";
-import Button from "../common/Button";
+import { ErrorMessage } from "@hookform/error-message";
+import urls from "consts/urls";
+import AuthLayout from "layouts/AuthLayout";
+import FormCard from "components/common/FormCard";
+import Field from "components/common/Field";
+import Label from "components/common/Label";
+import TextField from "components/common/TextField";
+import ErrorText from "components/common/ErrorText";
+import ButtonGroup from "components/common/ButtonGroup";
+import Button from "components/common/Button";
 
 const schema = yup.object().shape({
     name: yup.string().required("Nhập vào tên"),
     address: yup.string().required("Nhập vào địa điểm"),
 });
 
-const defaultValues = {
-    name: "",
-    address: "",
-};
+const Step1 = memo(({ formData, setFormData, nextStep }) => {
+    const router = useRouter();
 
-const Step1 = memo(({nextStep}) => {
     const methods = useForm({
         resolver: yupResolver(schema),
-        defaultValues: defaultValues,
+        defaultValues: formData,
     });
 
     const onSubmit = (data) => {
-        console.log(data);
+        setFormData(Object.assign({}, formData, data));
         nextStep();
     };
 
@@ -64,11 +63,21 @@ const Step1 = memo(({nextStep}) => {
                             />
                         </Field>
 
-                        <div className="text-center">
-                            <Button type="submit" variant="primary">
+                        <ButtonGroup>
+                            <Button
+                                type="button"
+                                variant="danger"
+                                onClick={() => {
+                                    router.push(urls.HOME);
+                                }}
+                            >
+                                Về trang chủ
+                            </Button>
+
+                            <Button type="submit" variant="primary" onClick={() => {}}>
                                 Tiếp theo
                             </Button>
-                        </div>
+                        </ButtonGroup>
                     </form>
                 </FormProvider>
             </FormCard>
@@ -77,10 +86,11 @@ const Step1 = memo(({nextStep}) => {
 });
 
 Step1.propTypes = {
+    formData: PropTypes.object,
+    setFormData: PropTypes.func,
     nextStep: PropTypes.func,
 };
 
 Step1.defaultProps = {};
 
 export default Step1;
-

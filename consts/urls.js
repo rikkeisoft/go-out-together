@@ -1,4 +1,4 @@
 export default {
     HOME: "/",
-    SESSIONS: "/sessions",
+    SESSIONS_CREATE: "/sessions/create",
 };
