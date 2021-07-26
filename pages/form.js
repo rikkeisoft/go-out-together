@@ -13,62 +13,62 @@ import ErrorText from "../components/common/ErrorText";
 import Button from "../components/common/Button";
 
 const schema = yup.object().shape({
-  username: yup.string().required(),
-  description: yup.string().required(),
+    username: yup.string().required(),
+    description: yup.string().required(),
 });
 
 const defaultValues = {
-  username: "",
-  description: "",
+    username: "",
+    description: "",
 };
 
 export default function Form() {
-  const methods = useForm({
-    resolver: yupResolver(schema),
-    defaultValues: defaultValues,
-  });
+    const methods = useForm({
+        resolver: yupResolver(schema),
+        defaultValues: defaultValues,
+    });
 
-  const onSubmit = (data) => {
-    console.log(data);
-  };
+    const onSubmit = (data) => {
+        console.log(data);
+    };
 
-  return (
-    <AuthLayout>
-      <Head>
-        <title>Form</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <FormCard>
-        <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(onSubmit)}>
-            <Field>
-              <Label htmlFor="username">Username:</Label>
-              <TextField id="username" name="username" />
-              <ErrorMessage
-                errors={methods.formState.errors}
-                name="username"
-                render={({ message }) => <ErrorText>{message}</ErrorText>}
-              />
-            </Field>
+    return (
+        <AuthLayout>
+            <Head>
+                <title>Form</title>
+                <link rel="icon" href="/favicon.ico" />
+            </Head>
+            <FormCard>
+                <FormProvider {...methods}>
+                    <form onSubmit={methods.handleSubmit(onSubmit)}>
+                        <Field>
+                            <Label htmlFor="username">Username:</Label>
+                            <TextField id="username" name="username" />
+                            <ErrorMessage
+                                errors={methods.formState.errors}
+                                name="username"
+                                render={({ message }) => <ErrorText>{message}</ErrorText>}
+                            />
+                        </Field>
 
-            <Field>
-              <Label htmlFor="description">Description:</Label>
-              <TextArea id="description" name="description" />
-              <ErrorMessage
-                errors={methods.formState.errors}
-                name="username"
-                render={({ message }) => <ErrorText>{message}</ErrorText>}
-              />
-            </Field>
+                        <Field>
+                            <Label htmlFor="description">Description:</Label>
+                            <TextArea id="description" name="description" />
+                            <ErrorMessage
+                                errors={methods.formState.errors}
+                                name="username"
+                                render={({ message }) => <ErrorText>{message}</ErrorText>}
+                            />
+                        </Field>
 
-            <div className="text-center">
-              <Button type="submit" variant="primary">
-                Login
-              </Button>
-            </div>
-          </form>
-        </FormProvider>
-      </FormCard>
-    </AuthLayout>
-  );
+                        <div className="text-center">
+                            <Button type="submit" variant="primary">
+                                Login
+                            </Button>
+                        </div>
+                    </form>
+                </FormProvider>
+            </FormCard>
+        </AuthLayout>
+    );
 }
