@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { ErrorMessage } from '@hookform/error-message';
+import { ErrorMessage } from "@hookform/error-message";
 import AuthLayout from "../layouts/AuthLayout";
 import FormCard from "../components/common/FormCard";
 import Field from "../components/common/Field";

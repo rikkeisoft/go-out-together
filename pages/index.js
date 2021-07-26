@@ -7,7 +7,7 @@ import Container from "../components/common/Container";
 import TitleText from "../components/common/TitleText";
 import Button from "../components/common/Button";
 import Center from "../components/common/Center";
-import homeBgSrc from "../public/images/homeBg.svg";
+import homeBgSrc from "../public/assets/images/homeBg.svg";
 
 export default function Home() {
     const router = useRouter();
@@ -17,6 +17,8 @@ export default function Home() {
             <Head>
                 <title>Home</title>
                 <link rel="icon" href="/favicon.ico" />
+                <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
+                <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
             </Head>
 
             <BackgroundImage src={homeBgSrc}>

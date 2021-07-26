@@ -8,12 +8,14 @@
   "dependencies": {
     "@hookform/error-message": "^2.0.0",
     "@hookform/resolvers": "^2.6.1",
+    "axios": "^0.21.1",
     "classnames": "^2.3.1",
+    "mapbox-gl": "^2.3.1",
     "next": "latest",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-hook-form": "^7.11.1",
-    "react-query": "^3.19.0",
+    "react-query": "^3.19.1",
     "yup": "^0.32.9"
   },
   "devDependencies": {

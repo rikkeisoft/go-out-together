@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { ErrorMessage } from '@hookform/error-message';
+import { ErrorMessage } from "@hookform/error-message";
 import AuthLayout from "../../layouts/AuthLayout";
 import FormCard from "../common/FormCard";
 import Field from "../common/Field";
@@ -24,7 +24,7 @@ const defaultValues = {
     address: "",
 };
 
-const Step1 = memo(({nextStep}) => {
+const Step1 = memo(({ nextStep }) => {
     const methods = useForm({
         resolver: yupResolver(schema),
         defaultValues: defaultValues,
@@ -83,4 +83,3 @@ Step1.propTypes = {
 Step1.defaultProps = {};
 
 export default Step1;
-
