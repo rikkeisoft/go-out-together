@@ -1,4 +1,4 @@
 export default {
-    HOME: "/",
-    SESSIONS_CREATE: "/sessions/create",
-};
+  HOME: '/',
+  SESSIONS_CREATE: '/sessions/create',
+}

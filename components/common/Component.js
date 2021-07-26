@@ -1,12 +1,11 @@
-import React, { memo } from "react";
-import PropTypes from "prop-types";
+import React, { memo } from 'react'
 
-const Component = memo(({}) => {
-    return <div className=""></div>;
-});
+const Component = memo(() => {
+  return <div className=""></div>
+})
 
-Component.propTypes = {};
+Component.propTypes = {}
 
-Component.defaultProps = {};
+Component.defaultProps = {}
 
-export default Component;
+export default Component

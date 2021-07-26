@@ -1,14 +1,14 @@
-import React, { memo } from "react";
-import PropTypes from "prop-types";
+import React, { memo } from 'react'
+import PropTypes from 'prop-types'
 
 const Field = memo(({ children }) => {
-    return <div className="relative mb-7">{children}</div>;
-});
+  return <div className="relative mb-7">{children}</div>
+})
 
 Field.propTypes = {
-    children: PropTypes.any,
-};
+  children: PropTypes.any,
+}
 
-Field.defaultProps = {};
+Field.defaultProps = {}
 
-export default Field;
+export default Field

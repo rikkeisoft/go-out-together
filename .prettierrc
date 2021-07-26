@@ -1,0 +1,16 @@
+{
+  "tabWidth": 2,
+  "useTabs": false,
+  "printWidth": 120,
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "eslintIntegration": false,
+  "ignorePath": ".prettierignore",
+  "jsxBracketSameLine": false,
+  "proseWrap": "preserve",
+  "semi": false,
+  "singleQuote": true,
+  "stylelintIntegration": false,
+  "trailingComma": "all",
+  "jsxSingleQuote": false
+}
