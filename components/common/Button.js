@@ -2,7 +2,7 @@ import React, { memo } from 'react'
 import PropTypes from 'prop-types'
 
 const Button = memo(({ type, variant, children, onClick }) => {
-  let className = 'px-5 py-2 text-white rounded-md'
+  let className = 'inline-flex items-center px-5 py-2 text-white rounded-md'
   if (variant === 'primary') {
     className += ' bg-blue-500 hover:bg-blue-400'
   } else if (variant === 'danger') {

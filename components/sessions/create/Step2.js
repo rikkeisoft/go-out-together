@@ -4,8 +4,8 @@ import PropTypes from 'prop-types'
 import { useForm, FormProvider } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
+import _ from 'lodash'
 import { ErrorMessage } from '@hookform/error-message'
-import MainLayout from 'layouts/MainLayout'
 import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
@@ -14,12 +14,14 @@ import SelectBox from 'components/common/SelectBox'
 import ErrorText from 'components/common/ErrorText'
 import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
+import TextArea from 'components/common/TextArea'
+import List from 'components/common/List'
 
 const schema = yup.object().shape({
   title: yup.string().required('Nhập vào tiêu đề'),
   content: yup.string().required('Nhập vào nội dung'),
   timeLimit: yup.string().required('Chọn giới hạn thời gian vote'),
-  addresses: yup.string().required('Chọn địa điểm'),
+  addresses: yup.array().min(1, 'Chọn địa chỉ'),
 })
 
 const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
@@ -33,8 +35,17 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
     nextStep()
   }
 
+  const addAddress = (address) => {
+    let addresses = methods.watch('addresses')
+    if (!Array.isArray(addresses)) {
+      addresses = []
+    }
+    addresses.push(address)
+    methods.setValue('addresses', addresses, { shouldValidate: true })
+  }
+
   return (
-    <MainLayout>
+    <>
       <Head>
         <title>Bước 2</title>
         <link rel="icon" href="/favicon.ico" />
@@ -54,7 +65,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
 
             <Field>
               <Label htmlFor="content">Nội dung:</Label>
-              <TextField id="content" name="content" />
+              <TextArea id="content" name="content" />
               <ErrorMessage
                 errors={methods.formState.errors}
                 name="content"
@@ -90,8 +101,20 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
             </Field>
 
             <Field>
-              <Label htmlFor="addresses">Các địa điểm ăn chơi:</Label>
-              <TextField id="addresses" name="addresses" />
+              <Label htmlFor="addresses">Danh sách địa điểm ăn chơi:</Label>
+              <div className="py-2">
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={() => {
+                    addAddress('Cầu giấy')
+                  }}
+                >
+                  Thêm địa điểm từ bản đồ
+                </Button>
+              </div>
+              <List name="addresses" />
+
               <ErrorMessage
                 errors={methods.formState.errors}
                 name="addresses"
@@ -117,7 +140,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
           </form>
         </FormProvider>
       </FormCard>
-    </MainLayout>
+    </>
   )
 })
 
