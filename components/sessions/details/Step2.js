@@ -14,7 +14,6 @@ import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MessageText from 'components/common/MessageText'
 import MemberList from 'components/common/MemberList'
-import Avatar from 'boring-avatars'
 
 const schema = yup.object().shape({
   votedAddress: yup.mixed().required('Chọn địa điểm'),
@@ -75,21 +74,7 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
       <MessageText>Tiêu đề: {title}</MessageText>
       <MessageText>Nội dung: {content}</MessageText>
       <MessageText>
-        {/* Các thành viên đang tham gia: <MemberList members={members} /> */}
-        Các thành viên đang tham gia:
-        {members.map((item, index) => {
-          return (
-            <div className="inline-block ml-3" key={index}>
-              <Avatar
-                size={40}
-                name="SN"
-                variant="beam"
-                colors={['#92A1C6', '#146A7C', '#F0AB3D', '#C271B4', '#C20D90']}
-              />
-              <p className="text-center text-xs">{getNameUser(item)}</p>
-            </div>
-          )
-        })}
+        Các thành viên đang tham gia: <MemberList members={members} />
       </MessageText>
       <FormCard>
         <FormProvider {...methods}>
