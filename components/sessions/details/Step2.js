@@ -34,7 +34,7 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
 
   const title = 'Đi ăn lẩu'
   const content = 'Đi ăn lẩu ngày nghỉ'
-  const members = ['Doãn Chí Bình', 'Tiểu Long Nữ', 'Dương Quá', 'Thải Chi']
+  const members = ['Nguyễn Tiến Báo', 'Bùi Thị Nhàn', 'Nguyễn Văn Trung', 'Đặng Tiến Hùng']
 
   return (
     <MainLayout>

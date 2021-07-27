@@ -13,7 +13,11 @@ import CopyableLink from 'components/common/CopyableLink'
 
 const Step3 = memo(({ formData, setFormData, backwardStep }) => {
   const router = useRouter()
-  console.log(formData)
+  const hostname = 'https://cungdichoi.vn'
+  const path = '/sessions'
+  const id = 1
+  const relativeUrl = `${path}/${encodeURIComponent(id)}`
+  const absoluteUrl = hostname + relativeUrl
 
   return (
     <MainLayout>
@@ -24,12 +28,12 @@ const Step3 = memo(({ formData, setFormData, backwardStep }) => {
       <Center>
         <MessageText>Chia sẻ link với bạn bè để họ tham gia vote</MessageText>
         <CopyableLink
-          text="https://xxx.yyy/sessions/1"
+          text={absoluteUrl}
           onClick={() => {
-            router.push('/sessions/1')
+            router.push(relativeUrl)
           }}
         >
-          https://xxx.yyy/sessions/1
+          {absoluteUrl}
         </CopyableLink>
       </Center>
       <FormCard>
@@ -51,7 +55,7 @@ const Step3 = memo(({ formData, setFormData, backwardStep }) => {
               backwardStep()
             }}
           >
-            Về trang chủ
+            Tạo nhóm mới
           </Button>
         </ButtonGroup>
       </FormCard>
