@@ -25,8 +25,6 @@ const MemberList = memo(({ members, representativeCount = 2 }) => {
     summaryText = members.slice(0, representativeCount - 1).join(',') + ` và ${anotherCount} người khác`
   }
 
-  console.log(members)
-
   return (
     <>
       <span
