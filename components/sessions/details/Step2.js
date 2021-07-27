@@ -1,15 +1,14 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import Head from 'next/head'
 import PropTypes from 'prop-types'
 import { useForm, FormProvider } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { ErrorMessage } from '@hookform/error-message'
-import MainLayout from 'layouts/MainLayout'
 import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
-import SelectBox from 'components/common/SelectBox'
+import RadioList from 'components/common/RadioList'
 import ErrorText from 'components/common/ErrorText'
 import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
@@ -17,7 +16,7 @@ import MessageText from 'components/common/MessageText'
 import MemberList from 'components/common/MemberList'
 
 const schema = yup.object().shape({
-  addresses: yup.string().required('Chọn địa điểm'),
+  votedAddress: yup.mixed().required('Chọn địa điểm'),
 })
 
 const Step2 = memo(({ formData, prevStep, nextStep }) => {
@@ -26,8 +25,38 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
     defaultValues: formData,
   })
 
+  const [addresses, setAddresses] = useState([
+    {
+      label: 'Địa điểm 1 (2 người vote)',
+      value: 'Địa điểm 1',
+    },
+    {
+      label: 'Địa điểm 2 (34 người vote)',
+      value: 'Địa điểm 2',
+    },
+    {
+      label: 'Địa điểm 3 (34 người vote)',
+      value: 'Địa điểm 3',
+    },
+    {
+      label: 'Địa điểm 4 (4 người vote)',
+      value: 'Địa điểm 4',
+    },
+  ])
+
+  const addAddress = (address) => {
+    const newAddresses = addresses.slice()
+    newAddresses.push(address)
+    setAddresses(newAddresses)
+  }
+
+  const deleteAddress = (index) => {
+    const newAddresses = addresses.slice()
+    newAddresses.splice(index, 1)
+    setAddresses(newAddresses)
+  }
+
   const onSubmit = (data) => {
-    console.log(data)
     // setFormData(Object.assign({}, formData, data));
     nextStep()
   }
@@ -37,7 +66,7 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
   const members = ['Nguyễn Tiến Báo', 'Bùi Thị Nhàn', 'Nguyễn Văn Trung', 'Đặng Tiến Hùng']
 
   return (
-    <MainLayout>
+    <>
       <Head>
         <title>Bước 2</title>
         <link rel="icon" href="/favicon.ico" />
@@ -51,34 +80,26 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <Field>
-              <Button type="button" variant="primary" onClick={() => {}}>
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => {
+                  addAddress({
+                    label: 'Tòa nhà sông Đà (0 người vote)',
+                    value: 'Tòa nhà sông Đà',
+                  })
+                }}
+              >
                 Thêm địa điểm
               </Button>
             </Field>
 
             <Field>
-              <Label htmlFor="addresses">Chọn địa điểm ăn chơi:</Label>
-              <SelectBox
-                id="addresses"
-                name="addresses"
-                data={[
-                  {
-                    label: 'Địa điểm 1 (2 người)',
-                    value: '1-2',
-                  },
-                  {
-                    label: 'Địa điểm 2 (30 người)',
-                    value: '2-30',
-                  },
-                  {
-                    label: 'Địa điểm 3 (2 người)',
-                    value: '3-2',
-                  },
-                ]}
-              />
+              <Label htmlFor="votedAddress">Chọn địa điểm ăn chơi:</Label>
+              <RadioList name="votedAddress" data={addresses} onDelete={deleteAddress} />
               <ErrorMessage
                 errors={methods.formState.errors}
-                name="addresses"
+                name="votedAddress"
                 render={({ message }) => <ErrorText>{message}</ErrorText>}
               />
             </Field>
@@ -101,7 +122,7 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
           </form>
         </FormProvider>
       </FormCard>
-    </MainLayout>
+    </>
   )
 })
 

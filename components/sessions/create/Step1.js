@@ -1,13 +1,10 @@
 import { memo } from 'react'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import PropTypes from 'prop-types'
 import { useForm, FormProvider } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { ErrorMessage } from '@hookform/error-message'
-import urls from 'consts/urls'
-import AuthLayout from 'layouts/AuthLayout'
 import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
@@ -22,8 +19,6 @@ const schema = yup.object().shape({
 })
 
 const Step1 = memo(({ formData, setFormData, nextStep }) => {
-  const router = useRouter()
-
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: formData,
@@ -35,7 +30,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   }
 
   return (
-    <AuthLayout>
+    <>
       <Head>
         <title>Bước 1</title>
         <link rel="icon" href="/favicon.ico" />
@@ -54,8 +49,20 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
             </Field>
 
             <Field>
-              <Label htmlFor="address">Địa điểm:</Label>
-              <TextField id="address" name="address" />
+              <Label htmlFor="address">Địa điểm hiện tại của bạn:</Label>
+              <div className="py-2">
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={() => {
+                    methods.setValue('address', 'Hà Nội')
+                  }}
+                >
+                  Chọn địa điểm trên bản đồ
+                </Button>
+              </div>
+
+              <TextField id="address" name="address" readOnly={true} />
               <ErrorMessage
                 errors={methods.formState.errors}
                 name="address"
@@ -64,16 +71,6 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
             </Field>
 
             <ButtonGroup>
-              <Button
-                type="button"
-                variant="danger"
-                onClick={() => {
-                  router.push(urls.HOME)
-                }}
-              >
-                Về trang chủ
-              </Button>
-
               <Button type="submit" variant="primary" onClick={() => {}}>
                 Tiếp theo
               </Button>
@@ -81,7 +78,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
           </form>
         </FormProvider>
       </FormCard>
-    </AuthLayout>
+    </>
   )
 })
 
