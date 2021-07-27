@@ -23,7 +23,6 @@ const CopyableLink = memo(({ text, children, onClick }) => {
           text={text}
           onCopy={() => {
             notify()
-            console.log('aaa')
           }}
         >
           <span className="inline-block ml-3 cursor-pointer">

@@ -1,33 +1,34 @@
 import React, { useEffect } from 'react'
-import axios from 'axios';
-import mapboxgl from 'mapbox-gl';
-import Head from 'next/head';
+import axios from 'axios'
+import mapboxgl from 'mapbox-gl'
+import Head from 'next/head'
 
 const Routes = () => {
 
   useEffect(() => {
-    mapboxgl.accessToken = 'pk.eyJ1Ijoic29ubnY1IiwiYSI6ImNrcmczMTF1ZzI3b3oyb3F1NHU0cmd6N3EifQ.cnxzBouZ3K6aMsEdQhT65w';
+    mapboxgl.accessToken = 'pk.eyJ1Ijoic29ubnY1IiwiYSI6ImNrcmczMTF1ZzI3b3oyb3F1NHU0cmd6N3EifQ.cnxzBouZ3K6aMsEdQhT65w'
     let map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/streets-v10',
-      center: [-122.662323, 45.523751], 
-      zoom: 12
-    });
-    let start = [-122.662323, 45.523751];
+      center: [-122.662323, 45.523751],
+      zoom: 12,
+    })
+    let start = [-122.662323, 45.523751]
     const getRoute = async (end) => {
-      const response = await axios.get(`https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`);
+      const response = await axios.get(
+        `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`)
       const data = response.data.routes[0]
-      const coordinates = data.geometry.coordinates;
+      const coordinates = data.geometry.coordinates
       const geojson = {
         type: 'Feature',
         properties: {},
         geometry: {
           type: 'LineString',
-          coordinates: coordinates
-        }
-      };
+          coordinates: coordinates,
+        },
+      }
       if (map.getSource('route')) {
-        map.getSource('route').setData(geojson);
+        map.getSource('route').setData(geojson)
       } else {
         map.addLayer({
           id: 'route',
@@ -39,30 +40,30 @@ const Routes = () => {
               properties: {},
               geometry: {
                 type: 'LineString',
-                coordinates: geojson
-              }
-            }
+                coordinates: geojson,
+              },
+            },
           },
           layout: {
             'line-join': 'round',
-            'line-cap': 'round'
+            'line-cap': 'round',
           },
           paint: {
             'line-color': '#3887be',
             'line-width': 5,
-            'line-opacity': 0.75
-          }
-        });
+            'line-opacity': 0.75,
+          },
+        })
       }
-      
+
       if (start !== end) {
         const distance = response.data.routes[0].distance
-        console.log('Quãng đường::',distance)
+        console.log('Quãng đường::', distance)
       }
-    };
+    }
 
     map.on('load', () => {
-      getRoute(start);
+      getRoute(start)
 
       map.addLayer({
         id: 'point',
@@ -76,19 +77,19 @@ const Routes = () => {
               properties: {},
               geometry: {
                 type: 'Point',
-                coordinates: start
-              }
-            }
-            ]
-          }
+                coordinates: start,
+              },
+            },
+            ],
+          },
         },
         paint: {
           'circle-radius': 10,
-          'circle-color': '#3887be'
-        }
-      });
+          'circle-color': '#3887be',
+        },
+      })
 
-    });
+    })
 
     map.on('load', () => {
       const coords = [-122.6389770527341, 45.51533159015108]
@@ -99,13 +100,13 @@ const Routes = () => {
           properties: {},
           geometry: {
             type: 'Point',
-            coordinates: coords
-          }
-        }
-        ]
-      };
+            coordinates: coords,
+          },
+        },
+        ],
+      }
       if (map.getLayer('end')) {
-        map.getSource('end').setData(end);
+        map.getSource('end').setData(end)
       } else {
         map.addLayer({
           id: 'end',
@@ -119,20 +120,20 @@ const Routes = () => {
                 properties: {},
                 geometry: {
                   type: 'Point',
-                  coordinates: coords
-                }
-              }]
-            }
+                  coordinates: coords,
+                },
+              }],
+            },
           },
           paint: {
             'circle-radius': 10,
-            'circle-color': '#f30'
-          }
-        });
+            'circle-color': '#f30',
+          },
+        })
       }
-      getRoute(coords);
-    });
-    
+      getRoute(coords)
+    })
+
   }, [])
 
   return (
@@ -143,7 +144,7 @@ const Routes = () => {
         <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
-      <div id="map" style={{ width: "100vw", height: "80vh" }}></div>
+      <div id="map" style={{ width: '100vw', height: '80vh' }}></div>
     </>
   )
 }

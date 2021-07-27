@@ -15,6 +15,7 @@ import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MessageText from 'components/common/MessageText'
 import MemberList from 'components/common/MemberList'
+import Avatar from 'boring-avatars'
 
 const schema = yup.object().shape({
   addresses: yup.string().required('Chọn địa điểm'),
@@ -34,7 +35,14 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
 
   const title = 'Đi ăn lẩu'
   const content = 'Đi ăn lẩu ngày nghỉ'
-  const members = ['Doãn Chí Bình', 'Tiểu Long Nữ', 'Dương Quá', 'Thải Chi']
+  const members = ['nGuyễn Văn  Sơn ', 'pHạm Thị thúy ']
+
+  const getNameUser = (item) => {
+    const fisrtLetter = item[0]
+    const lastLetter = item[item.trim().lastIndexOf(' ') + 1]
+    const processName = fisrtLetter.toUpperCase() + lastLetter.toUpperCase()
+    return processName
+  }
 
   return (
     <MainLayout>
@@ -45,13 +53,29 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
       <MessageText>Tiêu đề: {title}</MessageText>
       <MessageText>Nội dung: {content}</MessageText>
       <MessageText>
-        Các thành viên đang tham gia: <MemberList members={members} />
+        {/* Các thành viên đang tham gia: <MemberList members={members} /> */}
+        Các thành viên đang tham gia:
+        {
+          members.map((item, index) => {
+            return (
+              <div className="inline-block ml-3" key={index}>
+                <Avatar
+                  size={40}
+                  name="SN"
+                  variant="beam"
+                  colors={['#92A1C6', '#146A7C', '#F0AB3D', '#C271B4', '#C20D90']}
+                />
+                <p className="text-center text-xs">{getNameUser(item)}</p>
+              </div>
+            )
+          })
+        }
       </MessageText>
       <FormCard>
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <Field>
-              <Button type="button" variant="primary" onClick={() => {}}>
+              <Button type="button" variant="primary" onClick={() => { }}>
                 Thêm địa điểm
               </Button>
             </Field>
