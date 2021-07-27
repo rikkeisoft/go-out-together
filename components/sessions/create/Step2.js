@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import Head from 'next/head'
 import PropTypes from 'prop-types'
 import { useForm, FormProvider } from 'react-hook-form'
@@ -15,6 +15,7 @@ import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import TextArea from 'components/common/TextArea'
 import List from 'components/common/List'
+import MapBox from 'components/common/MapBox'
 
 const schema = yup.object().shape({
   title: yup.string().required('Nhập vào tiêu đề'),
@@ -24,6 +25,7 @@ const schema = yup.object().shape({
 })
 
 const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
+  const [showMap, setShowMap] = useState(false)
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: formData,
@@ -49,96 +51,108 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
         <title>Bước 2</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <FormCard>
-        <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(onSubmit)}>
-            <Field>
-              <Label htmlFor="title">Tiêu đề:</Label>
-              <TextField id="title" name="title" />
-              <ErrorMessage
-                errors={methods.formState.errors}
-                name="title"
-                render={({ message }) => <ErrorText>{message}</ErrorText>}
-              />
-            </Field>
 
-            <Field>
-              <Label htmlFor="content">Nội dung:</Label>
-              <TextArea id="content" name="content" />
-              <ErrorMessage
-                errors={methods.formState.errors}
-                name="content"
-                render={({ message }) => <ErrorText>{message}</ErrorText>}
-              />
-            </Field>
+      {
+        showMap && <MapBox
+          show={() => {
+            setShowMap(false)
+          }} />
+      }
 
-            <Field>
-              <Label htmlFor="timeLimit">Giới hạn thời gian vote:</Label>
-              <SelectBox
-                id="timeLimit"
-                name="timeLimit"
-                data={[
-                  {
-                    label: '10 phút',
-                    value: 10,
-                  },
-                  {
-                    label: '15 phút',
-                    value: 15,
-                  },
-                  {
-                    label: '20 phút',
-                    value: 20,
-                  },
-                ]}
-              />
-              <ErrorMessage
-                errors={methods.formState.errors}
-                name="timeLimit"
-                render={({ message }) => <ErrorText>{message}</ErrorText>}
-              />
-            </Field>
+      {
+        showMap === true ? null :
+          <FormCard>
+            <FormProvider {...methods}>
+              <form onSubmit={methods.handleSubmit(onSubmit)}>
+                <Field>
+                  <Label htmlFor="title">Tiêu đề:</Label>
+                  <TextField id="title" name="title" />
+                  <ErrorMessage
+                    errors={methods.formState.errors}
+                    name="title"
+                    render={({ message }) => <ErrorText>{message}</ErrorText>}
+                  />
+                </Field>
 
-            <Field>
-              <Label htmlFor="addresses">Danh sách địa điểm ăn chơi:</Label>
-              <div className="py-2">
-                <Button
-                  type="button"
-                  variant="primary"
-                  onClick={() => {
-                    addAddress('Cầu giấy')
-                  }}
-                >
-                  Thêm địa điểm từ bản đồ
-                </Button>
-              </div>
-              <List name="addresses" />
+                <Field>
+                  <Label htmlFor="content">Nội dung:</Label>
+                  <TextArea id="content" name="content" />
+                  <ErrorMessage
+                    errors={methods.formState.errors}
+                    name="content"
+                    render={({ message }) => <ErrorText>{message}</ErrorText>}
+                  />
+                </Field>
 
-              <ErrorMessage
-                errors={methods.formState.errors}
-                name="addresses"
-                render={({ message }) => <ErrorText>{message}</ErrorText>}
-              />
-            </Field>
+                <Field>
+                  <Label htmlFor="timeLimit">Giới hạn thời gian vote:</Label>
+                  <SelectBox
+                    id="timeLimit"
+                    name="timeLimit"
+                    data={[
+                      {
+                        label: '10 phút',
+                        value: 10,
+                      },
+                      {
+                        label: '15 phút',
+                        value: 15,
+                      },
+                      {
+                        label: '20 phút',
+                        value: 20,
+                      },
+                    ]}
+                  />
+                  <ErrorMessage
+                    errors={methods.formState.errors}
+                    name="timeLimit"
+                    render={({ message }) => <ErrorText>{message}</ErrorText>}
+                  />
+                </Field>
 
-            <ButtonGroup>
-              <Button
-                type="button"
-                variant="danger"
-                onClick={() => {
-                  prevStep()
-                }}
-              >
-                Trước đó
-              </Button>
+                <Field>
+                  <Label htmlFor="addresses">Danh sách địa điểm ăn chơi:</Label>
+                  <div className="py-2">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={() => {
+                        addAddress('Cầu giấy')
+                        setShowMap(true)
+                      }}
+                    >
+                      Thêm địa điểm từ bản đồ
+                    </Button>
+                  </div>
+                  <List name="addresses" />
 
-              <Button type="submit" variant="primary">
-                Tiếp theo
-              </Button>
-            </ButtonGroup>
-          </form>
-        </FormProvider>
-      </FormCard>
+                  <ErrorMessage
+                    errors={methods.formState.errors}
+                    name="addresses"
+                    render={({ message }) => <ErrorText>{message}</ErrorText>}
+                  />
+                </Field>
+
+                <ButtonGroup>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    onClick={() => {
+                      prevStep()
+                    }}
+                  >
+                    Trước đó
+                  </Button>
+
+                  <Button type="submit" variant="primary">
+                    Tiếp theo
+                  </Button>
+                </ButtonGroup>
+              </form>
+            </FormProvider>
+          </FormCard>
+      }
     </>
   )
 })

@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import Head from 'next/head'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
@@ -14,6 +14,7 @@ import TextField from 'components/common/TextField'
 import ErrorText from 'components/common/ErrorText'
 import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
+import MapBox from 'components/common/MapBox'
 
 const schema = yup.object().shape({
   name: yup.string().required('Nhập vào tên'),
@@ -34,6 +35,8 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
 
   const defaultValues = Object.assign({}, formData, obj)
 
+  const [showMap, setShowMap] = useState(false)
+  const [locationUser, setLocationUser] = useState(null)
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: defaultValues,
@@ -52,49 +55,64 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
         <title>Bước 1</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <FormCard>
-        <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(onSubmit)}>
-            <Field>
-              <Label htmlFor="name">Tên:</Label>
-              <TextField id="name" name="name" />
-              <ErrorMessage
-                errors={methods.formState.errors}
-                name="name"
-                render={({ message }) => <ErrorText>{message}</ErrorText>}
-              />
-            </Field>
+      {
+        showMap && <MapBox isOneLocaion={true}
+          data={(data) => {
+            setLocationUser(data)
+          }}
+          show={() => {
+            setShowMap(false)
+          }} />
+      }
+      {
+        showMap === true ? null :
+          <FormCard>
+            <FormProvider {...methods}>
+              {
+                locationUser && methods.setValue('address', locationUser)
+              }
+              <form onSubmit={methods.handleSubmit(onSubmit)}>
+                <Field>
+                  <Label htmlFor="name">Tên:</Label>
+                  <TextField id="name" name="name" />
+                  <ErrorMessage
+                    errors={methods.formState.errors}
+                    name="name"
+                    render={({ message }) => <ErrorText>{message}</ErrorText>}
+                  />
+                </Field>
 
-            <Field>
-              <Label htmlFor="address">Địa điểm hiện tại của bạn:</Label>
-              <div className="py-2">
-                <Button
-                  type="button"
-                  variant="primary"
-                  onClick={() => {
-                    methods.setValue('address', 'Hà Nội')
-                  }}
-                >
-                  Chọn địa điểm trên bản đồ
-                </Button>
-              </div>
+                <Field>
+                  <Label htmlFor="address">Địa điểm hiện tại của bạn:</Label>
+                  <div className="py-2">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={() => {
+                        setShowMap(true)
+                        // methods.setValue('address', 'Hà Nội')
+                      }}
+                    >
+                      Chọn địa điểm trên bản đồ
+                    </Button>
+                  </div>
+                  <TextField id="address" name="address" readOnly={true} />
+                  <ErrorMessage
+                    errors={methods.formState.errors}
+                    name="address"
+                    render={({ message }) => <ErrorText>{message}</ErrorText>}
+                  />
+                </Field>
 
-              <TextField id="address" name="address" readOnly={true} />
-              <ErrorMessage
-                errors={methods.formState.errors}
-                name="address"
-                render={({ message }) => <ErrorText>{message}</ErrorText>}
-              />
-            </Field>
-
-            <ButtonGroup>
-              <Button type="submit" variant="primary" onClick={() => {}}>
-                Tiếp theo
-              </Button>
-            </ButtonGroup>
-          </form>
-        </FormProvider>
-      </FormCard>
+                <ButtonGroup>
+                  <Button type="submit" variant="primary" onClick={() => { }}>
+                    Tiếp theo
+                  </Button>
+                </ButtonGroup>
+              </form>
+            </FormProvider>
+          </FormCard>
+      }
     </>
   )
 })
