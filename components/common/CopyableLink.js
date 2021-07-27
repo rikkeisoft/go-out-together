@@ -27,7 +27,7 @@ const CopyableLink = memo(({ text, children, onClick }) => {
           }}
         >
           <span className="inline-block ml-3 cursor-pointer">
-            <CopyIcon />
+            <CopyIcon className="w-7" />
           </span>
         </CopyToClipboard>
       </div>
