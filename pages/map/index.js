@@ -10,13 +10,13 @@ const Map = () => {
   const [listLocation, setListLocation] = useState([])
   const [showListLocation, setShowListLocation] = useState(true)
 
+  // proximity=105.77791972881141,21.028422014324164&
+
   useEffect(() => {
     if (location) {
       const getLocation = async () => {
         try {
-          const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_API_MAPBOX}/${location}.json?access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
-          )
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_MAPBOX}/${location}.json?proximity=105.777909,21.028412&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`)
           const dataList = response.data.features
           setDataLocation(dataList)
         } catch (error) {
@@ -26,6 +26,11 @@ const Map = () => {
       getLocation()
     }
   }, [location])
+
+  console.log(selectedLocation)
+  // 0: 105.799588
+  // 1: 21.03202
+  // 105.777909, 21.028412
 
   useEffect(() => {
     setLocation(selectedLocation.place_name)
@@ -66,7 +71,7 @@ const Map = () => {
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
       <div className="w-80 m-5 relative">
-        {listLocation.length > 4 ? (
+        {listLocation.length >= 5 ? (
           <span className="text-red-500">Chỉ được tạo tối đa 5 địa điểm !</span>
         ) : (
           <form>

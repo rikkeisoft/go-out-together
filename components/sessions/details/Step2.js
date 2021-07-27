@@ -63,7 +63,7 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
 
   const title = 'Đi ăn lẩu'
   const content = 'Đi ăn lẩu ngày nghỉ'
-  const members = ['Nguyễn Tiến Báo', 'Bùi Thị Nhàn', 'Nguyễn Văn Trung', 'Đặng Tiến Hùng']
+  const members = ['Nguyễn Văn Sơn', 'Châu Nhuận Phát', 'Tiêu Viêm']
 
   return (
     <>

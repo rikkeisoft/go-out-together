@@ -2,8 +2,9 @@ import React, { memo, useState } from 'react'
 import PropTypes from 'prop-types'
 import Popup from 'components/common/Popup'
 import MessageText from 'components/common/MessageText'
+import Avatar from 'boring-avatars'
 
-const MemberList = memo(({ members, representativeCount = 2 }) => {
+const MemberList = memo(({ members }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const openModal = () => {
@@ -16,14 +17,7 @@ const MemberList = memo(({ members, representativeCount = 2 }) => {
     setIsOpen(false)
   }
 
-  let summaryText
-
-  if (members.length <= representativeCount) {
-    summaryText = members.join(',')
-  } else {
-    const anotherCount = members.length - representativeCount
-    summaryText = members.slice(0, representativeCount - 1).join(',') + ` và ${anotherCount} người khác`
-  }
+  let summaryText = members.length + ' thành viên'
 
   return (
     <>
@@ -37,9 +31,19 @@ const MemberList = memo(({ members, representativeCount = 2 }) => {
       </span>
       <Popup isOpen={isOpen} onAfterOpen={afterOpenModal} onRequestClose={closeModal}>
         <div className="overflow-y-auto">
-          <MessageText>Các thành viên đang tham gia</MessageText>
+          <MessageText>Các thành viên</MessageText>
           {members.map((member) => {
-            return <div key={'member-' + member}>{member}</div>
+            return (
+              <div key={'member-' + member} className="flex flex-row justify-start items-center mb-4">
+                <Avatar
+                  size={40}
+                  name="SN"
+                  variant="beam"
+                  colors={['#92A1C6', '#146A7C', '#F0AB3D', '#C271B4', '#C20D90']}
+                />
+                <span className="inline-block ml-4">{member}</span>
+              </div>
+            )
           })}
         </div>
       </Popup>
