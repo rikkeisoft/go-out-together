@@ -28,7 +28,9 @@ export default function Form() {
     defaultValues: defaultValues,
   })
 
-  const onSubmit = (data) => {}
+  const onSubmit = (data) => {
+    console.log(data)
+  }
 
   return (
     <AuthLayout>

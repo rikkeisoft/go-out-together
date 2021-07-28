@@ -56,8 +56,7 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
     setAddresses(newAddresses)
   }
 
-  const onSubmit = (data) => {
-    // setFormData(Object.assign({}, formData, data));
+  const onSubmit = () => {
     nextStep()
   }
 
