@@ -16,7 +16,9 @@ const Map = () => {
     if (location) {
       const getLocation = async () => {
         try {
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_MAPBOX}/${location}.json?proximity=105.777909,21.028412&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`)
+          const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_MAPBOX}/${location}.json?proximity=105.777909,21.028412&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
+          )
           const dataList = response.data.features
           setDataLocation(dataList)
         } catch (error) {
