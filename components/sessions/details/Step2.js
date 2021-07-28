@@ -15,6 +15,7 @@ import Button from 'components/common/Button'
 import MessageText from 'components/common/MessageText'
 import MemberList from 'components/common/MemberList'
 import MapBox from 'components/common/MapBox'
+// import DirectionRoutes from 'components/common/DirectionRoutes'
 
 const schema = yup.object().shape({
   votedAddress: yup.mixed().required('Chọn địa điểm'),
@@ -22,6 +23,7 @@ const schema = yup.object().shape({
 
 const Step2 = memo(({ formData, prevStep, nextStep }) => {
   const [showMap, setShowMap] = useState(false)
+  // const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
   const [listDataLocation, setListDataLocation] = useState(null)
 
   const methods = useForm({
@@ -49,7 +51,7 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
   const content = 'Đi ăn lẩu ngày nghỉ'
   const members = ['Nguyễn Tiến Báo', 'Bùi Thị Nhàn', 'Nguyễn Văn Trung', 'Đặng Tiến Hùng']
 
-  console.log(listDataLocation)
+  console.log(formData)
 
   useEffect(() => {
 
@@ -69,6 +71,15 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
   const onSubmit = () => {
     nextStep()
   }
+
+  // const handleShowDirectionRoutes = () => {
+  //   setShowMap(true)
+  //   if (showDirectionRoutes) {
+  //     return (
+  //       <DirectionRoutes />
+  //     )
+  //   }
+  // }
 
   return (
     <>
