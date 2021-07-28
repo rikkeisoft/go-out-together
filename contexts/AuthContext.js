@@ -9,7 +9,7 @@ const AuthContextProvider = ({ children }) => {
     isAuthenticated: false,
     user: null,
   })
-  const [cookie, setCookie, removeCookie] = useCookies(['uid', 'username', 'imgURL'])
+  const [cookie, setCookie, removeCookie] = useCookies([])
 
   const loadUser = () => {
     if (cookie?.uid === undefined) {
@@ -20,7 +20,6 @@ const AuthContextProvider = ({ children }) => {
         user: null,
       })
     } else {
-      console.log(cookie)
       const { uid, username, imgURL } = cookie
       setAuthState({
         ...authState,
@@ -52,9 +51,9 @@ const AuthContextProvider = ({ children }) => {
   }
 
   const logOut = () => {
-    removeCookie('uid', { domain: 'localhost', path: '/' })
-    removeCookie('username', { domain: 'localhost', path: '/' })
-    removeCookie('imgURL', { domain: 'localhost', path: '/' })
+    removeCookie('uid', { path: '/' })
+    removeCookie('username', { path: '/' })
+    removeCookie('imgURL', { path: '/' })
     setAuthState({
       ...authState,
       authLoading: false,

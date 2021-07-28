@@ -6,7 +6,7 @@ import TitleText from 'components/common/TitleText'
 import Button from 'components/common/Button'
 import Center from 'components/common/Center'
 import homeBgSrc from 'public/assets/images/homeBg.svg'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import urls from 'consts/urls'
 import GoogleLoginModal from 'components/auth/GoogleLoginModal'
@@ -14,14 +14,24 @@ import { AuthContext } from 'contexts/AuthContext'
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [redirectURL, setRedirectURL] = useState(null)
   const {
     authState: { user },
   } = useContext(AuthContext)
   const router = useRouter()
 
+  useEffect(() => {
+    const url = localStorage.getItem('redirectURL')
+    if (url === undefined) {
+      setRedirectURL(urls.SESSIONS_CREATE)
+    } else {
+      setRedirectURL(url)
+    }
+  }, [])
+
   const handleButtonClick = () => {
     if (user?.uid !== undefined) {
-      router.push(urls.SESSIONS_CREATE)
+      router.push(redirectURL)
     } else setIsModalOpen(true)
   }
 
@@ -41,11 +51,7 @@ export default function Home() {
             <Button type="button" variant="primary" onClick={handleButtonClick}>
               Thử ngay
             </Button>
-            <GoogleLoginModal
-              isOpen={isModalOpen}
-              onRequestClose={() => setIsModalOpen(false)}
-              url={urls.SESSIONS_CREATE}
-            />
+            <GoogleLoginModal isOpen={isModalOpen} onRequestClose={() => setIsModalOpen(false)} url={redirectURL} />
           </Center>
         </Container>
       </BackgroundImage>
