@@ -36,7 +36,8 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   const defaultValues = Object.assign({}, formData, obj)
 
   const [showMap, setShowMap] = useState(false)
-  const [locationUser, setLocationUser] = useState(null)
+  const [userLocation, setUserLocation] = useState(null)
+
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: defaultValues,
@@ -58,7 +59,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
       {
         showMap && <MapBox isOneLocaion={true}
           data={(data) => {
-            setLocationUser(data)
+            setUserLocation(data)
           }}
           show={() => {
             setShowMap(false)
@@ -69,7 +70,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
           <FormCard>
             <FormProvider {...methods}>
               {
-                locationUser && methods.setValue('address', locationUser)
+                userLocation && methods.setValue('address', userLocation)
               }
               <form onSubmit={methods.handleSubmit(onSubmit)}>
                 <Field>

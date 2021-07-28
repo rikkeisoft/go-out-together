@@ -1,4 +1,4 @@
-import { memo, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import Head from 'next/head'
 import PropTypes from 'prop-types'
 import { useForm, FormProvider } from 'react-hook-form'
@@ -14,12 +14,16 @@ import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MessageText from 'components/common/MessageText'
 import MemberList from 'components/common/MemberList'
+import MapBox from 'components/common/MapBox'
 
 const schema = yup.object().shape({
   votedAddress: yup.mixed().required('Chọn địa điểm'),
 })
 
 const Step2 = memo(({ formData, prevStep, nextStep }) => {
+  const [showMap, setShowMap] = useState(false)
+  const [listDataLocation, setListDataLocation] = useState(null)
+
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: formData,
@@ -29,6 +33,7 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
     {
       label: 'Địa điểm 1 (2 người vote)',
       value: 'Địa điểm 1',
+      amountVote: 0,
     },
     {
       label: 'Địa điểm 2 (34 người vote)',
@@ -38,17 +43,22 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
       label: 'Địa điểm 3 (34 người vote)',
       value: 'Địa điểm 3',
     },
-    {
-      label: 'Địa điểm 4 (4 người vote)',
-      value: 'Địa điểm 4',
-    },
   ])
+  
+  const title = 'Đi ăn lẩu'
+  const content = 'Đi ăn lẩu ngày nghỉ'
+  const members = ['Nguyễn Tiến Báo', 'Bùi Thị Nhàn', 'Nguyễn Văn Trung', 'Đặng Tiến Hùng']
 
-  const addAddress = (address) => {
-    const newAddresses = addresses.slice()
-    newAddresses.push(address)
-    setAddresses(newAddresses)
-  }
+  console.log(listDataLocation)
+
+  useEffect(() => {
+
+    // const addAddress = (address) => {
+    //   const newAddresses = addresses.slice()
+    //   newAddresses.push(address)
+    //   setAddresses(newAddresses)
+    // }
+  }, [listDataLocation])
 
   const deleteAddress = (index) => {
     const newAddresses = addresses.slice()
@@ -60,67 +70,83 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
     nextStep()
   }
 
-  const title = 'Đi ăn lẩu'
-  const content = 'Đi ăn lẩu ngày nghỉ'
-  const members = ['Nguyễn Văn Sơn', 'Châu Nhuận Phát', 'Tiêu Viêm']
-
   return (
     <>
       <Head>
         <title>Bước 2</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <MessageText>Tiêu đề: {title}</MessageText>
-      <MessageText>Nội dung: {content}</MessageText>
-      <MessageText>
-        Các thành viên đang tham gia: <MemberList members={members} />
-      </MessageText>
-      <FormCard>
-        <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(onSubmit)}>
-            <Field>
-              <Button
-                type="button"
-                variant="primary"
-                onClick={() => {
-                  addAddress({
-                    label: 'Tòa nhà sông Đà (0 người vote)',
-                    value: 'Tòa nhà sông Đà',
-                  })
-                }}
-              >
-                Thêm địa điểm
-              </Button>
-            </Field>
 
-            <Field>
-              <Label htmlFor="votedAddress">Chọn địa điểm ăn chơi:</Label>
-              <RadioList name="votedAddress" data={addresses} onDelete={deleteAddress} />
-              <ErrorMessage
-                errors={methods.formState.errors}
-                name="votedAddress"
-                render={({ message }) => <ErrorText>{message}</ErrorText>}
-              />
-            </Field>
+      {
+        showMap && <MapBox
+          data={(data) => {
+            setListDataLocation(data)
+          }
+          }
+          show={() => {
+            setShowMap(false)
+          }} />
+      }
 
-            <ButtonGroup>
-              <Button
-                type="button"
-                variant="danger"
-                onClick={() => {
-                  prevStep()
-                }}
-              >
-                Trước đó
-              </Button>
+      {
+        showMap === true ? null : (
+          <>
+            <MessageText>Tiêu đề: {title}</MessageText>
+            <MessageText>Nội dung: {content}</MessageText>
+            <MessageText>
+              Các thành viên đang tham gia: <MemberList members={members} />
+            </MessageText>
+            <FormCard>
+              <FormProvider {...methods}>
+                <form onSubmit={methods.handleSubmit(onSubmit)}>
+                  <Field>
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={() => {
+                        setShowMap(true)
+                        // addAddress({
+                        //   label: 'Tòa nhà sông Đà (0 người vote)',
+                        //   value: 'Tòa nhà sông Đà',
+                        // })
+                      }}
+                    >
+                      Thêm địa điểm
+                    </Button>
+                  </Field>
 
-              <Button type="submit" variant="primary">
-                Tiếp theo
-              </Button>
-            </ButtonGroup>
-          </form>
-        </FormProvider>
-      </FormCard>
+                  <Field>
+                    <Label htmlFor="votedAddress">Chọn địa điểm ăn chơi:</Label>
+                    <RadioList name="votedAddress" data={addresses} onDelete={deleteAddress} />
+                    <ErrorMessage
+                      errors={methods.formState.errors}
+                      name="votedAddress"
+                      render={({ message }) => <ErrorText>{message}</ErrorText>}
+                    />
+                  </Field>
+
+                  <ButtonGroup>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      onClick={() => {
+                        prevStep()
+                      }}
+                    >
+                      Trước đó
+                    </Button>
+
+                    <Button type="submit" variant="primary">
+                      Tiếp theo
+                    </Button>
+                  </ButtonGroup>
+                </form>
+              </FormProvider>
+            </FormCard>
+          </>
+        )
+
+      }
     </>
   )
 })

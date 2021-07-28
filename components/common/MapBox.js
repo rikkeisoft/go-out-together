@@ -29,8 +29,6 @@ const MapBox = ({ show, isOneLocaion, data }) => {
     }
   }, [location])
 
-  console.log(listLocation)
-
   useEffect(() => {
     setLocation(selectedLocation.place_name)
 
@@ -70,8 +68,24 @@ const MapBox = ({ show, isOneLocaion, data }) => {
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
       <div className="w-80 mb-2 relative mx-auto w-4/5">
-        {listLocation.length > 4 ? (
-          <span className="text-red-500 absolute">Chỉ được tạo tối đa 5 địa điểm !</span>
+        {(listLocation.length) > 4 ? (
+          <div className="flex justify-between">
+            <p className="text-red-500">Chỉ được tạo tối đa 5 địa điểm !</p>
+            <Button
+                type="submit"
+                variant="primary"
+                onClick={() => {
+                  if (isOneLocaion) {
+                    data(selectedLocation.place_name)
+                  }
+                  else {
+                    data(listLocation)
+                  }
+                  show()
+                }}>
+                Xong
+              </Button>
+          </div>
         ) : (
           <form className="mb-2">
             <input
@@ -116,7 +130,7 @@ const MapBox = ({ show, isOneLocaion, data }) => {
                   }
                   show()
                 }}>
-                Hoàn Thành
+                Thêm địa điểm
               </Button>
             </div>
           </form>
