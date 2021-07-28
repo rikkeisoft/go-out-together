@@ -4,7 +4,6 @@ import mapboxgl from 'mapbox-gl'
 import Head from 'next/head'
 
 const Routes = () => {
-
   useEffect(() => {
     mapboxgl.accessToken = 'pk.eyJ1Ijoic29ubnY1IiwiYSI6ImNrcmczMTF1ZzI3b3oyb3F1NHU0cmd6N3EifQ.cnxzBouZ3K6aMsEdQhT65w'
     let map = new mapboxgl.Map({
@@ -16,7 +15,8 @@ const Routes = () => {
     let start = [-122.662323, 45.523751]
     const getRoute = async (end) => {
       const response = await axios.get(
-        `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`)
+        `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
+      )
       const data = response.data.routes[0]
       const coordinates = data.geometry.coordinates
       const geojson = {
@@ -72,14 +72,15 @@ const Routes = () => {
           type: 'geojson',
           data: {
             type: 'FeatureCollection',
-            features: [{
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Point',
-                coordinates: start,
+            features: [
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'Point',
+                  coordinates: start,
+                },
               },
-            },
             ],
           },
         },
@@ -88,21 +89,21 @@ const Routes = () => {
           'circle-color': '#3887be',
         },
       })
-
     })
 
     map.on('load', () => {
       const coords = [-122.6389770527341, 45.51533159015108]
       let end = {
         type: 'FeatureCollection',
-        features: [{
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'Point',
-            coordinates: coords,
+        features: [
+          {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: coords,
+            },
           },
-        },
         ],
       }
       if (map.getLayer('end')) {
@@ -115,14 +116,16 @@ const Routes = () => {
             type: 'geojson',
             data: {
               type: 'FeatureCollection',
-              features: [{
-                type: 'Feature',
-                properties: {},
-                geometry: {
-                  type: 'Point',
-                  coordinates: coords,
+              features: [
+                {
+                  type: 'Feature',
+                  properties: {},
+                  geometry: {
+                    type: 'Point',
+                    coordinates: coords,
+                  },
                 },
-              }],
+              ],
             },
           },
           paint: {
@@ -133,7 +136,6 @@ const Routes = () => {
       }
       getRoute(coords)
     })
-
   }, [])
 
   return (

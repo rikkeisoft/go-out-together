@@ -11,8 +11,16 @@ import Step1 from 'components/sessions/create/Step1'
 import Step2 from 'components/sessions/create/Step2'
 import Step3 from 'components/sessions/create/Step3'
 import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
+import UserAvatar from 'components/avatar/UserAvatar'
+import { auth } from 'lib/firebase'
+import { useContext } from 'react'
+import { AuthContext } from 'contexts/AuthContext'
 
 export default function Create() {
+  const {
+    authState: { user },
+    logOut,
+  } = useContext(AuthContext)
   const router = useRouter()
   const { step, formData, backwardStep, prevStep, nextStep, setFormData } = useStep()
 
@@ -31,6 +39,14 @@ export default function Create() {
       break
   }
 
+  const goToHomePage = () => router.push(urls.HOME)
+
+  const handleSignOut = () => {
+    logOut()
+    auth.signOut()
+    goToHomePage()
+  }
+
   return (
     <MainLayout>
       <Head>
@@ -38,15 +54,12 @@ export default function Create() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container>
-        <Button
-          type="button"
-          variant="danger"
-          onClick={() => {
-            router.push(urls.HOME)
-          }}
-        >
-          <ArrowLeftIcon className="w-7" /> Về trang chủ
-        </Button>
+        <div className="flex items-center justify-around">
+          <Button type="button" variant="danger" onClick={goToHomePage}>
+            <ArrowLeftIcon className="w-7" /> Về trang chủ
+          </Button>
+          <UserAvatar imgURL={user?.imgURL} username={user?.username} onSignOut={handleSignOut} />
+        </div>
         <Center>
           <TitleText>Tạo nhóm để vote địa điểm</TitleText>
         </Center>
