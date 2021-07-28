@@ -11,14 +11,12 @@ import Step1 from 'components/sessions/details/Step1'
 import Step2 from 'components/sessions/details/Step2'
 import Step3 from 'components/sessions/details/Step3'
 import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
-import GoogleLoginModal from 'components/auth/GoogleLoginModal'
-import { useContext, useState } from 'react'
+import { useContext } from 'react'
 import { auth } from 'lib/firebase'
 import UserAvatar from 'components/avatar/UserAvatar'
 import { AuthContext } from 'contexts/AuthContext'
 
 export default function Details() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const {
     authState: { user },
     logOut,
@@ -44,12 +42,6 @@ export default function Details() {
 
   const goToHomePage = () => router.push(urls.HOME)
 
-  const handleButtonClick = () => {
-    if (user?.uid !== undefined) {
-      router.push(`/sessions/${id}`)
-    } else setIsModalOpen(true)
-  }
-
   const handleSignOut = () => {
     logOut()
     auth.signOut()
@@ -74,20 +66,7 @@ export default function Details() {
             Bạn đang tham gia nhóm: <span className="text-blue-500">{id}</span>
           </TitleText>
         </Center>
-        {user?.uid !== undefined ? (
-          <div>{stepElement}</div>
-        ) : (
-          <div className="text-center">
-            <Button type="button" variant="primary" onClick={handleButtonClick}>
-              Đăng nhập
-            </Button>
-            <GoogleLoginModal
-              isOpen={isModalOpen}
-              onRequestClose={() => setIsModalOpen(false)}
-              url={`/sessions/${id}`}
-            />
-          </div>
-        )}
+        {stepElement}
       </Container>
     </MainLayout>
   )

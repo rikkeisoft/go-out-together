@@ -16,10 +16,8 @@ function GoogleLoginModal({ isOpen, onRequestClose, url }) {
 
   useEffect(() => {
     const unregisterAuthObserver = auth.onAuthStateChanged((userFirebase) => {
-      console.log(userFirebase)
       setIsSignedIn(() => !!userFirebase)
       if (!isSignedIn && user?.uid === undefined && userFirebase) {
-        console.log(1)
         logIn(userFirebase)
       }
     })
