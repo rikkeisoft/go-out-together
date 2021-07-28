@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
-import { Controller, useFormContext } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
 import TrashIcon from 'components/icons/TrashIcon'
 
 const RadioList = memo(({ name, data, onDelete }) => {

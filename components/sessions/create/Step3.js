@@ -10,7 +10,7 @@ import urls from 'consts/urls'
 import ButtonGroup from 'components/common/ButtonGroup'
 import CopyableLink from 'components/common/CopyableLink'
 
-const Step3 = memo(({ formData, setFormData, backwardStep }) => {
+const Step3 = memo(({ setFormData, backwardStep }) => {
   const router = useRouter()
   const hostname = 'https://cungdichoi.vn'
   const path = '/sessions'

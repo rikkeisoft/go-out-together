@@ -11,11 +11,7 @@ const List = memo(({ name }) => {
       control={control}
       name={name}
       defaultValue={[]}
-      render={({
-        field: { onChange, onBlur, value, name, ref },
-        fieldState: { invalid, isTouched, isDirty, error },
-        formState,
-      }) => (
+      render={({ field: { onChange, value, name } }) => (
         <table className="w-full">
           <tbody>
             {value.map((item, index) => {
