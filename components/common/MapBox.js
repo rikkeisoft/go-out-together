@@ -29,6 +29,8 @@ const MapBox = ({ show, isOneLocaion, data }) => {
     }
   }, [location])
 
+  console.log(listLocation)
+
   useEffect(() => {
     setLocation(selectedLocation.place_name)
 
@@ -106,7 +108,12 @@ const MapBox = ({ show, isOneLocaion, data }) => {
                 type="submit"
                 variant="primary"
                 onClick={() => {
-                  data(selectedLocation.place_name)
+                  if (isOneLocaion) {
+                    data(selectedLocation.place_name)
+                  }
+                  else {
+                    data(listLocation)
+                  }
                   show()
                 }}>
                 Hoàn Thành

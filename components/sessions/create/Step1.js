@@ -90,7 +90,6 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
                       variant="primary"
                       onClick={() => {
                         setShowMap(true)
-                        // methods.setValue('address', 'Hà Nội')
                       }}
                     >
                       Chọn địa điểm trên bản đồ

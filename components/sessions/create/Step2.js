@@ -26,6 +26,7 @@ const schema = yup.object().shape({
 
 const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
   const [showMap, setShowMap] = useState(false)
+  const [listDataLocation, setListDataLocation] = useState(null)
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: formData,
@@ -36,14 +37,28 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
     nextStep()
   }
 
-  const addAddress = (address) => {
-    let addresses = methods.watch('addresses')
-    if (!Array.isArray(addresses)) {
-      addresses = []
+  let addresses = methods.watch('addresses')
+  if (listDataLocation) {
+    const isSetAddress = (listData) => {
+      listData.forEach((item) => {
+        addresses.push(item.place_name)
+      })
     }
-    addresses.push(address)
-    methods.setValue('addresses', addresses, { shouldValidate: true })
+    isSetAddress(listDataLocation)
+    console.log(addresses)
+    // methods.setValue('addresses', addresses, { shouldValidate: true })
   }
+
+  // if (listDataLocation) {
+  //   const addAddress = (address) => {
+  //     let addresses = methods.watch('addresses')
+  //     if (!Array.isArray(addresses)) {
+  //       addresses = []
+  //     }
+  //     addresses.push(address)
+  //     methods.setValue('addresses', addresses, { shouldValidate: true })
+  //   }
+  // }
 
   return (
     <>
@@ -54,6 +69,10 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
 
       {
         showMap && <MapBox
+          data={(data) => {
+            setListDataLocation(data)
+            }
+          }
           show={() => {
             setShowMap(false)
           }} />
@@ -118,7 +137,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
                       type="button"
                       variant="primary"
                       onClick={() => {
-                        addAddress('Cầu giấy')
+                        // addAddress('Cầu giấy')
                         setShowMap(true)
                       }}
                     >
