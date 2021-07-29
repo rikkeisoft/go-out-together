@@ -44,8 +44,7 @@ export default async function handler(req, res) {
     if (_.isNil(result)) {
       res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không thêm được thông tin người dùng' })
     }
-  }
-  else {
+  } else {
     // user already in db -> check update info
     let user = result[0]
 
@@ -56,8 +55,7 @@ export default async function handler(req, res) {
       if (_.isNil(result)) {
         res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không cập nhật được người dùng' })
       }
-    }
-    else {
+    } else {
       // update user is online now
       queryString = `UPDATE users SET is_online = ? WHERE uuid = ?`
       values = [isOnline, uuid]

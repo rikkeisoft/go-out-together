@@ -34,12 +34,10 @@ export default async function handler(req, res) {
   if (result.length === 0) {
     // user not in table
     res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Thông tin người dùng không có trong bảng' })
-  }
-  else if (result[0].is_online === 0) {
+  } else if (result[0].is_online === 0) {
     // user is offline
     res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Người dùng đang offline' })
-  }
-  else {
+  } else {
     // user is online
     res.status(200).json({
       messageCode: messageCodes.SUCCESS,

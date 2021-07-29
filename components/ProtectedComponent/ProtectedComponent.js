@@ -9,10 +9,7 @@ import { useQuery } from 'react-query'
 export default function ProtectedComponent({ children }) {
   const [cookies] = useCookies(['uid', 'username', 'imgURL'])
   const param = { uuid: cookies?.uid }
-  const {
-    isError,
-    isLoading,
-  } = useQuery([queriesKey.CHECK_USER, param], () => userAPI.checkUser(param), {
+  const { isError, isLoading } = useQuery([queriesKey.CHECK_USER, param], () => userAPI.checkUser(param), {
     retry: 2,
   })
   const router = useRouter()

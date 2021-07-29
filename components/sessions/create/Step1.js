@@ -56,63 +56,62 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
         <title>Bước 1</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {
-        showMap && <MapBox isOneLocaion={true}
+      {showMap && (
+        <MapBox
+          isOneLocaion={true}
           data={(data) => {
             setUserLocation(data)
           }}
           show={() => {
             setShowMap(false)
-          }} />
-      }
-      {
-        showMap === true ? null :
-          <FormCard>
-            <FormProvider {...methods}>
-              {
-                userLocation && methods.setValue('address', userLocation.place_name)
-              }
-              <form onSubmit={methods.handleSubmit(onSubmit)}>
-                <Field>
-                  <Label htmlFor="name">Tên:</Label>
-                  <TextField id="name" name="name" />
-                  <ErrorMessage
-                    errors={methods.formState.errors}
-                    name="name"
-                    render={({ message }) => <ErrorText>{message}</ErrorText>}
-                  />
-                </Field>
+          }}
+        />
+      )}
+      {showMap === true ? null : (
+        <FormCard>
+          <FormProvider {...methods}>
+            {userLocation && methods.setValue('address', userLocation.place_name)}
+            <form onSubmit={methods.handleSubmit(onSubmit)}>
+              <Field>
+                <Label htmlFor="name">Tên:</Label>
+                <TextField id="name" name="name" />
+                <ErrorMessage
+                  errors={methods.formState.errors}
+                  name="name"
+                  render={({ message }) => <ErrorText>{message}</ErrorText>}
+                />
+              </Field>
 
-                <Field>
-                  <Label htmlFor="address">Địa điểm hiện tại của bạn:</Label>
-                  <div className="py-2">
-                    <Button
-                      type="button"
-                      variant="primary"
-                      onClick={() => {
-                        setShowMap(true)
-                      }}
-                    >
-                      Chọn địa điểm trên bản đồ
-                    </Button>
-                  </div>
-                  <TextField id="address" name="address" readOnly={true} />
-                  <ErrorMessage
-                    errors={methods.formState.errors}
-                    name="address"
-                    render={({ message }) => <ErrorText>{message}</ErrorText>}
-                  />
-                </Field>
-
-                <ButtonGroup>
-                  <Button type="submit" variant="primary" onClick={() => { }}>
-                    Tiếp theo
+              <Field>
+                <Label htmlFor="address">Địa điểm hiện tại của bạn:</Label>
+                <div className="py-2">
+                  <Button
+                    type="button"
+                    variant="primary"
+                    onClick={() => {
+                      setShowMap(true)
+                    }}
+                  >
+                    Chọn địa điểm trên bản đồ
                   </Button>
-                </ButtonGroup>
-              </form>
-            </FormProvider>
-          </FormCard>
-      }
+                </div>
+                <TextField id="address" name="address" readOnly={true} />
+                <ErrorMessage
+                  errors={methods.formState.errors}
+                  name="address"
+                  render={({ message }) => <ErrorText>{message}</ErrorText>}
+                />
+              </Field>
+
+              <ButtonGroup>
+                <Button type="submit" variant="primary" onClick={() => {}}>
+                  Tiếp theo
+                </Button>
+              </ButtonGroup>
+            </form>
+          </FormProvider>
+        </FormCard>
+      )}
     </>
   )
 })

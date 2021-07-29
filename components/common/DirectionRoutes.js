@@ -51,7 +51,8 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
       let start = [expCurrentLocation.coordinates[0], expCurrentLocation.coordinates[1]]
       const getRoute = async (end) => {
         const response = await axios.get(
-          `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`)
+          `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
+        )
         const data = response.data.routes[0]
         const coordinates = data.geometry.coordinates
         const geojson = {
@@ -104,14 +105,15 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             type: 'geojson',
             data: {
               type: 'FeatureCollection',
-              features: [{
-                type: 'Feature',
-                properties: {},
-                geometry: {
-                  type: 'Point',
-                  coordinates: start,
+              features: [
+                {
+                  type: 'Feature',
+                  properties: {},
+                  geometry: {
+                    type: 'Point',
+                    coordinates: start,
+                  },
                 },
-              },
               ],
             },
           },
@@ -125,14 +127,15 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
         const coords = [expDestination.coordinates[0], expDestination.coordinates[1]]
         let end = {
           type: 'FeatureCollection',
-          features: [{
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'Point',
-              coordinates: coords,
+          features: [
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Point',
+                coordinates: coords,
+              },
             },
-          },
           ],
         }
         if (map.getLayer('end')) {
@@ -145,14 +148,16 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
               type: 'geojson',
               data: {
                 type: 'FeatureCollection',
-                features: [{
-                  type: 'Feature',
-                  properties: {},
-                  geometry: {
-                    type: 'Point',
-                    coordinates: coords,
+                features: [
+                  {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                      type: 'Point',
+                      coordinates: coords,
+                    },
                   },
-                }],
+                ],
               },
             },
             paint: {
@@ -176,9 +181,13 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
       </Head>
       <div className="w-9/12 mx-auto relative">
         <div className="absolute right-0">
-          <Button type="submit" variant="primary" onClick={() => {
-            showMap()
-          }}>
+          <Button
+            type="submit"
+            variant="primary"
+            onClick={() => {
+              showMap()
+            }}
+          >
             Xong
           </Button>
         </div>
@@ -215,13 +224,18 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
         </p>
         <p>
           <svg
-            xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline mr-2"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 inline mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
-              d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+              d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
+            />
           </svg>
           Chiều dài quãng đường: {(distance / 1000).toFixed(2)} KM
         </p>

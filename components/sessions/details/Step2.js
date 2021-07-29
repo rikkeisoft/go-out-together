@@ -100,94 +100,96 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {
-        showMap && <MapBox
+      {showMap && (
+        <MapBox
           data={(data) => {
             setListDataLocation(data)
-          }
-          }
+          }}
           show={() => {
             setShowMap(false)
-          }} />
-      }
+          }}
+        />
+      )}
 
-      {
-        showDirectionRoutes && <DirectionRoutes
+      {showDirectionRoutes && (
+        <DirectionRoutes
           currentLocation={formData}
           listUserLocation={expListUserLocation}
           destination={voteAddress}
           showMap={() => {
             setShowDirectionRoutes(false)
-          }} />
-      }
+          }}
+        />
+      )}
 
-      {
-        (showMap || showDirectionRoutes) === true ? null : (
-          <>
-            <MessageText>Tiêu đề: {title}</MessageText>
-            <MessageText>Nội dung: {content}</MessageText>
-            <MessageText>
-              Các thành viên đang tham gia: <MemberList members={members} />
-            </MessageText>
-            <FormCard>
-              <FormProvider {...methods}>
-                <form onSubmit={methods.handleSubmit(onSubmit)}>
-                  <Field>
-                    {
-                      addresses.length >= 5 ? <p className="text-red-500">Chỉ giới hạn tối đa 5 địa điểm!</p> :
-                        <Button
-                          type="button"
-                          variant="primary"
-                          onClick={() => {
-                            setShowMap(true)
-                            // addAddress({
-                            //   label: 'Tòa nhà sông Đà (0 người vote)',
-                            //   value: 'Tòa nhà sông Đà',
-                            // })
-                          }}
-                        >
-                          Thêm địa điểm
-                        </Button>
-                    }
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="votedAddress">Chọn địa điểm ăn chơi:</Label>
-                    <RadioList name="votedAddress"
-                      data={addresses}
-                      onClick={(item) => {
-                        setVoteAddress(item)
-                        setShowDirectionRoutes(true)
-                      }}
-                      onDelete={deleteAddress} />
-                    <ErrorMessage
-                      errors={methods.formState.errors}
-                      name="votedAddress"
-                      render={({ message }) => <ErrorText>{message}</ErrorText>}
-                    />
-                  </Field>
-
-                  <ButtonGroup>
+      {(showMap || showDirectionRoutes) === true ? null : (
+        <>
+          <MessageText>Tiêu đề: {title}</MessageText>
+          <MessageText>Nội dung: {content}</MessageText>
+          <MessageText>
+            Các thành viên đang tham gia: <MemberList members={members} />
+          </MessageText>
+          <FormCard>
+            <FormProvider {...methods}>
+              <form onSubmit={methods.handleSubmit(onSubmit)}>
+                <Field>
+                  {addresses.length >= 5 ? (
+                    <p className="text-red-500">Chỉ giới hạn tối đa 5 địa điểm!</p>
+                  ) : (
                     <Button
                       type="button"
-                      variant="danger"
+                      variant="primary"
                       onClick={() => {
-                        prevStep()
+                        setShowMap(true)
+                        // addAddress({
+                        //   label: 'Tòa nhà sông Đà (0 người vote)',
+                        //   value: 'Tòa nhà sông Đà',
+                        // })
                       }}
                     >
-                      Trước đó
+                      Thêm địa điểm
                     </Button>
+                  )}
+                </Field>
 
-                    <Button type="submit" variant="primary">
-                      Tiếp theo
-                    </Button>
-                  </ButtonGroup>
-                </form>
-              </FormProvider>
-            </FormCard>
-          </>
-        )
-      }
+                <Field>
+                  <Label htmlFor="votedAddress">Chọn địa điểm ăn chơi:</Label>
+                  <RadioList
+                    name="votedAddress"
+                    data={addresses}
+                    onClick={(item) => {
+                      setVoteAddress(item)
+                      setShowDirectionRoutes(true)
+                    }}
+                    onDelete={deleteAddress}
+                  />
+                  <ErrorMessage
+                    errors={methods.formState.errors}
+                    name="votedAddress"
+                    render={({ message }) => <ErrorText>{message}</ErrorText>}
+                  />
+                </Field>
+
+                <ButtonGroup>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    onClick={() => {
+                      prevStep()
+                    }}
+                  >
+                    Trước đó
+                  </Button>
+
+                  <Button type="submit" variant="primary">
+                    Tiếp theo
+                  </Button>
+                </ButtonGroup>
+              </form>
+            </FormProvider>
+          </FormCard>
+        </>
+      )}
     </>
   )
 })

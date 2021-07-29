@@ -68,23 +68,23 @@ const MapBox = ({ show, isOneLocaion, data }) => {
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
       <div className="w-80 mb-2 relative mx-auto w-4/5">
-        {(listLocation.length) > 4 ? (
+        {listLocation.length > 4 ? (
           <div className="flex justify-between">
             <p className="text-red-500">Chỉ được tạo tối đa 5 địa điểm !</p>
             <Button
-                type="submit"
-                variant="primary"
-                onClick={() => {
-                  if (isOneLocaion) {
-                    data(selectedLocation)
-                  }
-                  else {
-                    data(listLocation)
-                  }
-                  show()
-                }}>
-                Xong
-              </Button>
+              type="submit"
+              variant="primary"
+              onClick={() => {
+                if (isOneLocaion) {
+                  data(selectedLocation)
+                } else {
+                  data(listLocation)
+                }
+                show()
+              }}
+            >
+              Xong
+            </Button>
           </div>
         ) : (
           <form className="mb-2">
@@ -124,13 +124,13 @@ const MapBox = ({ show, isOneLocaion, data }) => {
                 onClick={() => {
                   if (isOneLocaion) {
                     data(selectedLocation)
-                  }
-                  else {
+                  } else {
                     console.log(listLocation)
                     data(listLocation)
                   }
                   show()
-                }}>
+                }}
+              >
                 Thêm địa điểm
               </Button>
             </div>
@@ -149,8 +149,7 @@ const MapBox = ({ show, isOneLocaion, data }) => {
                     setSelectedLocation(item)
                     if (isOneLocaion) {
                       setListLocation([item])
-                    }
-                    else {
+                    } else {
                       setListLocation([...listLocation, item])
                     }
                     setShowListLocation(false)
@@ -174,7 +173,6 @@ const MapBox = ({ show, isOneLocaion, data }) => {
             })}
         </ul>
         <div id="map" className="absolute" style={{ width: '100%', height: '70vh' }}></div>
-
       </div>
     </>
   )

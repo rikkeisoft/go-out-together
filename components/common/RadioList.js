@@ -16,13 +16,18 @@ const RadioList = memo(({ name, data, onDelete, onClick }) => {
       <tbody>
         {data.map((item, index) => {
           return (
-            <tr key={`list-item-` + index} className="hover:bg-gray-100" >
+            <tr key={`list-item-` + index} className="hover:bg-gray-100">
               <td className="p-2 cursor-pointer">
                 <label className="cursor-pointer">
-                  <input type="radio" {...register(name)} value={item.value} className="mr-4"
+                  <input
+                    type="radio"
+                    {...register(name)}
+                    value={item.value}
+                    className="mr-4"
                     onClick={() => {
                       onClick(item)
-                    }} />
+                    }}
+                  />
                   {item.label}
                 </label>
               </td>

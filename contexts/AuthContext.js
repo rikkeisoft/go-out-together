@@ -41,7 +41,7 @@ const AuthContextProvider = ({ children }) => {
           setCookie('username', response.data.username, { path: '/' })
           setCookie('imgURL', response.data.avatar_URL, { path: '/' })
         }
-      } catch(err) {
+      } catch (err) {
         removeCookie('uid', { path: '/' })
         setAuthState({
           ...authState,
