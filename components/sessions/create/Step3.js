@@ -10,13 +10,8 @@ import urls from 'consts/urls'
 import ButtonGroup from 'components/common/ButtonGroup'
 import CopyableLink from 'components/common/CopyableLink'
 
-const Step3 = memo(({ setFormData, backwardStep }) => {
+const Step3 = memo(({ shareLink, setFormData, backwardStep }) => {
   const router = useRouter()
-  const hostname = 'https://cungdichoi.vn'
-  const path = '/sessions'
-  const id = 1
-  const relativeUrl = `${path}/${encodeURIComponent(id)}`
-  const absoluteUrl = hostname + relativeUrl
 
   return (
     <>
@@ -27,12 +22,12 @@ const Step3 = memo(({ setFormData, backwardStep }) => {
       <Center>
         <MessageText>Chia sẻ link với bạn bè để họ tham gia vote</MessageText>
         <CopyableLink
-          text={absoluteUrl}
+          text={shareLink}
           onClick={() => {
-            router.push(relativeUrl)
+            router.push(shareLink)
           }}
         >
-          {absoluteUrl}
+          {shareLink}
         </CopyableLink>
       </Center>
       <FormCard>
@@ -63,7 +58,7 @@ const Step3 = memo(({ setFormData, backwardStep }) => {
 })
 
 Step3.propTypes = {
-  formData: PropTypes.object,
+  shareLink: PropTypes.string,
   setFormData: PropTypes.func,
   backwardStep: PropTypes.func,
 }
