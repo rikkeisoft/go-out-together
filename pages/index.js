@@ -20,7 +20,7 @@ export default function Home() {
 
   useEffect(() => {
     const url = localStorage.getItem('redirectURL')
-    if (url) {
+    if (url !== null) {
       setRedirectURL(url)
     }
   }, [])
@@ -47,7 +47,7 @@ export default function Home() {
             <Button type="button" variant="primary" onClick={handleButtonClick}>
               Thử ngay
             </Button>
-            <GoogleLoginModal isOpen={isModalOpen} onRequestClose={() => setIsModalOpen(false)} url={redirectURL} />
+            <GoogleLoginModal isOpen={isModalOpen} onRequestClose={() => setIsModalOpen(false)} />
           </Center>
         </Container>
       </BackgroundImage>

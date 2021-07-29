@@ -9,22 +9,17 @@ import { useQuery } from 'react-query'
 export default function ProtectedComponent({ children }) {
   const [cookies] = useCookies(['uid', 'username', 'imgURL'])
   const param = { uuid: cookies?.uid }
-  const { isError, isLoading } = useQuery([queriesKey.CHECK_USER, param], () => userAPI.checkUser(param), {
-    retry: 2,
-  })
+  const { isError, isLoading } = useQuery([queriesKey.CHECK_USER, param], () => userAPI.checkUser(param))
   const router = useRouter()
 
-  if (router.query.id !== undefined && router.pathname === '/sessions/[id]') {
-    localStorage.setItem('redirectURL', `/sessions/${router.query.id}`)
-  }
-  console.log(router.pathname)
-  console.log(router.query)
-
   useEffect(() => {
-    if (router.query.id === undefined) {
+    if (!router.isReady) return
+    if (router.query.id === undefined && router.pathname === '/sessions/create') {
       localStorage.setItem('redirectURL', `/sessions/create`)
+    } else if (router.query.id !== undefined && router.pathname === '/sessions/[id]') {
+      localStorage.setItem('redirectURL', `/sessions/${router.query.id}`)
     }
-  }, [])
+  }, [router.isReady])
 
   if (isLoading) {
     return <div className="text-center">Loading....</div>
