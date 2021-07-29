@@ -24,8 +24,8 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   const [cookies, setCookie] = useCookies(['cookie-name'])
 
   let obj = {}
-  if (!_.isNil(cookies?.name)) {
-    obj.name = cookies.name
+  if (!_.isNil(cookies?.username)) {
+    obj.name = cookies.username
   }
 
   if (!_.isNil(cookies?.address)) {
