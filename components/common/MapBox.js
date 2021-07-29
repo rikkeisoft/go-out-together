@@ -76,7 +76,7 @@ const MapBox = ({ show, isOneLocaion, data }) => {
                 variant="primary"
                 onClick={() => {
                   if (isOneLocaion) {
-                    data(selectedLocation.place_name)
+                    data(selectedLocation)
                   }
                   else {
                     data(listLocation)
@@ -123,9 +123,10 @@ const MapBox = ({ show, isOneLocaion, data }) => {
                 variant="primary"
                 onClick={() => {
                   if (isOneLocaion) {
-                    data(selectedLocation.place_name)
+                    data(selectedLocation)
                   }
                   else {
+                    console.log(listLocation)
                     data(listLocation)
                   }
                   show()
@@ -172,7 +173,7 @@ const MapBox = ({ show, isOneLocaion, data }) => {
               )
             })}
         </ul>
-        <div id="map" className="absolute" style={{ width: '100%', height: '60vh' }}></div>
+        <div id="map" className="absolute" style={{ width: '100%', height: '70vh' }}></div>
 
       </div>
     </>

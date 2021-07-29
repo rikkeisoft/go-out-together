@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react'
+import { memo, useState } from 'react'
 import Head from 'next/head'
 import PropTypes from 'prop-types'
 import { useForm, FormProvider } from 'react-hook-form'
@@ -15,7 +15,7 @@ import Button from 'components/common/Button'
 import MessageText from 'components/common/MessageText'
 import MemberList from 'components/common/MemberList'
 import MapBox from 'components/common/MapBox'
-// import DirectionRoutes from 'components/common/DirectionRoutes'
+import DirectionRoutes from 'components/common/DirectionRoutes'
 
 const schema = yup.object().shape({
   votedAddress: yup.mixed().required('Chọn địa điểm'),
@@ -23,7 +23,8 @@ const schema = yup.object().shape({
 
 const Step2 = memo(({ formData, prevStep, nextStep }) => {
   const [showMap, setShowMap] = useState(false)
-  // const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
+  const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
+  const [voteAddress, setVoteAddress] = useState(null)
   const [listDataLocation, setListDataLocation] = useState(null)
 
   const methods = useForm({
@@ -33,34 +34,54 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
 
   const [addresses, setAddresses] = useState([
     {
-      label: 'Địa điểm 1 (2 người vote)',
+      label: 'Địa điểm 1 (0 người vote)',
       value: 'Địa điểm 1',
       amountVote: 0,
     },
     {
-      label: 'Địa điểm 2 (34 người vote)',
+      label: 'Địa điểm 2 (44 người vote)',
       value: 'Địa điểm 2',
+      amountVote: 4,
     },
     {
-      label: 'Địa điểm 3 (34 người vote)',
+      label: 'Địa điểm 3 (2 người vote)',
       value: 'Địa điểm 3',
+      amountVote: 2,
+    },
+    {
+      label: 'Địa điểm 2 (44 người vote)',
+      value: 'Địa điểm 2',
+      amountVote: 4,
     },
   ])
-  
+
+  const expListUserLocation = [
+    {
+      label: 'Khách sạn Cầu Giấy (0 người vote)',
+      value: 'Khách sạn Cầu Giấy',
+      amountVote: 0,
+      coordinates: [105.8, 21.0333],
+    },
+    {
+      label: 'Đại học Quốc Gia (2 người vote)',
+      value: 'Đại học Quốc Gia',
+      amountVote: 2,
+      coordinates: [105.782214, 21.037867],
+    },
+    {
+      label: 'Bên xe Mỹ Đình (4 người vote)',
+      value: 'Bên xe Mỹ Đình',
+      amountVote: 4,
+      coordinates: [105.777909, 21.028412],
+    },
+  ]
+
+  console.log(listDataLocation)
+  // console.log(voteAddress)
+
   const title = 'Đi ăn lẩu'
   const content = 'Đi ăn lẩu ngày nghỉ'
   const members = ['Nguyễn Tiến Báo', 'Bùi Thị Nhàn', 'Nguyễn Văn Trung', 'Đặng Tiến Hùng']
-
-  console.log(formData)
-
-  useEffect(() => {
-
-    // const addAddress = (address) => {
-    //   const newAddresses = addresses.slice()
-    //   newAddresses.push(address)
-    //   setAddresses(newAddresses)
-    // }
-  }, [listDataLocation])
 
   const deleteAddress = (index) => {
     const newAddresses = addresses.slice()
@@ -71,15 +92,6 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
   const onSubmit = () => {
     nextStep()
   }
-
-  // const handleShowDirectionRoutes = () => {
-  //   setShowMap(true)
-  //   if (showDirectionRoutes) {
-  //     return (
-  //       <DirectionRoutes />
-  //     )
-  //   }
-  // }
 
   return (
     <>
@@ -100,7 +112,17 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
       }
 
       {
-        showMap === true ? null : (
+        showDirectionRoutes && <DirectionRoutes
+          currentLocation={formData}
+          listUserLocation={expListUserLocation}
+          destination={voteAddress}
+          showMap={() => {
+            setShowDirectionRoutes(false)
+          }} />
+      }
+
+      {
+        (showMap || showDirectionRoutes) === true ? null : (
           <>
             <MessageText>Tiêu đề: {title}</MessageText>
             <MessageText>Nội dung: {content}</MessageText>
@@ -111,24 +133,33 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
               <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(onSubmit)}>
                   <Field>
-                    <Button
-                      type="button"
-                      variant="primary"
-                      onClick={() => {
-                        setShowMap(true)
-                        // addAddress({
-                        //   label: 'Tòa nhà sông Đà (0 người vote)',
-                        //   value: 'Tòa nhà sông Đà',
-                        // })
-                      }}
-                    >
-                      Thêm địa điểm
-                    </Button>
+                    {
+                      addresses.length >= 5 ? <p className="text-red-500">Chỉ giới hạn tối đa 5 địa điểm!</p> :
+                        <Button
+                          type="button"
+                          variant="primary"
+                          onClick={() => {
+                            setShowMap(true)
+                            // addAddress({
+                            //   label: 'Tòa nhà sông Đà (0 người vote)',
+                            //   value: 'Tòa nhà sông Đà',
+                            // })
+                          }}
+                        >
+                          Thêm địa điểm
+                        </Button>
+                    }
                   </Field>
 
                   <Field>
                     <Label htmlFor="votedAddress">Chọn địa điểm ăn chơi:</Label>
-                    <RadioList name="votedAddress" data={addresses} onDelete={deleteAddress} />
+                    <RadioList name="votedAddress"
+                      data={addresses}
+                      onClick={(item) => {
+                        setVoteAddress(item)
+                        setShowDirectionRoutes(true)
+                      }}
+                      onDelete={deleteAddress} />
                     <ErrorMessage
                       errors={methods.formState.errors}
                       name="votedAddress"
@@ -156,7 +187,6 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
             </FormCard>
           </>
         )
-
       }
     </>
   )

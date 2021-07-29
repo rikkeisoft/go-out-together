@@ -70,7 +70,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
           <FormCard>
             <FormProvider {...methods}>
               {
-                userLocation && methods.setValue('address', userLocation)
+                userLocation && methods.setValue('address', userLocation.place_name)
               }
               <form onSubmit={methods.handleSubmit(onSubmit)}>
                 <Field>

@@ -22,6 +22,8 @@ const schema = yup.object().shape({
 })
 
 const Step1 = memo(({ formData, setFormData, nextStep }) => {
+  const [showMap, setShowMap] = useState(false)
+  const [userLocation, setUserLocation] = useState(null)
   const [cookies, setCookie] = useCookies(['cookie-name'])
 
   let obj = {}
@@ -34,8 +36,6 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   }
 
   const defaultValues = Object.assign({}, formData, obj)
-  const [showMap, setShowMap] = useState(false)
-  const [userLocation, setUserLocation] = useState(null)
 
   const methods = useForm({
     resolver: yupResolver(schema),
@@ -49,8 +49,10 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
     nextStep()
   }
 
-  // console.log(formData)
-  // Đã có data của
+  // if (userLocation) {
+  // console.log(userLocation)
+  // }
+  // Đã có data của user
 
   return (
     <>
@@ -59,7 +61,8 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {
-        showMap && <MapBox isOneLocaion={true}
+        showMap && <MapBox
+          isOneLocaion={true}
           data={(data) => {
             setUserLocation(data)
           }}
@@ -72,7 +75,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
           <FormCard>
             <FormProvider {...methods}>
               {
-                userLocation && methods.setValue('address', userLocation)
+                userLocation && methods.setValue('address', userLocation.place_name)
               }
               <form onSubmit={methods.handleSubmit(onSubmit)}>
                 <Field>
