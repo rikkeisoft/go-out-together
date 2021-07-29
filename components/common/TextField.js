@@ -4,7 +4,6 @@ import { useFormContext } from 'react-hook-form'
 
 const TextField = memo(({ type, id, readOnly, name, placeholder }) => {
   const { register } = useFormContext()
-
   return (
     <input
       type={type}

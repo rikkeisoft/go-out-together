@@ -2,7 +2,7 @@ import React, { memo } from 'react'
 import PropTypes from 'prop-types'
 
 const Center = memo(({ children }) => {
-  return <div className="mt-10 text-center">{children}</div>
+  return <div className=" text-center">{children}</div>
 })
 
 Center.propTypes = {
