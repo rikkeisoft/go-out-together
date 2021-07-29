@@ -1,0 +1,26 @@
+POST http://localhost:3000/api/users/login
+content-type: application/json
+
+{
+  "uuid": "xKxwk2hSjCTbmjkvV6whsgstRvF2",
+  "username": "Lợi Lê Đức",
+  "avatar_url": "https://lh3.googleusercontent.com/a-/AOh14GgCRNQuiT23fGBLuUYEcNSonxmFsLE91BVAcUn9=s96-c"
+}
+
+###
+
+POST http://localhost:3000/api/users/logout
+content-type: application/json
+
+{
+  "uuid": "xKxwk2hSjCTbmjkvV6whsgstRvF2"
+}
+
+###
+
+POST http://localhost:3000/api/users/check
+content-type: application/json
+
+{
+  "uuid": "xKxwk2hSjCTbmjkvV6whsgstRvF2"
+}

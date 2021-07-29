@@ -4,21 +4,28 @@ import { useEffect } from 'react'
 import { auth } from 'lib/firebase'
 import { useState } from 'react'
 import GoogleLogin from 'components/common/GoogleLogin'
-import { useContext } from 'react'
-import { AuthContext } from 'contexts/AuthContext'
+import { useMutation } from 'react-query'
+import userAPI from 'api/userAPI'
+import { useCookies } from 'react-cookie'
 
 function GoogleLoginModal({ isOpen, onRequestClose, url }) {
   const [isSignedIn, setIsSignedIn] = useState(false)
-  const {
-    authState: { user },
-    logIn,
-  } = useContext(AuthContext)
+  const [, setCookie] = useCookies(['uid', 'username', 'imgURL'])
+  const { mutate } = useMutation((userInfo) => userAPI.login(userInfo))
 
   useEffect(() => {
     const unregisterAuthObserver = auth.onAuthStateChanged((userFirebase) => {
       setIsSignedIn(() => !!userFirebase)
-      if (!isSignedIn && user?.uid === undefined && userFirebase) {
-        logIn(userFirebase)
+      if (!isSignedIn && userFirebase) {
+        const { uid, displayName, photoURL } = userFirebase
+        mutate({
+          uuid: uid,
+          username: displayName,
+          avatar_url: photoURL,
+        })
+        setCookie('uid', uid, { path: '/' })
+        setCookie('username', displayName, { path: '/' })
+        setCookie('imgURL', photoURL, { path: '/' })
       }
     })
     return () => unregisterAuthObserver()

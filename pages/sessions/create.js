@@ -13,14 +13,13 @@ import Step3 from 'components/sessions/create/Step3'
 import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
 import UserAvatar from 'components/avatar/UserAvatar'
 import { auth } from 'lib/firebase'
-import { useContext } from 'react'
-import { AuthContext } from 'contexts/AuthContext'
+import { useCookies } from 'react-cookie'
+import { useMutation } from 'react-query'
+import userAPI from 'api/userAPI'
 
 export default function Create() {
-  const {
-    authState: { user },
-    logOut,
-  } = useContext(AuthContext)
+  const [cookies, , removeCookie] = useCookies(['uid', 'username', 'imgURL'])
+  const { mutateAsync } = useMutation((param) => userAPI.logout(param))
   const router = useRouter()
   const { step, formData, backwardStep, prevStep, nextStep, setFormData } = useStep()
 
@@ -41,8 +40,12 @@ export default function Create() {
 
   const goToHomePage = () => router.push(urls.HOME)
 
-  const handleSignOut = () => {
-    logOut()
+  const handleSignOut = async () => {
+    await mutateAsync({ uuid: cookies.uid })
+    localStorage.removeItem('redirectURL')
+    removeCookie('uid', { path: '/' })
+    removeCookie('username', { path: '/' })
+    removeCookie('imgURL', { path: '/' })
     auth.signOut()
     goToHomePage()
   }
@@ -58,7 +61,7 @@ export default function Create() {
           <Button type="button" variant="danger" onClick={goToHomePage}>
             <ArrowLeftIcon className="w-7" /> Về trang chủ
           </Button>
-          <UserAvatar imgURL={user?.imgURL} username={user?.username} onSignOut={handleSignOut} />
+          <UserAvatar imgURL={cookies?.imgURL} username={cookies?.username} onSignOut={handleSignOut} />
         </div>
         <Center>
           <TitleText>Tạo nhóm để vote địa điểm</TitleText>

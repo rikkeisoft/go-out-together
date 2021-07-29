@@ -1,32 +1,41 @@
-import urls from 'consts/urls'
-import { AuthContext } from 'contexts/AuthContext'
+import userAPI from 'api/userAPI'
+import queriesKey from 'consts/queriesKey'
 import { useRouter } from 'next/router'
 import Home from 'pages'
-import { useContext, useEffect } from 'react'
+import { useEffect } from 'react'
+import { useCookies } from 'react-cookie'
+import { useQuery } from 'react-query'
 
 export default function ProtectedComponent({ children }) {
+  const [cookies] = useCookies(['uid', 'username', 'imgURL'])
+  const param = { uuid: cookies?.uid }
   const {
-    authState: { authLoading, isAuthenticated },
-  } = useContext(AuthContext)
+    isError,
+    isLoading,
+  } = useQuery([queriesKey.CHECK_USER, param], () => userAPI.checkUser(param), {
+    retry: 2,
+  })
   const router = useRouter()
 
-  if (router.query.id !== undefined) {
+  if (router.query.id !== undefined && router.pathname === '/sessions/[id]') {
     localStorage.setItem('redirectURL', `/sessions/${router.query.id}`)
   }
+  console.log(router.pathname)
+  console.log(router.query)
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push(urls.HOME)
+    if (router.query.id === undefined) {
+      localStorage.setItem('redirectURL', `/sessions/create`)
     }
-  }, [isAuthenticated, authLoading])
+  }, [])
 
-  if (authLoading) {
+  if (isLoading) {
     return <div className="text-center">Loading....</div>
   }
 
-  if (isAuthenticated) {
-    return <>{children}</>
+  if (isError) {
+    return <Home />
   }
 
-  return <Home />
+  return <>{children}</>
 }

@@ -1,14 +1,22 @@
 import ProtectedComponent from 'components/ProtectedComponent/ProtectedComponent'
-import AuthContextProvider from 'contexts/AuthContext'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import 'tailwindcss/tailwind.css'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 function MyApp({ Component, pageProps }) {
   return (
-    <AuthContextProvider>
+    <QueryClientProvider client={queryClient}>
       <ProtectedComponent>
         <Component {...pageProps} />
       </ProtectedComponent>
-    </AuthContextProvider>
+    </QueryClientProvider>
   )
 }
 
