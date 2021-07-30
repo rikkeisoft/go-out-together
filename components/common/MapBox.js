@@ -12,6 +12,8 @@ const MapBox = ({ show, isOneLocaion, data }) => {
   const [listLocation, setListLocation] = useState([])
   const [showListLocation, setShowListLocation] = useState(true)
 
+  console.log(listLocation)
+  
   useEffect(() => {
     if (location) {
       const getLocation = async () => {
@@ -77,12 +79,12 @@ const MapBox = ({ show, isOneLocaion, data }) => {
               onClick={() => {
                 if (isOneLocaion) {
                   data(selectedLocation)
-                } else {
+                }
+                else {
                   data(listLocation)
                 }
                 show()
-              }}
-            >
+              }}>
               Xong
             </Button>
           </div>
@@ -149,8 +151,16 @@ const MapBox = ({ show, isOneLocaion, data }) => {
                     setSelectedLocation(item)
                     if (isOneLocaion) {
                       setListLocation([item])
-                    } else {
-                      setListLocation([...listLocation, item])
+                    }
+                    else {
+                      if (listLocation.length === 0) {
+                        setListLocation([...listLocation, item])
+                      }
+                      else {
+                        listLocation.forEach((location) => {
+                          location.id === item.id ? null : setListLocation([...listLocation, item])
+                        })
+                      }
                     }
                     setShowListLocation(false)
                   }}
@@ -182,6 +192,7 @@ MapBox.propTypes = {
   show: PropTypes.func,
   isOneLocaion: PropTypes.bool,
   data: PropTypes.func,
+  listLocation: PropTypes.array,
 }
 
 MapBox.defaultProps = {}
