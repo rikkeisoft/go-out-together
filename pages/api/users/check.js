@@ -28,17 +28,17 @@ export default async function handler(req, res) {
 
   let queryString = 'SELECT username, avatar_url, is_online FROM users WHERE uuid = ?'
   let values = [req.body.uuid]
-  let result = await db.get(queryString, values)
+  let result = await db.all(queryString, values)
 
   if (_.isNil(result)) {
     await db.close()
     res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin người dùng' })
   }
-  if (result.length === 0) {
+  if (!result) {
     // user not in table
     await db.close()
     res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Thông tin người dùng không có trong bảng' })
-  } else if (result[0].is_online === 0) {
+  } else if (result.is_online === 0) {
     // user is offline
     await db.close()
     res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Người dùng đang offline' })
