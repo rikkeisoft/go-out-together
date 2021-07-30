@@ -17,11 +17,20 @@ export default async function handler(req, res) {
     })
   }
 
-  const isValid = schema.isValid({ ...req.body })
+  if (_.isNil(req?.body?.uuid)) {
+    // error
+    res.status(404).json({ messageCode: messageCodes.ERROR, message: 'Các thông tin không hợp lệ' })
+    return
+  }
+
+  const { uuid } = req.body
+
+  const isValid = await schema.isValid({ uuid })
 
   if (!isValid) {
     // error
     res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Các thông tin không hợp lệ' })
+    return
   }
 
   const db = await openDb()
@@ -33,15 +42,18 @@ export default async function handler(req, res) {
   if (_.isNil(result)) {
     await db.close()
     res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin người dùng' })
+    return
   }
   if (!result) {
     // user not in table
     await db.close()
-    res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Thông tin người dùng không có trong bảng' })
+    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Thông tin người dùng không có trong bảng' })
+    return
   } else if (result.is_online === 0) {
     // user is offline
     await db.close()
-    res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Người dùng đang offline' })
+    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Người dùng đang offline' })
+    return
   } else {
     // user is online
     await db.close()

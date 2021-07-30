@@ -17,6 +17,7 @@ const schema = yup.object().shape({
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(404).json({ messageCode: messageCodes.ERROR, message: 'Không tìm thấy api route' })
+    return
   }
 
   const { uid, name, address } = req.query
@@ -25,6 +26,7 @@ export default async function handler(req, res) {
 
   if (!isValid) {
     res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Các thông tin không hợp lệ' })
+    return
   }
 
   const db = await openDb()

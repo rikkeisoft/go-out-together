@@ -18,6 +18,7 @@ export default async function handler(req, res) {
       messageCode: messageCodes.ERROR,
       message: 'Không tìm thấy api route',
     })
+    return
   }
 
   const isValid = await schema.isValid({ ...req.body })
@@ -25,6 +26,7 @@ export default async function handler(req, res) {
   if (!isValid) {
     // error
     res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Các thông tin không hợp lệ' })
+    return
   }
   // valid -> check user is already in table or not
   const { uuid, username, avatar_url } = req.body
@@ -37,9 +39,6 @@ export default async function handler(req, res) {
   let result = await db.get(queryString, values)
 
   if (_.isNil(result)) {
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin người dùng' })
-  }
-  if (result.length === 0) {
     // new user -> insert
     queryString = 'INSERT INTO users (uuid, username, avatar_url, is_online) VALUES (?, ?, ?, ?)'
     values = [uuid, username, avatar_url, isOnline]
@@ -47,10 +46,11 @@ export default async function handler(req, res) {
     if (_.isNil(result)) {
       await db.close()
       res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không thêm được thông tin người dùng' })
+      return
     }
   } else {
     // user already in db -> check update info
-    let user = result[0]
+    let user = result
 
     if (user.username !== username || user.avatar_url !== avatar_url) {
       queryString = `UPDATE users SET username = ?, avatar_url = ?, is_online = ? WHERE uuid = ?`
@@ -59,6 +59,7 @@ export default async function handler(req, res) {
       if (_.isNil(result)) {
         await db.close()
         res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không cập nhật được người dùng' })
+        return
       }
     } else {
       // update user is online now
@@ -68,6 +69,7 @@ export default async function handler(req, res) {
       if (_.isNil(result)) {
         await db.close()
         res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không cập nhật được người dùng' })
+        return
       }
     }
   }
