@@ -11,9 +11,11 @@ import { useRouter } from 'next/router'
 import urls from 'consts/urls'
 import GoogleLoginModal from 'components/auth/GoogleLoginModal'
 import { useCookies } from 'react-cookie'
+import Popup from 'components/common/Popup'
 
-export default function Home() {
+export default function Home({ error }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isError, setIsError] = useState(false)
   const [redirectURL, setRedirectURL] = useState(urls.SESSIONS_CREATE)
   const [cookies] = useCookies(['uid', 'username', 'imgURL'])
   const router = useRouter()
@@ -24,6 +26,11 @@ export default function Home() {
       setRedirectURL(url)
     }
   }, [])
+
+  useEffect(() => {
+    if (error) setIsError(true)
+    else setIsError(false)
+  }, [error])
 
   const handleButtonClick = () => {
     if (cookies?.uid !== undefined) {
@@ -41,6 +48,9 @@ export default function Home() {
       </Head>
 
       <BackgroundImage src={homeBgSrc}>
+        <Popup isOpen={isError} onRequestClose={() => setIsError(false)}>
+          <h1>{error}</h1>
+        </Popup>
         <Container>
           <Center>
             <TitleText>Làm thế nào để tìm địa điểm vui chơi một cách dễ dàng</TitleText>
