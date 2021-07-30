@@ -5,6 +5,8 @@ import { useForm, FormProvider } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { ErrorMessage } from '@hookform/error-message'
+import io from 'socket.io-client'
+import socketKeys from 'consts/socketKeys'
 import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
@@ -18,6 +20,8 @@ import List from 'components/common/List'
 import MapBox from 'components/common/MapBox'
 import SmallTitle from 'components/common/SmallTitle'
 
+const socket = io.connect(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
+
 const schema = yup.object().shape({
   title: yup.string().required('Nhập vào tiêu đề'),
   content: yup.string().required('Nhập vào nội dung'),
@@ -25,7 +29,7 @@ const schema = yup.object().shape({
   addresses: yup.array().min(1, 'Chọn địa chỉ'),
 })
 
-const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
+const Step2 = memo(({ formData, prevStep, nextStep, setShareLink }) => {
   const [showMap, setShowMap] = useState(false)
   const [listDataLocation, setListDataLocation] = useState(null)
   const methods = useForm({
@@ -34,8 +38,12 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
   })
 
   const onSubmit = (data) => {
-    setFormData(Object.assign({}, formData, data))
-    nextStep()
+    socket.emit(socketKeys.USER_CREATE_SESSION, {
+      title: data.title,
+      content: data.content,
+      timeLimit: data.timeLimit,
+      addresses: data.addresses,
+    })
   }
 
   useEffect(() => {
@@ -83,6 +91,13 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
       )
     }
   }
+
+  useEffect(() => {
+    socket.on(socketKeys.USER_CREATE_SESSION, (data) => {
+      setShareLink(data)
+      nextStep()
+    })
+  })
 
   return (
     <>
@@ -193,9 +208,9 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
 
 Step2.propTypes = {
   formData: PropTypes.object,
-  setFormData: PropTypes.func,
   prevStep: PropTypes.func,
   nextStep: PropTypes.func,
+  setShareLink: PropTypes.func,
 }
 
 Step2.defaultProps = {}
