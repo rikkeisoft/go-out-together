@@ -1,10 +1,13 @@
-import { memo, useState } from 'react'
+import { memo, useState, useEffect } from 'react'
 import Head from 'next/head'
 import PropTypes from 'prop-types'
 import { useForm, FormProvider } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { ErrorMessage } from '@hookform/error-message'
+import { useCookies } from 'react-cookie'
+import io from 'socket.io-client'
+import socketKeys from 'consts/socketKeys'
 import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
@@ -17,16 +20,19 @@ import MemberList from 'components/common/MemberList'
 import MapBox from 'components/common/MapBox'
 import DirectionRoutes from 'components/common/DirectionRoutes'
 
+const socket = io.connect(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
+
 const schema = yup.object().shape({
   votedAddress: yup.mixed().required('Chọn địa điểm'),
 })
 
-const Step2 = memo(({ formData, prevStep, nextStep }) => {
+const Step2 = memo(({ sessionId, formData, prevStep, nextStep, setVoteResult }) => {
+  const [cookies] = useCookies(['cookie-name'])
+  const username = cookies.username
   const [showMap, setShowMap] = useState(false)
   const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
   const [voteAddress, setVoteAddress] = useState(null)
   const [listDataLocation, setListDataLocation] = useState(null)
-
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: formData,
@@ -82,16 +88,45 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
   const title = 'Đi ăn lẩu'
   const content = 'Đi ăn lẩu ngày nghỉ'
   const members = ['Nguyễn Tiến Báo', 'Bùi Thị Nhàn', 'Nguyễn Văn Trung', 'Đặng Tiến Hùng']
+  // const addAddress = (address) => {
+  //   socket.emit(socketKeys.USER_ADD_ADDRESS_TO_SESSION, {
+  //     sessionId,
+  //     username,
+  //     address,
+  //   })
+  // }
 
   const deleteAddress = (index) => {
-    const newAddresses = addresses.slice()
-    newAddresses.splice(index, 1)
-    setAddresses(newAddresses)
+    const address = addresses[index]
+
+    socket.emit(socketKeys.USER_REMOVE_ADDRESS_OF_SESSION, {
+      sessionId,
+      username,
+      address,
+    })
   }
 
   const onSubmit = () => {
-    nextStep()
+    socket.emit(socketKeys.USER_FINISH_VOTE, {
+      sessionId,
+      username,
+    })
   }
+
+  useEffect(() => {
+    socket.on(socketKeys.USER_ADD_ADDRESS_TO_SESSION, (data) => {
+      setAddresses(data)
+    })
+
+    socket.on(socketKeys.USER_REMOVE_ADDRESS_OF_SESSION, (data) => {
+      setAddresses(data)
+    })
+
+    socket.on(socketKeys.USER_FINISH_VOTE, (data) => {
+      setVoteResult(data)
+      nextStep()
+    })
+  })
 
   return (
     <>
@@ -195,10 +230,11 @@ const Step2 = memo(({ formData, prevStep, nextStep }) => {
 })
 
 Step2.propTypes = {
+  sessionId: PropTypes.any,
   formData: PropTypes.object,
-  setFormData: PropTypes.func,
   prevStep: PropTypes.func,
   nextStep: PropTypes.func,
+  setVoteResult: PropTypes.func,
 }
 
 Step2.defaultProps = {}

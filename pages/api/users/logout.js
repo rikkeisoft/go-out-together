@@ -1,8 +1,8 @@
 // /api/users/logout
 import _ from 'lodash'
 import * as yup from 'yup'
+import { openDb } from 'lib/db'
 import messageCodes from 'consts/messageCodes'
-import { query } from 'lib/db'
 
 const schema = yup.object().shape({
   uuid: yup.string().required(),
@@ -24,15 +24,20 @@ export default async function handler(req, res) {
   }
 
   const isOnline = 0
+
+  const db = await openDb()
+
   let queryString = 'UPDATE users SET is_online = ? WHERE uuid = ?'
   let values = [isOnline, req.body.uuid]
-  let result = await query(queryString, values)
+  let result = await db.run(queryString, values)
 
   if (_.isNil(result)) {
+    await db.close()
     res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không cập nhật được thông tin người dùng' })
   }
 
   // all done
+  await db.close()
   res.status(200).json({
     messageCode: messageCodes.SUCCESS,
     message: 'Đăng xuất thành công',

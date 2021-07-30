@@ -2,8 +2,8 @@
 // query: uuid, username, avatar_url
 // check user is in table, if not -> add
 import * as yup from 'yup'
+import { openDb } from 'lib/db'
 import messageCodes from 'consts/messageCodes'
-import { query } from 'lib/db'
 import _ from 'lodash'
 
 const schema = yup.object().shape({
@@ -29,9 +29,12 @@ export default async function handler(req, res) {
   // valid -> check user is already in table or not
   const { uuid, username, avatar_url } = req.body
   const isOnline = 1
+
+  const db = await openDb()
+
   let queryString = 'SELECT username, avatar_url FROM users WHERE uuid = ?'
   let values = [uuid]
-  let result = await query(queryString, values)
+  let result = await db.get(queryString, values)
 
   if (_.isNil(result)) {
     res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin người dùng' })
@@ -40,8 +43,9 @@ export default async function handler(req, res) {
     // new user -> insert
     queryString = 'INSERT INTO users (uuid, username, avatar_url, is_online) VALUES (?, ?, ?, ?)'
     values = [uuid, username, avatar_url, isOnline]
-    result = await query(queryString, values)
+    result = await db.run(queryString, values)
     if (_.isNil(result)) {
+      await db.close()
       res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không thêm được thông tin người dùng' })
     }
   } else {
@@ -51,22 +55,25 @@ export default async function handler(req, res) {
     if (user.username !== username || user.avatar_url !== avatar_url) {
       queryString = `UPDATE users SET username = ?, avatar_url = ?, is_online = ? WHERE uuid = ?`
       values = [username, avatar_url, isOnline, uuid]
-      result = await query(queryString, values)
+      result = await db.run(queryString, values)
       if (_.isNil(result)) {
+        await db.close()
         res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không cập nhật được người dùng' })
       }
     } else {
       // update user is online now
       queryString = `UPDATE users SET is_online = ? WHERE uuid = ?`
       values = [isOnline, uuid]
-      result = await query(queryString, values)
+      result = await db.run(queryString, values)
       if (_.isNil(result)) {
+        await db.close()
         res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không cập nhật được người dùng' })
       }
     }
   }
 
   // all done
+  await db.close()
   res.status(200).json({
     messageCode: messageCodes.SUCCESS,
     message: 'Đăng nhập thành công',

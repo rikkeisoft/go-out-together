@@ -1,4 +1,4 @@
-import { memo, useState } from 'react'
+import { memo, useState, useEffect } from 'react'
 import Head from 'next/head'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
@@ -7,6 +7,8 @@ import { useForm, FormProvider } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { ErrorMessage } from '@hookform/error-message'
+import io from 'socket.io-client'
+import socketKeys from 'consts/socketKeys'
 import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
@@ -16,12 +18,14 @@ import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MapBox from 'components/common/MapBox'
 
+const socket = io.connect(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
+
 const schema = yup.object().shape({
   name: yup.string().required('Nhập vào tên'),
   address: yup.string().required('Nhập vào địa điểm'),
 })
 
-const Step1 = memo(({ formData, setFormData, nextStep }) => {
+const Step1 = memo(({ sessionId, formData, setFormData, nextStep }) => {
   const [showMap, setShowMap] = useState(false)
   const [userLocation, setUserLocation] = useState(null)
   const [cookies, setCookie] = useCookies(['cookie-name'])
@@ -53,6 +57,19 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   // console.log(userLocation)
   // }
   // Đã có data của user
+
+  useEffect(() => {
+    if (!_.isNil(cookies?.username)) {
+      const username = cookies.username
+      socket.emit(socketKeys.USER_ONLINE, {
+        username,
+      })
+      socket.emit(socketKeys.USER_JOIN_SESSION, {
+        username,
+        sessionId,
+      })
+    }
+  }, [cookies])
 
   return (
     <>
@@ -122,6 +139,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
 })
 
 Step1.propTypes = {
+  sessionId: PropTypes.any,
   formData: PropTypes.object,
   setFormData: PropTypes.func,
   nextStep: PropTypes.func,

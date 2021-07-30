@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Head from 'next/head'
 import useStep from 'hooks/useStep'
 import { useRouter } from 'next/router'
@@ -22,6 +23,7 @@ export default function Create() {
   const { mutateAsync } = useMutation((param) => userAPI.logout(param))
   const router = useRouter()
   const { step, formData, backwardStep, prevStep, nextStep, setFormData } = useStep()
+  const [shareLink, setShareLink] = useState('')
 
   let stepElement = <></>
   switch (step) {
@@ -29,10 +31,18 @@ export default function Create() {
       stepElement = <Step1 formData={formData} setFormData={setFormData} nextStep={nextStep} />
       break
     case 2:
-      stepElement = <Step2 formData={formData} setFormData={setFormData} prevStep={prevStep} nextStep={nextStep} />
+      stepElement = (
+        <Step2
+          formData={formData}
+          setFormData={setFormData}
+          prevStep={prevStep}
+          nextStep={nextStep}
+          setShareLink={setShareLink}
+        />
+      )
       break
     case 3:
-      stepElement = <Step3 formData={formData} setFormData={setFormData} backwardStep={backwardStep} />
+      stepElement = <Step3 shareLink={shareLink} setFormData={setFormData} backwardStep={backwardStep} />
       break
     default:
       break
