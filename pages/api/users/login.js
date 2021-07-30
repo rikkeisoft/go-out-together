@@ -37,9 +37,6 @@ export default async function handler(req, res) {
   let result = await db.get(queryString, values)
 
   if (_.isNil(result)) {
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin người dùng' })
-  }
-  if (result.length === 0) {
     // new user -> insert
     queryString = 'INSERT INTO users (uuid, username, avatar_url, is_online) VALUES (?, ?, ?, ?)'
     values = [uuid, username, avatar_url, isOnline]
@@ -50,7 +47,7 @@ export default async function handler(req, res) {
     }
   } else {
     // user already in db -> check update info
-    let user = result[0]
+    let user = result
 
     if (user.username !== username || user.avatar_url !== avatar_url) {
       queryString = `UPDATE users SET username = ?, avatar_url = ?, is_online = ? WHERE uuid = ?`
