@@ -18,6 +18,7 @@ export default async function handler(req, res) {
       messageCode: messageCodes.ERROR,
       message: 'Không tìm thấy api route',
     })
+    return
   }
 
   const isValid = await schema.isValid({ ...req.body })
@@ -25,6 +26,7 @@ export default async function handler(req, res) {
   if (!isValid) {
     // error
     res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Các thông tin không hợp lệ' })
+    return
   }
   // valid -> check user is already in table or not
   const { uuid, username, avatar_url } = req.body
@@ -47,6 +49,7 @@ export default async function handler(req, res) {
     if (_.isNil(result)) {
       await db.close()
       res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không thêm được thông tin người dùng' })
+      return
     }
   } else {
     // user already in db -> check update info
@@ -59,6 +62,7 @@ export default async function handler(req, res) {
       if (_.isNil(result)) {
         await db.close()
         res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không cập nhật được người dùng' })
+        return
       }
     } else {
       // update user is online now
@@ -68,6 +72,7 @@ export default async function handler(req, res) {
       if (_.isNil(result)) {
         await db.close()
         res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không cập nhật được người dùng' })
+        return
       }
     }
   }
