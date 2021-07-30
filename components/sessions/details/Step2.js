@@ -88,13 +88,13 @@ const Step2 = memo(({ sessionId, formData, prevStep, nextStep, setVoteResult }) 
   const title = 'Đi ăn lẩu'
   const content = 'Đi ăn lẩu ngày nghỉ'
   const members = ['Nguyễn Tiến Báo', 'Bùi Thị Nhàn', 'Nguyễn Văn Trung', 'Đặng Tiến Hùng']
-  const addAddress = (address) => {
-    socket.emit(socketKeys.USER_ADD_ADDRESS_TO_SESSION, {
-      sessionId,
-      username,
-      address,
-    })
-  }
+  // const addAddress = (address) => {
+  //   socket.emit(socketKeys.USER_ADD_ADDRESS_TO_SESSION, {
+  //     sessionId,
+  //     username,
+  //     address,
+  //   })
+  // }
 
   const deleteAddress = (index) => {
     const address = addresses[index]
@@ -112,10 +112,6 @@ const Step2 = memo(({ sessionId, formData, prevStep, nextStep, setVoteResult }) 
       username,
     })
   }
-
-  const title = 'Đi ăn lẩu'
-  const content = 'Đi ăn lẩu ngày nghỉ'
-  const members = ['Nguyễn Văn Sơn', 'Châu Nhuận Phát', 'Tiêu Viêm']
 
   useEffect(() => {
     socket.on(socketKeys.USER_ADD_ADDRESS_TO_SESSION, (data) => {
