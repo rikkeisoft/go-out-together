@@ -32,7 +32,7 @@ Popup.propTypes = {
   isOpen: PropTypes.bool,
   onAfterOpen: PropTypes.func,
   onRequestClose: PropTypes.func,
-  children: PropTypes.func,
+  children: PropTypes.node,
 }
 
 Popup.defaultProps = {}

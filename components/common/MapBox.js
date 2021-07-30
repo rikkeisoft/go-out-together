@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 import mapboxgl from 'mapbox-gl'
 import Head from 'next/head'
 import axios from 'axios'
+import Button from './Button'
 
-const Map = () => {
+const MapBox = ({ show, isOneLocaion, data }) => {
   const [location, setLocation] = useState(null)
   const [dataLocation, setDataLocation] = useState(null)
   const [selectedLocation, setSelectedLocation] = useState('')
   const [listLocation, setListLocation] = useState([])
   const [showListLocation, setShowListLocation] = useState(true)
 
-  // proximity=105.77791972881141,21.028422014324164&
-
   useEffect(() => {
     if (location) {
       const getLocation = async () => {
         try {
           const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_API_MAPBOX}/${location}.json?proximity=105.777909,21.028412&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
+            `${process.env.NEXT_PUBLIC_API_MAPBOX}/${location}.json?access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
           )
           const dataList = response.data.features
           setDataLocation(dataList)
@@ -28,11 +28,6 @@ const Map = () => {
       getLocation()
     }
   }, [location])
-
-  console.log(selectedLocation)
-  // 0: 105.799588
-  // 1: 21.03202
-  // 105.777909, 21.028412
 
   useEffect(() => {
     setLocation(selectedLocation.place_name)
@@ -72,11 +67,27 @@ const Map = () => {
         <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
-      <div className="w-80 m-5 relative">
-        {listLocation.length >= 5 ? (
-          <span className="text-red-500">Chỉ được tạo tối đa 5 địa điểm !</span>
+      <div className="w-80 mb-2 relative mx-auto w-4/5">
+        {listLocation.length > 4 ? (
+          <div className="flex justify-between">
+            <p className="text-red-500">Chỉ được tạo tối đa 5 địa điểm !</p>
+            <Button
+              type="submit"
+              variant="primary"
+              onClick={() => {
+                if (isOneLocaion) {
+                  data(selectedLocation)
+                } else {
+                  data(listLocation)
+                }
+                show()
+              }}
+            >
+              Xong
+            </Button>
+          </div>
         ) : (
-          <form>
+          <form className="mb-2">
             <input
               type="text"
               value={location || ''}
@@ -88,7 +99,7 @@ const Map = () => {
               }}
             />
             <span
-              className="absolute right-1.5 top-1.5"
+              className="absolute top-1.5 left-72"
               onClick={() => {
                 setLocation('')
               }}
@@ -106,6 +117,23 @@ const Map = () => {
                 />
               </svg>
             </span>
+            <div className="absolute inline-block right-0">
+              <Button
+                type="submit"
+                variant="primary"
+                onClick={() => {
+                  if (isOneLocaion) {
+                    data(selectedLocation)
+                  } else {
+                    console.log(listLocation)
+                    data(listLocation)
+                  }
+                  show()
+                }}
+              >
+                Thêm địa điểm
+              </Button>
+            </div>
           </form>
         )}
 
@@ -119,7 +147,11 @@ const Map = () => {
                   className="cursor-pointer p-2"
                   onClick={() => {
                     setSelectedLocation(item)
-                    setListLocation([...listLocation, item])
+                    if (isOneLocaion) {
+                      setListLocation([item])
+                    } else {
+                      setListLocation([...listLocation, item])
+                    }
                     setShowListLocation(false)
                   }}
                 >
@@ -140,10 +172,17 @@ const Map = () => {
               )
             })}
         </ul>
+        <div id="map" className="absolute" style={{ width: '100%', height: '70vh' }}></div>
       </div>
-      <div id="map" style={{ width: '100vw', height: '80vh' }}></div>
     </>
   )
 }
 
-export default Map
+MapBox.propTypes = {
+  show: PropTypes.func,
+  isOneLocaion: PropTypes.bool,
+  data: PropTypes.func,
+}
+
+MapBox.defaultProps = {}
+export default MapBox

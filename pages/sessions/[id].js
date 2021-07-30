@@ -11,9 +11,16 @@ import Step1 from 'components/sessions/details/Step1'
 import Step2 from 'components/sessions/details/Step2'
 import Step3 from 'components/sessions/details/Step3'
 import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
+import { auth } from 'lib/firebase'
+import UserAvatar from 'components/avatar/UserAvatar'
+import { useCookies } from 'react-cookie'
+import { useMutation } from 'react-query'
+import userAPI from 'api/userAPI'
 
 export default function Details() {
+  const [cookies, , removeCookie] = useCookies(['uid', 'username', 'imgURL'])
   const router = useRouter()
+  const { mutateAsync } = useMutation((param) => userAPI.logout(param))
   const { id } = router.query
 
   const { step, formData, prevStep, nextStep, setFormData } = useStep()
@@ -31,6 +38,19 @@ export default function Details() {
     default:
       break
   }
+
+  const goToHomePage = () => router.push(urls.HOME)
+
+  const handleSignOut = async () => {
+    await mutateAsync({ uuid: cookies.uid })
+    localStorage.removeItem('redirectURL')
+    removeCookie('uid', { path: '/' })
+    removeCookie('username', { path: '/' })
+    removeCookie('imgURL', { path: '/' })
+    auth.signOut()
+    goToHomePage()
+  }
+
   return (
     <MainLayout>
       <Head>
@@ -38,15 +58,12 @@ export default function Details() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container>
-        <Button
-          type="button"
-          variant="danger"
-          onClick={() => {
-            router.push(urls.HOME)
-          }}
-        >
-          <ArrowLeftIcon className="w-7" /> Về trang chủ
-        </Button>
+        <div className="flex items-center justify-around">
+          <Button type="button" variant="danger" onClick={goToHomePage}>
+            <ArrowLeftIcon className="w-7" /> Về trang chủ
+          </Button>
+          <UserAvatar imgURL={cookies?.imgURL} username={cookies?.username} onSignOut={handleSignOut} />
+        </div>
         <Center>
           <TitleText>
             Bạn đang tham gia nhóm: <span className="text-blue-500">{id}</span>
