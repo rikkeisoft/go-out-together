@@ -13,8 +13,8 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
 
   const expCurrentLocation = {
     name: 'son nguyen',
-    address: 'Khách sạn Cầu Giấy',
-    coordinates: [105.8, 21.0333],
+    address: 'Dong Da, Hanoi, Vietnam',
+    coordinates: [105.8333, 21.0167],
   }
   const expDestination = {
     name: 'son nguyen',
@@ -35,6 +35,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
       })
 
       listUserLocation.map((item) => {
+        // add marker
         const addMarker = () => {
           const marker = new mapboxgl.Marker()
           const markerPopup = new mapboxgl.Popup()
@@ -46,103 +47,60 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           marker.addTo(map)
         }
         map.on('load', addMarker)
-      })
 
-      let start = [expCurrentLocation.coordinates[0], expCurrentLocation.coordinates[1]]
-      const getRoute = async (end) => {
-        const response = await axios.get(
-          `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
-        )
-        const data = response.data.routes[0]
-        const coordinates = data.geometry.coordinates
-        const geojson = {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'LineString',
-            coordinates: coordinates,
-          },
-        }
-        if (map.getSource('route')) {
-          map.getSource('route').setData(geojson)
-        } else {
-          map.addLayer({
-            id: 'route',
-            type: 'line',
-            source: {
-              type: 'geojson',
-              data: {
-                type: 'Feature',
-                properties: {},
-                geometry: {
-                  type: 'LineString',
-                  coordinates: geojson,
-                },
-              },
+        // add route
+        let start = [item.coordinates[0], item.coordinates[1]]
+        const getRoute = async (end) => {
+          const response = await axios.get(
+            `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
+          )
+          const data = response.data.routes[0]
+          const coordinates = data.geometry.coordinates
+          const geojson = {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates: coordinates,
             },
-            layout: {
-              'line-join': 'round',
-              'line-cap': 'round',
-            },
-            paint: {
-              'line-color': '#3887be',
-              'line-width': 5,
-              'line-opacity': 0.75,
-            },
-          })
-        }
-        if (start !== end) {
-          const length = response.data.routes[0].distance
-          setDistance(length)
-        }
-      }
-      map.on('load', () => {
-        getRoute(start)
-        map.addLayer({
-          id: 'point',
-          type: 'circle',
-          source: {
-            type: 'geojson',
-            data: {
-              type: 'FeatureCollection',
-              features: [
-                {
+          }
+          if (map.getSource('route')) {
+            map.getSource('route').setData(geojson)
+          } else {
+            map.addLayer({
+              id: 'route',
+              type: 'line',
+              source: {
+                type: 'geojson',
+                data: {
                   type: 'Feature',
                   properties: {},
                   geometry: {
-                    type: 'Point',
-                    coordinates: start,
+                    type: 'LineString',
+                    coordinates: geojson,
                   },
                 },
-              ],
-            },
-          },
-          paint: {
-            'circle-radius': 10,
-            'circle-color': '#3887be',
-          },
-        })
-      })
-      map.on('load', () => {
-        const coords = [expDestination.coordinates[0], expDestination.coordinates[1]]
-        let end = {
-          type: 'FeatureCollection',
-          features: [
-            {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Point',
-                coordinates: coords,
               },
-            },
-          ],
+              layout: {
+                'line-join': 'round',
+                'line-cap': 'round',
+              },
+              paint: {
+                'line-color': '#3887be',
+                'line-width': 5,
+                'line-opacity': 0.75,
+              },
+            })
+          }
+          if (start !== end) {
+            const length = response.data.routes[0].distance
+            setDistance(length)
+          }
         }
-        if (map.getLayer('end')) {
-          map.getSource('end').setData(end)
-        } else {
+        map.on('load', () => {
+          getRoute(start)
           map.addLayer({
-            id: 'end',
+            id: 'point',
             type: 'circle',
             source: {
               type: 'geojson',
@@ -154,7 +112,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
                     properties: {},
                     geometry: {
                       type: 'Point',
-                      coordinates: coords,
+                      coordinates: start,
                     },
                   },
                 ],
@@ -162,11 +120,55 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             },
             paint: {
               'circle-radius': 10,
-              'circle-color': '#f30',
+              'circle-color': '#3887be',
             },
           })
-        }
-        getRoute(coords)
+        })
+        map.on('load', () => {
+          const coords = [expDestination.coordinates[0], expDestination.coordinates[1]]
+          let end = {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'Point',
+                  coordinates: coords,
+                },
+              },
+            ],
+          }
+          if (map.getLayer('end')) {
+            map.getSource('end').setData(end)
+          } else {
+            map.addLayer({
+              id: 'end',
+              type: 'circle',
+              source: {
+                type: 'geojson',
+                data: {
+                  type: 'FeatureCollection',
+                  features: [
+                    {
+                      type: 'Feature',
+                      properties: {},
+                      geometry: {
+                        type: 'Point',
+                        coordinates: coords,
+                      },
+                    },
+                  ],
+                },
+              },
+              paint: {
+                'circle-radius': 10,
+                'circle-color': '#f30',
+              },
+            })
+          }
+          getRoute(coords)
+        })
       })
     }
   }, [destination])

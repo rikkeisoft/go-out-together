@@ -13,7 +13,7 @@ const MapBox = ({ show, isOneLocaion, data }) => {
   const [showListLocation, setShowListLocation] = useState(true)
 
   console.log(listLocation)
-  
+
   useEffect(() => {
     if (location) {
       const getLocation = async () => {
@@ -42,7 +42,7 @@ const MapBox = ({ show, isOneLocaion, data }) => {
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v11',
         center: [longitude, latitude],
-        zoom: 15,
+        zoom: 12,
       })
 
       listLocation.map((item) => {
@@ -58,6 +58,11 @@ const MapBox = ({ show, isOneLocaion, data }) => {
         }
         map.on('load', addMarker)
       })
+      // map.fitBounds([[105.82075699999999, 21.053331],
+      // [105.733275, 20.998666],],
+      //   {
+      //     padding: { top: 10, bottom: 25, left: 15, right: 5 },
+      //   })
     }
   }, [selectedLocation])
 
@@ -127,7 +132,6 @@ const MapBox = ({ show, isOneLocaion, data }) => {
                   if (isOneLocaion) {
                     data(selectedLocation)
                   } else {
-                    console.log(listLocation)
                     data(listLocation)
                   }
                   show()
