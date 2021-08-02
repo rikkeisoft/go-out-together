@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     return
   }
 
-  const { uid, title, content, timeLimit, addresses } = req.query
+  const { uid, title, content, timeLimit, addresses } = req.body
 
   const isValid = await schema.isValid({ uid, title, content, timeLimit, addresses })
 
