@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import mapboxgl from 'mapbox-gl'
 import Head from 'next/head'
 import PropTypes from 'prop-types'
 import Button from './Button'
+import * as turf from '@turf/turf'
 
 const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destination }) => {
   const [distance, setDistance] = useState([])
+  const distanceRef = useRef([])
   console.log('currentLocation', currentLocation)
   // console.log('listUserLocation', listUserLocation)
   // console.log('destination', destination)
@@ -33,7 +35,9 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
         center: [longitude, latitude],
         zoom: 15,
       })
-      const addDistanceMarker = () => {
+
+      // add marker for distance
+      const addDestinationMarker = () => {
         const marker = new mapboxgl.Marker({ color: '#ff0000' })
         const markerPopup = new mapboxgl.Popup()
         markerPopup.setText(`${expDestination.value}`)
@@ -41,7 +45,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
         marker.setLngLat([expDestination.coordinates[0], expDestination.coordinates[1]])
         marker.addTo(map)
       }
-      map.on('load', addDistanceMarker)
+      map.on('load', addDestinationMarker)
 
       listUserLocation.map((item, index) => {
         const addMarker = () => {
@@ -56,7 +60,6 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
         }
         map.on('load', addMarker)
 
-        // add marker for distance
         let start = [listUserLocation[index].coordinates[0], listUserLocation[index].coordinates[1]]
         const getRoute = async (end) => {
           const response = await axios.get(
@@ -64,6 +67,8 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           )
           const data = response.data.routes[0]
           const coordinates = data.geometry.coordinates
+          distanceRef.current.push(data.distance)
+          setDistance([...distance, distanceRef.current])
           const geojson = {
             type: 'Feature',
             properties: {},
@@ -99,13 +104,9 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
                 'line-opacity': 0.75,
               },
             })
-            if (start !== end) {
-              const length = response.data.routes[0].distance
-              setDistance([...distance, length])
-            }
           }
         }
-
+        //add start point
         map.on('load', () => {
           getRoute(start)
           map.addLayer({
@@ -133,6 +134,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             },
           })
         })
+        // add end point 
         map.on('load', () => {
           const coords = [expDestination.coordinates[0], expDestination.coordinates[1]]
           let end = {
@@ -179,10 +181,42 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           getRoute(coords)
         })
       })
+
+      const arrayPoint = []
+      const getCenterPoint = () => {
+        listUserLocation.forEach((item) => {
+          arrayPoint.push(item.coordinates)
+        })
+        arrayPoint.push(arrayPoint[0])
+      }
+
+      if (listUserLocation.length > 2) {
+        getCenterPoint()
+        let polygon = turf.polygon([arrayPoint])
+        let center = turf.centerOfMass(polygon)
+
+        let point = turf.point([center.geometry.coordinates[0], center.geometry.coordinates[1]])
+        let buffered = turf.buffer(point, 1000, { units: 'miles' })
+        console.log(buffered)
+        // map.on('load', () => {
+        //   const marker = new mapboxgl.Marker()
+        //   marker.setLngLat([center.geometry.coordinates[0], center.geometry.coordinates[1]])
+        //   marker.addTo(map)
+        // })
+        // console.log(center)
+      }
+
     }
   }, [destination])
 
-  console.log(distance)
+  const getDistance = () => {
+    if (distance[0] !== undefined) {
+      const total = distance[0].reduce((accumlator, value) => {
+        return accumlator + value
+      }, 0)
+      return (total / distance[0].length) / 500
+    }
+  }
 
   return (
     <>
@@ -251,6 +285,8 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             />
           </svg>
           {/* Chiều dài quãng đường: {(distance / 1000).toFixed(2)} KM */}
+          Chiều dài quãng đường trung bình: {distance[0] && getDistance().toFixed(2)} KM
+
         </p>
       </div>
     </>

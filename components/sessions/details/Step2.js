@@ -79,6 +79,17 @@ const Step2 = memo(({ sessionId, formData, prevStep, nextStep, setVoteResult }) 
       address: 'Dong Da, Hanoi, Vietnam',
       coordinates: [105.8333, 21.0167],
     },
+    {
+      name: 'son nguyen',
+      address: 'Cầu Thăng Long',
+      coordinates: [105.786341, 21.096548],
+    },
+    // {
+    //   label: 'Bên xe Mỹ Đình (4 người vote)',
+    //   value: 'Bên xe Mỹ Đình',
+    //   amountVote: 4,
+    //   coordinates: [105.777909, 21.028412],
+    // },
   ]
 
   console.log(listDataLocation)

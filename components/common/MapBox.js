@@ -14,7 +14,7 @@ const MapBox = ({ show, isOneLocaion, data }) => {
   const [showListLocation, setShowListLocation] = useState(true)
   const [arrayCoodinates, setArrayCoodinates] = useState([])
 
-  // console.log(listLocation)
+  console.log(listLocation)
 
   useEffect(() => {
     if (location) {
