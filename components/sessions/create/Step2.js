@@ -1,10 +1,15 @@
 import { memo, useEffect, useState } from 'react'
 import Head from 'next/head'
 import PropTypes from 'prop-types'
+import _ from 'lodash'
+import { useCookies } from 'react-cookie'
 import { useForm, FormProvider } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { ErrorMessage } from '@hookform/error-message'
+import messageCodes from 'consts/messageCodes'
+import { useMutation } from 'react-query'
+import { createSession } from 'api/sessions'
 import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
@@ -17,17 +22,31 @@ import TextArea from 'components/common/TextArea'
 import List from 'components/common/List'
 import MapBox from 'components/common/MapBox'
 import SmallTitle from 'components/common/SmallTitle'
+import LoadingOverlay from 'components/common/LoadingOverlay'
 
 const schema = yup.object().shape({
   title: yup.string().required('Nhập vào tiêu đề'),
   content: yup.string().required('Nhập vào nội dung'),
   timeLimit: yup.string().required('Chọn giới hạn thời gian vote'),
-  addresses: yup.array().min(1, 'Chọn địa chỉ'),
+  addresses: yup
+    .array()
+    .of(
+      yup.object({
+        aid: yup.string().required(),
+        name: yup.string().required(),
+        latitude: yup.number().required(),
+        longitude: yup.number().required(),
+      }),
+    )
+    .min(2),
 })
 
-const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
+const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
+  const [cookies] = useCookies()
   const [showMap, setShowMap] = useState(false)
   const [listDataLocation, setListDataLocation] = useState(null)
+  const createSessionMutation = useMutation(createSession)
+
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: formData,
@@ -46,18 +65,40 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
 
   const onSubmit = (data) => {
     setFormData(Object.assign({}, formData, data))
-    nextStep()
+    createSessionMutation.mutate({
+      uid: cookies.uid,
+      title: data.title,
+      content: data.content,
+      timeLimit: data.timeLimit,
+      addresses: data.addresses,
+    })
   }
 
   useEffect(() => {
-    let addresses = methods.watch('addresses')
     if (listDataLocation) {
+      let addresses = [...methods.watch('addresses')]
       listDataLocation.forEach((item) => {
-        addresses.push(item.place_name)
+        addresses.push({
+          aid: item.id,
+          name: item.place_name,
+          longitude: item.center[0],
+          latitude: item.center[1],
+        })
       })
       methods.setValue('addresses', addresses, { shouldValidate: true })
     }
   }, [listDataLocation])
+
+  useEffect(() => {
+    if (createSessionMutation.isSuccess) {
+      if (createSessionMutation.data.messageCode === messageCodes.SUCCESS) {
+        setSid(createSessionMutation.data.data.sid)
+        nextStep()
+      } else {
+        alert(createSessionMutation.data.message)
+      }
+    }
+  }, [createSessionMutation.isSuccess])
 
   const renderListLocation = () => {
     if (methods.getValues('addresses')) {
@@ -173,11 +214,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
 
                 <List name="addresses" />
 
-                <ErrorMessage
-                  errors={methods.formState.errors}
-                  name="addresses"
-                  render={({ message }) => <ErrorText>{message}</ErrorText>}
-                />
+                {!_.isNil(methods.formState.errors.addresses) && <ErrorText>Chọn ít nhất 2 địa điểm</ErrorText>}
               </Field>
 
               <ButtonGroup>
@@ -192,13 +229,14 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
                 </Button>
 
                 <Button type="submit" variant="primary">
-                  Tiếp theo
+                  Tạo nhóm
                 </Button>
               </ButtonGroup>
             </form>
           </FormProvider>
         </FormCard>
       )}
+      <LoadingOverlay isOpen={createSessionMutation.isLoading} message="Đang xử lí..." />
     </>
   )
 })
@@ -208,6 +246,7 @@ Step2.propTypes = {
   setFormData: PropTypes.func,
   prevStep: PropTypes.func,
   nextStep: PropTypes.func,
+  setSid: PropTypes.func,
 }
 
 Step2.defaultProps = {}

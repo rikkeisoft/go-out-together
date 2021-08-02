@@ -2,7 +2,15 @@ import { useState } from 'react'
 import Head from 'next/head'
 import useStep from 'hooks/useStep'
 import { useRouter } from 'next/router'
+import { useCookies } from 'react-cookie'
+import {
+  // useMutation,
+  useQueryClient,
+} from 'react-query'
 import urls from 'consts/urls'
+import queryKeys from 'consts/queryKeys'
+import { auth } from 'lib/firebase'
+// import userAPI from 'api/userAPI'
 import MainLayout from 'layouts/MainLayout'
 import Container from 'components/common/Container'
 import Button from 'components/common/Button'
@@ -11,19 +19,16 @@ import TitleText from 'components/common/TitleText'
 import Step1 from 'components/sessions/create/Step1'
 import Step2 from 'components/sessions/create/Step2'
 import Step3 from 'components/sessions/create/Step3'
-import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
 import UserAvatar from 'components/avatar/UserAvatar'
-import { auth } from 'lib/firebase'
-import { useCookies } from 'react-cookie'
-import { useQueryClient } from 'react-query'
-import queryKeys from 'consts/queryKeys'
+import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
 
 export default function Create() {
+  const router = useRouter()
   const [cookies, , removeCookie] = useCookies(['uid', 'username', 'imgURL'])
   const queryClient = useQueryClient()
-  const router = useRouter()
+  // const { mutateAsync } = useMutation((param) => userAPI.logout(param))
   const { step, formData, backwardStep, prevStep, nextStep, setFormData } = useStep()
-  const [shareLink, setShareLink] = useState('')
+  const [sid, setSid] = useState(null)
 
   let stepElement = <></>
   switch (step) {
@@ -32,17 +37,11 @@ export default function Create() {
       break
     case 2:
       stepElement = (
-        <Step2
-          formData={formData}
-          setFormData={setFormData}
-          prevStep={prevStep}
-          nextStep={nextStep}
-          setShareLink={setShareLink}
-        />
+        <Step2 formData={formData} setFormData={setFormData} prevStep={prevStep} nextStep={nextStep} setSid={setSid} />
       )
       break
     case 3:
-      stepElement = <Step3 shareLink={shareLink} setFormData={setFormData} backwardStep={backwardStep} />
+      stepElement = <Step3 sid={sid} setFormData={setFormData} backwardStep={backwardStep} />
       break
     default:
       break

@@ -1,4 +1,4 @@
-import { memo, useState } from 'react'
+import { memo, useState, useEffect } from 'react'
 import Head from 'next/head'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
@@ -7,37 +7,40 @@ import { useForm, FormProvider } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { ErrorMessage } from '@hookform/error-message'
+import { useMutation } from 'react-query'
+import messageCodes from 'consts/messageCodes'
+import { updateSessionCreator } from 'api/users'
 import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
 import TextField from 'components/common/TextField'
+import AddressField from 'components/common/AddressField'
 import ErrorText from 'components/common/ErrorText'
 import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MapBox from 'components/common/MapBox'
-// import sessionsCreate from 'api/sessionsCreate'
-// import { uid } from 'uid'
+import LoadingOverlay from 'components/common/LoadingOverlay'
 
 const schema = yup.object().shape({
   name: yup.string().required('Nhập vào tên'),
-  address: yup.string().required('Nhập vào địa điểm'),
+  address: yup.object({
+    aid: yup.string().required(),
+    name: yup.string().required(),
+    latitude: yup.number().required(),
+    longitude: yup.number().required(),
+  }),
 })
 
 const Step1 = memo(({ formData, setFormData, nextStep }) => {
-  const [cookies, setCookie] = useCookies(['cookie-name'])
+  const [cookies] = useCookies()
   const [showMap, setShowMap] = useState(false)
   const [userLocation, setUserLocation] = useState(null)
 
-  let obj = {}
-  if (!_.isNil(cookies?.username)) {
-    obj.name = cookies.username
-  }
+  const updateSessionCreatorMutation = useMutation(updateSessionCreator)
 
-  if (!_.isNil(cookies?.address)) {
-    obj.address = cookies.address
-  }
-
-  const defaultValues = Object.assign({}, formData, obj)
+  const defaultValues = Object.assign({}, formData, {
+    name: cookies.username,
+  })
 
   const methods = useForm({
     resolver: yupResolver(schema),
@@ -45,11 +48,34 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   })
 
   const onSubmit = (data) => {
-    setCookie('name', data.name)
-    setCookie('address', data.address)
     setFormData(Object.assign({}, formData, data))
-    nextStep()
+    updateSessionCreatorMutation.mutate({
+      uid: cookies.uid,
+      name: data.name,
+      address: data.address,
+    })
   }
+
+  useEffect(() => {
+    if (userLocation) {
+      methods.setValue('address', {
+        aid: userLocation.id,
+        name: userLocation.place_name,
+        longitude: userLocation.center[0],
+        latitude: userLocation.center[1],
+      })
+    }
+  }, [userLocation])
+
+  useEffect(() => {
+    if (updateSessionCreatorMutation.isSuccess) {
+      if (updateSessionCreatorMutation.data.messageCode === messageCodes.SUCCESS) {
+        nextStep()
+      } else {
+        alert(updateSessionCreatorMutation.data.message)
+      }
+    }
+  }, [updateSessionCreatorMutation.isSuccess])
 
   // console.log(userLocation)
 
@@ -87,21 +113,20 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
         <title>Bước 1</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {showMap && (
+      {showMap ? (
         <MapBox
           isOneLocaion={true}
           data={(data) => {
+            console.log(data)
             setUserLocation(data)
           }}
           show={() => {
             setShowMap(false)
           }}
         />
-      )}
-      {showMap === true ? null : (
+      ) : (
         <FormCard>
           <FormProvider {...methods}>
-            {userLocation && methods.setValue('address', userLocation.place_name)}
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <Field>
                 <Label htmlFor="name">Tên:</Label>
@@ -126,12 +151,8 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
                     Chọn địa điểm trên bản đồ
                   </Button>
                 </div>
-                <TextField id="address" name="address" readOnly={true} />
-                <ErrorMessage
-                  errors={methods.formState.errors}
-                  name="address"
-                  render={({ message }) => <ErrorText>{message}</ErrorText>}
-                />
+                <AddressField name="address" />
+                {!_.isNil(methods.formState.errors.address) && <ErrorText>Nhập vào địa chỉ</ErrorText>}
               </Field>
 
               <ButtonGroup>
@@ -143,6 +164,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
           </FormProvider>
         </FormCard>
       )}
+      <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
     </>
   )
 })

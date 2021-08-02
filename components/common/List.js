@@ -17,7 +17,7 @@ const List = memo(({ name }) => {
             {value.map((item, index) => {
               return (
                 <tr key={`list-item-` + index} className="hover:bg-gray-100">
-                  <td className="p-2">{item}</td>
+                  <td className="p-2">{item.name}</td>
                   <td className="p-2 w-10">
                     <button
                       type="button"
@@ -42,7 +42,6 @@ const List = memo(({ name }) => {
 
 List.propTypes = {
   name: PropTypes.string,
-  data: PropTypes.array,
 }
 
 List.defaultProps = {}

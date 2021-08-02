@@ -19,6 +19,7 @@ export default function useStep(defaultStep = 1) {
   return {
     step,
     formData,
+    setStep,
     backwardStep,
     prevStep,
     nextStep,
