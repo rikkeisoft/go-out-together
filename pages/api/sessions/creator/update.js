@@ -46,8 +46,8 @@ export default async function handler(req, res) {
     addressId = result.id
   }
 
-  queryString = `UPDATE users SET address_id = ? WHERE uuid = ?`
-  values = [addressId, uid]
+  queryString = `UPDATE users SET address_id = ?, name = ? WHERE uuid = ?`
+  values = [addressId, name, uid]
   result = await db.run(queryString, values)
 
   await db.close()

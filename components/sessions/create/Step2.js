@@ -62,11 +62,8 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
   const renderListLocation = () => {
     if (methods.getValues('addresses')) {
       if (methods.getValues('addresses').length >= 5) {
-        return (
-          <p className="text-red-500 mb-5">Chỉ giới hạn nhập tối đa 5 địa điểm!</p>
-        )
-      }
-      else {
+        return <p className="text-red-500 mb-5">Chỉ giới hạn nhập tối đa 5 địa điểm!</p>
+      } else {
         return (
           <div className="py-2">
             <Button
@@ -81,8 +78,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
           </div>
         )
       }
-    }
-    else {
+    } else {
       return (
         <div className="py-2">
           <Button
@@ -107,103 +103,102 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
       </Head>
 
       <SmallTitle>Nhanh tay điền thông tin và bắt đầu thôi!</SmallTitle>
-      {
-        showMap && <MapBox
+      {showMap && (
+        <MapBox
           // listSelectedLocation={expListLocation}
           data={(data) => {
             setListDataLocation(data)
-          }
-          }
+          }}
           show={() => {
             setShowMap(false)
-          }} />
-      }
+          }}
+        />
+      )}
 
-      {
-        showMap === true ? null :
-          <FormCard>
-            <FormProvider {...methods}>
-              <form onSubmit={methods.handleSubmit(onSubmit)}>
-                <Field>
-                  <Label htmlFor="title">Tiêu đề:</Label>
-                  <TextField id="title" name="title" />
-                  <ErrorMessage
-                    errors={methods.formState.errors}
-                    name="title"
-                    render={({ message }) => <ErrorText>{message}</ErrorText>}
-                  />
-                </Field>
+      {showMap === true ? null : (
+        <FormCard>
+          <FormProvider {...methods}>
+            <form onSubmit={methods.handleSubmit(onSubmit)}>
+              <Field>
+                <Label htmlFor="title">Tiêu đề:</Label>
+                <TextField id="title" name="title" />
+                <ErrorMessage
+                  errors={methods.formState.errors}
+                  name="title"
+                  render={({ message }) => <ErrorText>{message}</ErrorText>}
+                />
+              </Field>
 
-                <Field>
-                  <Label htmlFor="content">Nội dung:</Label>
-                  <TextArea id="content" name="content" />
-                  <ErrorMessage
-                    errors={methods.formState.errors}
-                    name="content"
-                    render={({ message }) => <ErrorText>{message}</ErrorText>}
-                  />
-                </Field>
+              <Field>
+                <Label htmlFor="content">Nội dung:</Label>
+                <TextArea id="content" name="content" />
+                <ErrorMessage
+                  errors={methods.formState.errors}
+                  name="content"
+                  render={({ message }) => <ErrorText>{message}</ErrorText>}
+                />
+              </Field>
 
-                <Field>
-                  <Label htmlFor="timeLimit">Giới hạn thời gian vote:</Label>
-                  <SelectBox
-                    id="timeLimit"
-                    name="timeLimit"
-                    data={[
-                      {
-                        label: '10 phút',
-                        value: 10,
-                      },
-                      {
-                        label: '15 phút',
-                        value: 15,
-                      },
-                      {
-                        label: '20 phút',
-                        value: 20,
-                      },
-                    ]}
-                  />
-                  <ErrorMessage
-                    errors={methods.formState.errors}
-                    name="timeLimit"
-                    render={({ message }) => <ErrorText>{message}</ErrorText>}
-                  />
-                </Field>
+              <Field>
+                <Label htmlFor="timeLimit">Giới hạn thời gian vote:</Label>
+                <SelectBox
+                  id="timeLimit"
+                  name="timeLimit"
+                  data={[
+                    {
+                      label: '10 phút',
+                      value: 10,
+                    },
+                    {
+                      label: '15 phút',
+                      value: 15,
+                    },
+                    {
+                      label: '20 phút',
+                      value: 20,
+                    },
+                  ]}
+                />
+                <ErrorMessage
+                  errors={methods.formState.errors}
+                  name="timeLimit"
+                  render={({ message }) => <ErrorText>{message}</ErrorText>}
+                />
+              </Field>
 
-                <Field>
-                  <Label htmlFor="addresses">Danh sách địa điểm ăn chơi:</Label>
+              <Field>
+                <Label htmlFor="addresses">Danh sách địa điểm ăn chơi:</Label>
 
-                  {renderListLocation()}
+                {renderListLocation()}
 
-                  <List name="addresses" />
+                <List name="addresses" />
 
-                  <ErrorMessage
-                    errors={methods.formState.errors}
-                    name="addresses"
-                    render={({ message }) => <ErrorText>{message}</ErrorText>}
-                  />
-                </Field>
+                <ErrorMessage
+                  errors={methods.formState.errors}
+                  name="addresses"
+                  render={({ message }) => <ErrorText>{message}</ErrorText>}
+                />
+              </Field>
 
-                <ButtonGroup>
-                  <Button
-                    type="button"
-                    variant="danger"
-                    onClick={() => {
-                      prevStep()
-                    }}
-                  >
-                    Trước đó
-                  </Button>
+              <ButtonGroup>
+                <Button
+                  type="button"
+                  variant="danger"
+                  onClick={() => {
+                    prevStep()
+                  }}
+                >
+                  Trước đó
+                </Button>
 
-                  <Button type="submit" variant="primary">
-                    Tiếp theo
-                  </Button>
-                </ButtonGroup>
-              </form>
-            </FormProvider>
-          </FormCard>
-      }
+                <Button type="submit" variant="primary">
+                  Tiếp theo
+                </Button>
+              </ButtonGroup>
+            </form>
+          </FormProvider>
+        </FormCard>
+      )}
     </>
   )
 })

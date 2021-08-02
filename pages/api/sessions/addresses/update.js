@@ -34,7 +34,7 @@ export default async function handler(req, res) {
   let values = [address.aid]
   let result = await db.get(queryString, values)
 
-  if (_.isNil(result.id)) {
+  if (_.isNil(result)) {
     // insert address to table
     queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
     values = [address.aid, address.name, address.latitude, address.longitude]
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
 
   // save user to session_address (address of session)
   // check
-  const addressId = result.id ?? result.lastID
+  const addressId = result?.id ?? result.lastID
   queryString = `SELECT DISTINCT session_id FROM session_address WHERE address_id = ?`
   values = [addressId]
   result = await db.all(queryString, values)

@@ -41,7 +41,7 @@ export default async function handler(req, res) {
   let queryString = `INSERT INTO sessions (title, content, expire_time, creator) VALUES (?, ?, ?, ?) `
   let values = [title, content, expireTime, uid]
   let result = await db.run(queryString, values)
-  const sessionId = result.lastId
+  const sessionId = result.lastID
 
   let addressIds = []
   for (let address of addresses) {
@@ -64,6 +64,17 @@ export default async function handler(req, res) {
     queryString = `INSERT INTO session_address (session_id, address_id) VALUES (?, ?)`
     values = [sessionId, addressId]
     result = await db.run(queryString, values)
+  }
+
+  // insert admin to session_user
+  queryString = `INSERT INTO session_user VALUES (?, ?)`
+  values = [sessionId, uid]
+  result = await db.run(queryString, values)
+
+  if (_.isNil(result)) {
+    await db.close()
+    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin' })
+    return
   }
 
   await db.close()
