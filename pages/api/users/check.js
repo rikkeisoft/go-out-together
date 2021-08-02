@@ -35,7 +35,7 @@ export default async function handler(req, res) {
 
   const db = await openDb()
 
-  let queryString = 'SELECT username, avatar_url, is_online FROM users WHERE uuid = ?'
+  let queryString = 'SELECT username, avatar_url FROM users WHERE uuid = ?'
   let values = [req.body.uuid]
   let result = await db.all(queryString, values)
 
@@ -48,11 +48,6 @@ export default async function handler(req, res) {
     // user not in table
     await db.close()
     res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Thông tin người dùng không có trong bảng' })
-    return
-  } else if (result.is_online === 0) {
-    // user is offline
-    await db.close()
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Người dùng đang offline' })
     return
   } else {
     // user is online
