@@ -3,7 +3,7 @@ import queryString from 'query-string'
 
 // Set ip default config for http requests here
 const axiosClient = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: '/api',
   headers: {
     'content-type': 'application/json',
   },
