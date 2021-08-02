@@ -9,7 +9,7 @@ const schema = yup.object().shape({
 })
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
+  if (req.method !== 'GET') {
     res.status(404).json({ messageCode: messageCodes.ERROR, message: 'Không tìm thấy api route' })
     return
   }
@@ -31,12 +31,14 @@ export default async function handler(req, res) {
   let result = await db.get(queryString, values)
 
   if (_.isNil(result)) {
+    await db.close()
     res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin' })
     return
   }
 
   if (userId === result.creator) isAdmin = true
 
+  await db.close()
   res.status(200).json({
     messageCode: messageCodes.SUCCESS,
     data: {
