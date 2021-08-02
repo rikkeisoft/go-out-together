@@ -56,20 +56,20 @@ export default async function handler(req, res) {
 
     queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
     values = [address.aid, address.name, address.latitude, address.longitude]
-    result = await db.get(queryString, values)
+    result = await db.run(queryString, values)
     addressIds.push(result.lastId)
   }
 
   for (let addressId of addressIds) {
     queryString = `INSERT INTO session_address (session_id, address_id) VALUES (?, ?)`
     values = [sessionId, addressId]
-    result = await db.get(queryString, values)
+    result = await db.run(queryString, values)
   }
 
   await db.close()
   res.status(200).json({
     messageCode: messageCodes.SUCCESS,
-    message: 'Cập nhật thông tin người tạo session thành công',
+    message: 'Tạo session thành công',
     data: {
       sharedLink: req.headers.host + '/sessions/' + sessionId,
     },
