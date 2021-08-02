@@ -15,15 +15,13 @@ import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
 import { auth } from 'lib/firebase'
 import UserAvatar from 'components/avatar/UserAvatar'
 import { useCookies } from 'react-cookie'
-import { useMutation, useQueryClient } from 'react-query'
-import userAPI from 'api/userAPI'
+import { useQueryClient } from 'react-query'
 import queriesKey from 'consts/queriesKey'
 
 export default function Details() {
   const [cookies, , removeCookie] = useCookies(['uid', 'username', 'imgURL'])
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { mutateAsync } = useMutation((param) => userAPI.logout(param))
   const { id } = router.query
 
   const { step, formData, prevStep, nextStep, setFormData } = useStep()
@@ -53,21 +51,14 @@ export default function Details() {
 
   const goToHomePage = () => router.push(urls.HOME)
 
-  const handleSignOut = async () => {
-    await mutateAsync(
-      { uuid: cookies.uid },
-      {
-        onSuccess: () => {
-          queryClient.setQueryData(queriesKey.CHECK_USER, { isSignedOut: true })
-        },
-      },
-    )
+  const handleSignOut = () => {
+    goToHomePage()
+    queryClient.setQueryData(queriesKey.CHECK_USER, { isSignedOut: true })
     localStorage.removeItem('redirectURL')
     removeCookie('uid', { path: '/' })
     removeCookie('username', { path: '/' })
     removeCookie('imgURL', { path: '/' })
     auth.signOut()
-    goToHomePage()
   }
 
   return (

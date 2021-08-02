@@ -15,16 +15,12 @@ import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
 import UserAvatar from 'components/avatar/UserAvatar'
 import { auth } from 'lib/firebase'
 import { useCookies } from 'react-cookie'
-import { useMutation, useQueryClient } from 'react-query'
-import userAPI from 'api/userAPI'
-import Popup from 'components/common/Popup'
-import Loading from 'components/common/Loading'
+import { useQueryClient } from 'react-query'
 import queriesKey from 'consts/queriesKey'
 
 export default function Create() {
   const [cookies, , removeCookie] = useCookies(['uid', 'username', 'imgURL'])
   const queryClient = useQueryClient()
-  const { isLoading, mutateAsync } = useMutation((param) => userAPI.logout(param))
   const router = useRouter()
   const { step, formData, backwardStep, prevStep, nextStep, setFormData } = useStep()
   const [shareLink, setShareLink] = useState('')
@@ -54,21 +50,14 @@ export default function Create() {
 
   const goToHomePage = () => router.push(urls.HOME)
 
-  const handleSignOut = async () => {
-    await mutateAsync(
-      { uuid: cookies.uid },
-      {
-        onSuccess: () => {
-          queryClient.setQueryData(queriesKey.CHECK_USER, { isSignedOut: true })
-        },
-      },
-    )
+  const handleSignOut = () => {
+    goToHomePage()
+    queryClient.setQueryData(queriesKey.CHECK_USER, { isSignedOut: true })
     localStorage.removeItem('redirectURL')
     removeCookie('uid', { path: '/' })
     removeCookie('username', { path: '/' })
     removeCookie('imgURL', { path: '/' })
     auth.signOut()
-    goToHomePage()
   }
 
   return (
@@ -78,11 +67,6 @@ export default function Create() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container>
-        {isLoading && (
-          <Popup isOpen={isLoading} onRequestClose={(isSuccess) => isSuccess}>
-            <Loading />
-          </Popup>
-        )}
         <div className="flex items-center justify-around">
           <Button type="button" variant="danger" onClick={goToHomePage}>
             <ArrowLeftIcon className="w-7" /> Về trang chủ
