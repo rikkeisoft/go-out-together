@@ -60,7 +60,8 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
         let start = [listUserLocation[index].coordinates[0], listUserLocation[index].coordinates[1]]
         const getRoute = async (end) => {
           const response = await axios.get(
-            `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`)
+            `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
+          )
           const data = response.data.routes[0]
           const coordinates = data.geometry.coordinates
           const geojson = {
@@ -114,14 +115,15 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
               type: 'geojson',
               data: {
                 type: 'FeatureCollection',
-                features: [{
-                  type: 'Feature',
-                  properties: {},
-                  geometry: {
-                    type: 'Point',
-                    coordinates: start,
+                features: [
+                  {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                      type: 'Point',
+                      coordinates: start,
+                    },
                   },
-                },
                 ],
               },
             },
@@ -135,14 +137,15 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           const coords = [expDestination.coordinates[0], expDestination.coordinates[1]]
           let end = {
             type: 'FeatureCollection',
-            features: [{
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Point',
-                coordinates: coords,
+            features: [
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'Point',
+                  coordinates: coords,
+                },
               },
-            },
             ],
           }
           if (map.getLayer('end')) {
@@ -155,14 +158,16 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
                 type: 'geojson',
                 data: {
                   type: 'FeatureCollection',
-                  features: [{
-                    type: 'Feature',
-                    properties: {},
-                    geometry: {
-                      type: 'Point',
-                      coordinates: coords,
+                  features: [
+                    {
+                      type: 'Feature',
+                      properties: {},
+                      geometry: {
+                        type: 'Point',
+                        coordinates: coords,
+                      },
                     },
-                  }],
+                  ],
                 },
               },
               paint: {
@@ -246,7 +251,6 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             />
           </svg>
           {/* Chiều dài quãng đường: {(distance / 1000).toFixed(2)} KM */}
-
         </p>
       </div>
     </>

@@ -9,7 +9,6 @@ const sessionsCreate = {
     const url = endPoint.CREATE_ADMIN_INFO
     return axiosClient.post(url, dataAdmin)
   },
-
 }
 
 export default sessionsCreate

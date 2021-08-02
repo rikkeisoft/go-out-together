@@ -54,7 +54,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   // console.log(userLocation)
 
   // call API
-  
+
   // useEffect(() => {
   //   if (userLocation) {
   //     const adminInfo = {
@@ -68,7 +68,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   //       },
   //     }
   //     console.log(adminInfo)
-  
+
   //     const sendAminInfo = async () => {
   //       try {
   //         const response = await sessionsCreate.createInfoAdmin(adminInfo)
@@ -135,7 +135,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
               </Field>
 
               <ButtonGroup>
-                <Button type="submit" variant="primary" onClick={() => { }}>
+                <Button type="submit" variant="primary" onClick={() => {}}>
                   Tiếp theo
                 </Button>
               </ButtonGroup>

@@ -101,12 +101,12 @@ const MapBox = ({ show, isOneLocaion, data }) => {
               onClick={() => {
                 if (isOneLocaion) {
                   data(selectedLocation)
-                }
-                else {
+                } else {
                   data(listLocation)
                 }
                 show()
-              }}>
+              }}
+            >
               Xong
             </Button>
           </div>
@@ -184,12 +184,10 @@ const MapBox = ({ show, isOneLocaion, data }) => {
                     setSelectedLocation(item)
                     if (isOneLocaion) {
                       setListLocation([item])
-                    }
-                    else {
+                    } else {
                       if (listLocation.length === 0) {
                         setListLocation([...listLocation, item])
-                      }
-                      else {
+                      } else {
                         listLocation.forEach((location) => {
                           location.id === item.id ? null : setListLocation([...listLocation, item])
                         })

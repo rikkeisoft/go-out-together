@@ -1,5 +1,6 @@
 import { openDb } from 'lib/db'
 import * as yup from 'yup'
+import _ from 'lodash'
 import messageCodes from 'consts/messageCodes'
 
 const schema = yup.object().shape({
@@ -27,6 +28,13 @@ export default async function handler(req, res) {
   let queryString = `SELECT title, content, expire_time FROM sessions WHERE id = ?`
   let values = [sessionId]
   let result = await db.get(queryString, values)
+
+  if (_.isNil(result)) {
+    await db.close()
+    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin' })
+    return
+  }
+
   data.title = result.title
   data.content = result.content
   data.expireTime = result.expire_time
@@ -35,9 +43,16 @@ export default async function handler(req, res) {
   queryString = `SELECT user_id FROM session_user WHERE session_id = ?`
   values = [sessionId]
   result = await db.all(queryString, values)
+
+  if (_.isNil(result)) {
+    await db.close()
+    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin' })
+    return
+  }
+
   let userIds = result.map((row) => row.user_id)
   for (let userId of userIds) {
-    queryString = `SELECT name, avatar_url FROM users WHERE id = ?`
+    queryString = `SELECT name, avatar_url FROM users WHERE uuid = ?`
     values = [userId]
     result = await db.get(queryString, values)
     members.push({
@@ -71,7 +86,7 @@ export default async function handler(req, res) {
   await db.close()
   res.status(200).json({
     messageCode: messageCodes.SUCCESS,
-    message: 'Tạo session thành công',
+    message: 'Lấy dữ liệu session thành công',
     data: data,
   })
 }
