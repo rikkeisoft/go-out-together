@@ -15,6 +15,8 @@ import ErrorText from 'components/common/ErrorText'
 import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MapBox from 'components/common/MapBox'
+// import sessionsCreate from 'api/sessionsCreate'
+// import { uid } from 'uid'
 
 const schema = yup.object().shape({
   name: yup.string().required('Nhập vào tên'),
@@ -23,6 +25,8 @@ const schema = yup.object().shape({
 
 const Step1 = memo(({ formData, setFormData, nextStep }) => {
   const [cookies, setCookie] = useCookies(['cookie-name'])
+  const [showMap, setShowMap] = useState(false)
+  const [userLocation, setUserLocation] = useState(null)
 
   let obj = {}
   if (!_.isNil(cookies?.username)) {
@@ -35,9 +39,6 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
 
   const defaultValues = Object.assign({}, formData, obj)
 
-  const [showMap, setShowMap] = useState(false)
-  const [userLocation, setUserLocation] = useState(null)
-
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: defaultValues,
@@ -49,6 +50,36 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
     setFormData(Object.assign({}, formData, data))
     nextStep()
   }
+
+  // console.log(userLocation)
+
+  // call API
+  
+  // useEffect(() => {
+  //   if (userLocation) {
+  //     const adminInfo = {
+  //       uid: uid(),
+  //       name: formData.name,
+  //       address: {
+  //         aid: userLocation.id,
+  //         name: userLocation.place_name,
+  //         latitude: userLocation.geometry.coordinates[0],
+  //         longitude: userLocation.geometry.coordinates[1],
+  //       },
+  //     }
+  //     console.log(adminInfo)
+  
+  //     const sendAminInfo = async () => {
+  //       try {
+  //         const response = await sessionsCreate.createInfoAdmin(adminInfo)
+  //         console.log(response)
+  //       } catch (error) {
+  //         console.log('error', error)
+  //       }
+  //     }
+  //     sendAminInfo()
+  //   }
+  // }, [formData])
 
   return (
     <>
@@ -104,7 +135,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
               </Field>
 
               <ButtonGroup>
-                <Button type="submit" variant="primary" onClick={() => {}}>
+                <Button type="submit" variant="primary" onClick={() => { }}>
                   Tiếp theo
                 </Button>
               </ButtonGroup>

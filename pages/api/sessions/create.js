@@ -69,7 +69,7 @@ export default async function handler(req, res) {
   await db.close()
   res.status(200).json({
     messageCode: messageCodes.SUCCESS,
-    message: 'Cập nhật thông tin người tạo session thành công',
+    message: 'Tạo session thành công',
     data: {
       sharedLink: req.headers.host + '/sessions/' + sessionId,
     },

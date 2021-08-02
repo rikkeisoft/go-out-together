@@ -75,10 +75,9 @@ const Step2 = memo(({ sessionId, formData, prevStep, nextStep, setVoteResult }) 
       coordinates: [105.782214, 21.037867],
     },
     {
-      label: 'Bên xe Mỹ Đình (4 người vote)',
-      value: 'Bên xe Mỹ Đình',
-      amountVote: 4,
-      coordinates: [105.777909, 21.028412],
+      name: 'son nguyen',
+      address: 'Dong Da, Hanoi, Vietnam',
+      coordinates: [105.8333, 21.0167],
     },
   ]
 
