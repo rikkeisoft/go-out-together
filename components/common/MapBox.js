@@ -4,6 +4,7 @@ import mapboxgl from 'mapbox-gl'
 import Head from 'next/head'
 import axios from 'axios'
 import Button from './Button'
+// import * as turf from '@turf/turf'
 
 const MapBox = ({ show, isOneLocaion, data }) => {
   const [location, setLocation] = useState(null)
@@ -11,8 +12,9 @@ const MapBox = ({ show, isOneLocaion, data }) => {
   const [selectedLocation, setSelectedLocation] = useState('')
   const [listLocation, setListLocation] = useState([])
   const [showListLocation, setShowListLocation] = useState(true)
+  const [arrayCoodinates, setArrayCoodinates] = useState([])
 
-  console.log(listLocation)
+  // console.log(listLocation)
 
   useEffect(() => {
     if (location) {
@@ -44,7 +46,6 @@ const MapBox = ({ show, isOneLocaion, data }) => {
         center: [longitude, latitude],
         zoom: 12,
       })
-
       listLocation.map((item) => {
         const addMarker = () => {
           const marker = new mapboxgl.Marker()
@@ -55,16 +56,32 @@ const MapBox = ({ show, isOneLocaion, data }) => {
 
           marker.setLngLat([item.center[0], item.center[1]])
           marker.addTo(map)
+
+          setArrayCoodinates([...arrayCoodinates, item.geometry.coordinates])
         }
         map.on('load', addMarker)
       })
-      // map.fitBounds([[105.82075699999999, 21.053331],
-      // [105.733275, 20.998666],],
-      //   {
-      //     padding: { top: 10, bottom: 25, left: 15, right: 5 },
-      //   })
     }
   }, [selectedLocation])
+
+  // const getBound = () => {
+  //   if (arrayCoodinates.length > 2) {
+  //     let map = new mapboxgl.Map({
+  //       container: 'map',
+  //       style: 'mapbox://styles/mapbox/streets-v11',
+  //       center: [105.8, 21.0333],
+  //       zoom: 12,
+  //     })
+
+  //     const line = turf.lineString(arrayCoodinates)
+  //     const bbox = turf.bbox(line)
+  //     const bboxPolygon = turf.bboxPolygon(bbox)
+  //     const bounds = bboxPolygon.geometry.coordinates
+  //     console.log(bounds)
+
+  //     map.fitBounds(bounds[0], { padding: 10 })
+  //   }
+  // }
 
   return (
     <>
@@ -125,6 +142,18 @@ const MapBox = ({ show, isOneLocaion, data }) => {
               </svg>
             </span>
             <div className="absolute inline-block right-0">
+              {/* {
+                isOneLocaion === true ? null :
+                  (<div className="mr-2 inline-block">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={getBound}
+                    >
+                      Xem toàn bộ các điểm
+                    </Button>
+                  </div>)
+              } */}
               <Button
                 type="submit"
                 variant="primary"
