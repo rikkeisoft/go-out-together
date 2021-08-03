@@ -1,6 +1,6 @@
 import userAPI from 'api/userAPI'
 import Loading from 'components/common/Loading'
-import queriesKey from 'consts/queriesKey'
+import queryKeys from 'consts/queryKeys'
 import { useRouter } from 'next/router'
 import Home from 'pages'
 import { useEffect } from 'react'
@@ -11,18 +11,18 @@ export default function ProtectedComponent({ children }) {
   const [, , removeCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
   const queryClient = useQueryClient()
   const { error, isLoading } = useQuery(
-    [queriesKey.CHECK_USER],
+    [queryKeys.CHECK_USER],
     async () => {
-      const state = queryClient.getQueryState(queriesKey.CHECK_USER)
+      const state = queryClient.getQueryState(queryKeys.CHECK_USER)
       if (state?.data && (state?.data.isSignedOut || state?.data.isSignedIn)) {
         if (state?.data.isSignedOut) {
-          queryClient.setQueryData(queriesKey.CHECK_USER, { isSignedOut: false })
+          queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedOut: false })
         }
         return new Promise((rs) => rs())
       }
       try {
         await userAPI.checkUser()
-        queryClient.setQueryData(queriesKey.CHECK_USER, { isSignedIn: true })
+        queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedIn: true })
       } catch (error) {
         removeCookie('username', { path: '/' })
         removeCookie('uid', { path: '/' })
@@ -36,7 +36,7 @@ export default function ProtectedComponent({ children }) {
   const router = useRouter()
 
   useEffect(() => {
-    queryClient.invalidateQueries(queriesKey.CHECK_USER)
+    queryClient.invalidateQueries(queryKeys.CHECK_USER)
   }, [router.isReady, router.pathname])
 
   useEffect(() => {

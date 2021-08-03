@@ -1,7 +1,7 @@
 import userAPI from 'api/userAPI'
 import GoogleLogin from 'components/common/GoogleLogin'
 import Popup from 'components/common/Popup'
-import queriesKey from 'consts/queriesKey'
+import queryKeys from 'consts/queryKeys'
 import urls from 'consts/urls'
 import { auth } from 'lib/firebase'
 import { useRouter } from 'next/router'
@@ -31,7 +31,7 @@ function GoogleLoginModal({ isOpen, onRequestClose }) {
         setCookie('uid', uid, { path: '/' })
         setCookie('username', displayName, { path: '/' })
         setCookie('imgURL', photoURL, { path: '/' })
-        queryClient.setQueryData(queriesKey.CHECK_USER, { isSignedIn: true })
+        queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedIn: true })
         const url = localStorage.getItem('redirectURL')
         if (url !== null) router.push(url)
         else router.push(urls.SESSIONS_CREATE)

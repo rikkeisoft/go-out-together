@@ -16,7 +16,7 @@ import UserAvatar from 'components/avatar/UserAvatar'
 import { auth } from 'lib/firebase'
 import { useCookies } from 'react-cookie'
 import { useQueryClient } from 'react-query'
-import queriesKey from 'consts/queriesKey'
+import queryKeys from 'consts/queryKeys'
 
 export default function Create() {
   const [cookies, , removeCookie] = useCookies(['uid', 'username', 'imgURL'])
@@ -52,7 +52,7 @@ export default function Create() {
 
   const handleSignOut = () => {
     goToHomePage()
-    queryClient.setQueryData(queriesKey.CHECK_USER, { isSignedOut: true })
+    queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedOut: true })
     localStorage.removeItem('redirectURL')
     removeCookie('accessToken', { path: '/' })
     removeCookie('uid', { path: '/' })
