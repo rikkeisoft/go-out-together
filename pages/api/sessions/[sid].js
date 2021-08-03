@@ -3,7 +3,7 @@ import * as yup from 'yup'
 import _ from 'lodash'
 import messageCodes from 'consts/messageCodes'
 const schema = yup.object().shape({
-  sessionId: yup.string().required(),
+  sid: yup.string().required(),
 })
 
 export default async function handler(req, res) {
@@ -12,9 +12,9 @@ export default async function handler(req, res) {
     return
   }
 
-  const { sessionId } = req.query
+  const { sid } = req.query
 
-  const isValid = await schema.isValid({ sessionId })
+  const isValid = await schema.isValid({ sid })
 
   if (!isValid) {
     res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Các thông tin không hợp lệ' })
@@ -24,15 +24,17 @@ export default async function handler(req, res) {
   const db = await openDb()
 
   let data = {}
-  let queryString = `SELECT title, content, expire_time FROM sessions WHERE id = ?`
-  let values = [sessionId]
+  let queryString = `SELECT id, title, content, expire_time FROM sessions WHERE sid = ?`
+  let values = [sid]
   let result = await db.get(queryString, values)
 
   if (_.isNil(result)) {
     await db.close()
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin' })
+    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin session' })
     return
   }
+
+  const sessionId = result.id
 
   data.title = result.title
   data.content = result.content
@@ -45,27 +47,33 @@ export default async function handler(req, res) {
 
   if (_.isNil(result)) {
     await db.close()
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin' })
+    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được id thành viên' })
     return
   }
 
   let userIds = result.map((row) => row.user_id)
   for (let userId of userIds) {
-    queryString = `SELECT name, avatar_url FROM users WHERE uuid = ?`
+    queryString = `SELECT name, username, avatar_url FROM users WHERE id = ?`
     values = [userId]
     result = await db.get(queryString, values)
+    if (_.isNil(result)) {
+      await db.close()
+      res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin thành viên' })
+      return
+    }
+
     members.push({
       id: userId,
       username: result.username,
       name: result.name,
-      avatarURl: result.avatar_url,
+      avatarUrl: result.avatar_url,
     })
   }
   data.members = members
 
   let addresses = []
   queryString = `SELECT address_id FROM session_address WHERE session_id = ?`
-  values = [sessionId]
+  values = [sid]
   result = await db.all(queryString, values)
   let addressIds = result.map((row) => row.address_id)
   for (let addressId of addressIds) {

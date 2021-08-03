@@ -1,6 +1,7 @@
 import { openDb } from 'lib/db'
 import * as yup from 'yup'
 import _ from 'lodash'
+import { nanoid } from 'nanoid'
 import messageCodes from 'consts/messageCodes'
 import { getExpireTime } from 'lib/date'
 
@@ -38,8 +39,9 @@ export default async function handler(req, res) {
 
   const expireTime = getExpireTime(timeLimit)
 
-  let queryString = `INSERT INTO sessions (title, content, expire_time, creator) VALUES (?, ?, ?, ?) `
-  let values = [title, content, expireTime, uid]
+  const sid = nanoid()
+  let queryString = `INSERT INTO sessions (sid, title, content, expire_time, creator) VALUES (?, ?, ?, ?, ?) `
+  let values = [sid, title, content, expireTime, uid]
   let result = await db.run(queryString, values)
   const sessionId = result.lastID
 
@@ -66,9 +68,14 @@ export default async function handler(req, res) {
     result = await db.run(queryString, values)
   }
 
+  queryString = `SELECT id FROM users WHERE uuid = ?`
+  values = [uid]
+  result = await db.get(queryString, values)
+  const userId = result.id
+
   // insert admin to session_user
   queryString = `INSERT INTO session_user VALUES (?, ?)`
-  values = [sessionId, uid]
+  values = [sessionId, userId]
   result = await db.run(queryString, values)
 
   if (_.isNil(result)) {
@@ -82,7 +89,7 @@ export default async function handler(req, res) {
     messageCode: messageCodes.SUCCESS,
     message: 'Tạo session thành công',
     data: {
-      sharedLink: req.headers.host + '/sessions/' + sessionId,
+      sid: sid,
     },
   })
 }
