@@ -5,6 +5,7 @@ import * as yup from 'yup'
 import { openDb } from 'lib/db'
 import messageCodes from 'consts/messageCodes'
 import _ from 'lodash'
+import jwt from 'jsonwebtoken'
 
 const schema = yup.object().shape({
   uuid: yup.string().required(),
@@ -63,11 +64,16 @@ export default async function handler(req, res) {
     }
   }
 
+  // generate jwt token
+  const accessToken = jwt.sign({ userId: uuid }, process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET, { expiresIn: '10h' })
+
   // all done
   await db.close()
   res.status(200).json({
     messageCode: messageCodes.SUCCESS,
     message: 'Đăng nhập thành công',
-    data: result,
+    data: {
+      accessToken,
+    },
   })
 }

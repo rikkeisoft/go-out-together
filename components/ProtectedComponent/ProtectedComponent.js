@@ -8,29 +8,36 @@ import { useCookies } from 'react-cookie'
 import { useQuery, useQueryClient } from 'react-query'
 
 export default function ProtectedComponent({ children }) {
-  const [cookies] = useCookies(['uid', 'username', 'imgURL'])
-  const param = { uuid: cookies?.uid }
+  const [, , removeCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
   const queryClient = useQueryClient()
   const { error, isLoading } = useQuery(
-    [queriesKey.CHECK_USER, param],
+    [queriesKey.CHECK_USER],
     async () => {
       const state = queryClient.getQueryState(queriesKey.CHECK_USER)
       if (state?.data && (state?.data.isSignedOut || state?.data.isSignedIn)) {
-        if (state.data.isSignedOut) {
-          queryClient.setQueryData(queriesKey.CHECK_USER, { isSignedOut: false, isSignedIn: false })
+        if (state?.data.isSignedOut) {
+          queryClient.setQueryData(queriesKey.CHECK_USER, { isSignedOut: false })
         }
         return new Promise((rs) => rs())
       }
       try {
-        await userAPI.checkUser(param)
+        await userAPI.checkUser()
         queryClient.setQueryData(queriesKey.CHECK_USER, { isSignedIn: true })
       } catch (error) {
-        throw new Error('You need to login')
+        removeCookie('username', { path: '/' })
+        removeCookie('uid', { path: '/' })
+        removeCookie('imgURL', { path: '/' })
+        removeCookie('accessToken', { path: '/' })
+        throw new Error(error.response.data.message)
       }
     },
     { retry: 1 },
   )
   const router = useRouter()
+
+  useEffect(() => {
+    queryClient.invalidateQueries(queriesKey.CHECK_USER)
+  }, [router.isReady, router.pathname])
 
   useEffect(() => {
     if (!router.isReady) return

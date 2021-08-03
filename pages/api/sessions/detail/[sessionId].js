@@ -2,7 +2,6 @@ import { openDb } from 'lib/db'
 import * as yup from 'yup'
 import _ from 'lodash'
 import messageCodes from 'consts/messageCodes'
-
 const schema = yup.object().shape({
   sessionId: yup.string().required(),
 })

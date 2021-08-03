@@ -6,38 +6,39 @@ import urls from 'consts/urls'
 import { auth } from 'lib/firebase'
 import { useRouter } from 'next/router'
 import PropTypes from 'prop-types'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import { useMutation, useQueryClient } from 'react-query'
 
 function GoogleLoginModal({ isOpen, onRequestClose }) {
-  const [isSignedIn, setIsSignedIn] = useState(false)
   const queryClient = useQueryClient()
   const router = useRouter()
-  const [cookie, setCookie] = useCookies(['uid', 'username', 'imgURL'])
-  const { mutate } = useMutation((userInfo) => userAPI.login(userInfo))
+  const [cookies, setCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
+  const { mutate } = useMutation((userInfo) => userAPI.login(userInfo), {
+    onSuccess: (data) => setCookie('accessToken', data.data.accessToken, { path: '/' }),
+  })
 
   useEffect(() => {
+    if (cookies?.accessToken === undefined) auth.signOut()
     const unregisterAuthObserver = auth.onAuthStateChanged((userFirebase) => {
-      setIsSignedIn(() => !!userFirebase)
-      if (!isSignedIn && userFirebase && cookie?.uid === undefined) {
+      if (userFirebase && cookies?.accessToken === undefined) {
         const { uid, displayName, photoURL } = userFirebase
         mutate({
           uuid: uid,
           username: displayName,
           avatar_url: photoURL,
         })
+        setCookie('uid', uid, { path: '/' })
+        setCookie('username', displayName, { path: '/' })
+        setCookie('imgURL', photoURL, { path: '/' })
         queryClient.setQueryData(queriesKey.CHECK_USER, { isSignedIn: true })
         const url = localStorage.getItem('redirectURL')
         if (url !== null) router.push(url)
         else router.push(urls.SESSIONS_CREATE)
-        setCookie('uid', uid, { path: '/' })
-        setCookie('username', displayName, { path: '/' })
-        setCookie('imgURL', photoURL, { path: '/' })
       }
     })
     return () => unregisterAuthObserver()
-  }, [])
+  }, [isOpen])
 
   return (
     <Popup isOpen={isOpen} onRequestClose={onRequestClose}>

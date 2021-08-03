@@ -4,12 +4,13 @@ import _ from 'lodash'
 import * as yup from 'yup'
 import { openDb } from 'lib/db'
 import messageCodes from 'consts/messageCodes'
+import withProtect from 'middware/withProtect'
 
 const schema = yup.object().shape({
   uuid: yup.string().required(),
 })
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(404).json({
       messageCode: messageCodes.ERROR,
@@ -17,13 +18,7 @@ export default async function handler(req, res) {
     })
   }
 
-  if (_.isNil(req?.body?.uuid)) {
-    // error
-    res.status(404).json({ messageCode: messageCodes.ERROR, message: 'Các thông tin không hợp lệ' })
-    return
-  }
-
-  const { uuid } = req.body
+  const uuid = req.userId
 
   const isValid = await schema.isValid({ uuid })
 
@@ -59,3 +54,5 @@ export default async function handler(req, res) {
     })
   }
 }
+
+export default withProtect(handler)
