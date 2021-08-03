@@ -4,7 +4,7 @@ import mapboxgl from 'mapbox-gl'
 import Head from 'next/head'
 import axios from 'axios'
 import Button from './Button'
-// import * as turf from '@turf/turf'
+import * as turf from '@turf/turf'
 
 const MapBox = ({ show, isOneLocaion, data }) => {
   const [location, setLocation] = useState(null)
@@ -14,7 +14,7 @@ const MapBox = ({ show, isOneLocaion, data }) => {
   const [showListLocation, setShowListLocation] = useState(true)
   const [arrayCoodinates, setArrayCoodinates] = useState([])
 
-  console.log(listLocation)
+  // console.log(listLocation)
 
   useEffect(() => {
     if (location) {
@@ -64,24 +64,30 @@ const MapBox = ({ show, isOneLocaion, data }) => {
     }
   }, [selectedLocation])
 
-  // const getBound = () => {
-  //   if (arrayCoodinates.length > 2) {
-  //     let map = new mapboxgl.Map({
-  //       container: 'map',
-  //       style: 'mapbox://styles/mapbox/streets-v11',
-  //       center: [105.8, 21.0333],
-  //       zoom: 12,
-  //     })
+  const getBound = () => {
+    var line = turf.lineString([[-74, 40], [-78, 42], [-82, 35]])
+    var bbox = turf.bbox(line)
+    var bboxPolygon = turf.bboxPolygon(bbox)
+    console.log(bboxPolygon)
 
-  //     const line = turf.lineString(arrayCoodinates)
-  //     const bbox = turf.bbox(line)
-  //     const bboxPolygon = turf.bboxPolygon(bbox)
-  //     const bounds = bboxPolygon.geometry.coordinates
-  //     console.log(bounds)
+    // if (arrayCoodinates.length > 2) {
+    //   let map = new mapboxgl.Map({
+    //     container: 'map',
+    //     style: 'mapbox://styles/mapbox/streets-v11',
+    //     center: [105.8, 21.0333],
+    //     zoom: 12,
+    //   })
 
-  //     map.fitBounds(bounds[0], { padding: 10 })
-  //   }
-  // }
+    //   const line = turf.lineString(arrayCoodinates)
+    //   const bbox = turf.bbox(line)
+    //   const bboxPolygon = turf.bboxPolygon(bbox)
+    //   const bounds = bboxPolygon.geometry.coordinates
+    //   console.log(bounds)
+
+    //   map.fitBounds(bounds[0], { padding: 10 })
+    // }
+  }
+  getBound()
 
   return (
     <>

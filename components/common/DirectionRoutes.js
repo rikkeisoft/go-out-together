@@ -181,7 +181,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           getRoute(coords)
         })
       })
-
+      //xử lý mảng điểm kinh độ vĩ độ có a[0]=a[n-1]
       const arrayPoint = []
       const getCenterPoint = () => {
         listUserLocation.forEach((item) => {
@@ -193,17 +193,32 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
       if (listUserLocation.length > 2) {
         getCenterPoint()
         let polygon = turf.polygon([arrayPoint])
-        let center = turf.centerOfMass(polygon)
+        let centerCoordinates = turf.centerOfMass(polygon)
 
-        let point = turf.point([center.geometry.coordinates[0], center.geometry.coordinates[1]])
-        let buffered = turf.buffer(point, 1000, { units: 'miles' })
-        console.log(buffered)
-        // map.on('load', () => {
-        //   const marker = new mapboxgl.Marker()
-        //   marker.setLngLat([center.geometry.coordinates[0], center.geometry.coordinates[1]])
-        //   marker.addTo(map)
-        // })
-        // console.log(center)
+        map.on('load', function () {
+          let center = turf.point([centerCoordinates.geometry.coordinates[0], centerCoordinates.geometry.coordinates[1]])
+          let radius = 1
+          let options = {
+            steps: 90,
+            units: 'kilometers',
+          }
+
+          let circle = turf.circle(center, radius, options)
+
+          map.addSource('circleData', {
+            type: 'geojson',
+            data: circle,
+          })
+          map.addLayer({
+            id: 'circle-fill',
+            type: 'fill',
+            source: 'circleData',
+            paint: {
+              'fill-color': '#00FFFF',
+              'fill-opacity': 0.2,
+            },
+          })
+        })
       }
 
     }
