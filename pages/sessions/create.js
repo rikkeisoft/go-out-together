@@ -54,6 +54,7 @@ export default function Create() {
     goToHomePage()
     queryClient.setQueryData(queriesKey.CHECK_USER, { isSignedOut: true })
     localStorage.removeItem('redirectURL')
+    removeCookie('accessToken', { path: '/' })
     removeCookie('uid', { path: '/' })
     removeCookie('username', { path: '/' })
     removeCookie('imgURL', { path: '/' })
