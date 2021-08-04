@@ -1,9 +1,10 @@
-import { openDb } from 'lib/db'
+import { openDb, closeDb } from 'lib/db'
 import * as yup from 'yup'
 import _ from 'lodash'
 import { nanoid } from 'nanoid'
 import messageCodes from 'consts/messageCodes'
 import { getExpireTime } from 'lib/date'
+import ApiException from 'exceptions/ApiException'
 
 const schema = yup.object().shape({
   uid: yup.string().required(),
@@ -21,75 +22,120 @@ const schema = yup.object().shape({
 })
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(404).json({ messageCode: messageCodes.ERROR, message: 'Không tìm thấy api route' })
-    return
-  }
-
-  const { uid, title, content, timeLimit, addresses } = req.body
-
-  const isValid = await schema.isValid({ uid, title, content, timeLimit, addresses })
-
-  if (!isValid) {
-    res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Các thông tin không hợp lệ' })
-    return
-  }
-
-  const db = await openDb()
-
-  const expireTime = getExpireTime(timeLimit)
-
-  const sid = nanoid()
-  let queryString = `INSERT INTO sessions (sid, title, content, expire_time, creator) VALUES (?, ?, ?, ?, ?) `
-  let values = [sid, title, content, expireTime, uid]
-  let result = await db.run(queryString, values)
-  const sessionId = result.lastID
-
-  let addressIds = []
-  for (let address of addresses) {
-    queryString = `SELECT id FROM addresses WHERE aid = ?`
-    values = [address.aid]
-    result = await db.get(queryString, values)
-
-    if (!_.isNil(result)) {
-      addressIds.push(result.id)
-      continue
+  try {
+    if (req.method !== 'POST') {
+      throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
-    values = [address.aid, address.name, address.latitude, address.longitude]
-    result = await db.run(queryString, values)
-    addressIds.push(result.lastId)
-  }
+    const { uid, title, content, timeLimit, addresses } = req.body
 
-  for (let addressId of addressIds) {
-    queryString = `INSERT INTO session_address (session_id, address_id) VALUES (?, ?)`
-    values = [sessionId, addressId]
-    result = await db.run(queryString, values)
-  }
+    try {
+      await schema.validate({ uid, title, content, timeLimit, addresses })
+    } catch (err) {
+      throw new ApiException(400, 'Các thông tin không hợp lệ', err)
+    }
 
-  queryString = `SELECT id FROM users WHERE uuid = ?`
-  values = [uid]
-  result = await db.get(queryString, values)
-  const userId = result.id
+    const db = await openDb()
 
-  // insert admin to session_user
-  queryString = `INSERT INTO session_user VALUES (?, ?)`
-  values = [sessionId, userId]
-  result = await db.run(queryString, values)
+    const expireTime = getExpireTime(timeLimit)
 
-  if (_.isNil(result)) {
+    const sid = nanoid()
+    let queryString, values, result
+
+    queryString = `INSERT INTO sessions (sid, title, content, expire_time, creator) VALUES (?, ?, ?, ?, ?) `
+    values = [sid, title, content, expireTime, uid]
+
+    try {
+      result = await db.run(queryString, values)
+    } catch (err) {
+      closeDb(db)
+      throw new ApiException(500, 'Không chèn được dữ liệu vào bảng addresses', err)
+    }
+
+    const sessionId = result.lastID
+
+    let addressIds = []
+    for (let address of addresses) {
+      queryString = `SELECT id FROM addresses WHERE aid = ?`
+      values = [address.aid]
+      try {
+        result = await db.get(queryString, values)
+      } catch (err) {
+        closeDb(db)
+        throw new ApiException(500, 'Không lấy được id từ bảng addresses', err)
+      }
+
+      if (!_.isNil(result)) {
+        addressIds.push(result.id)
+        continue
+      }
+
+      queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
+      values = [address.aid, address.name, address.latitude, address.longitude]
+      try {
+        result = await db.run(queryString, values)
+      } catch (err) {
+        closeDb(db)
+        throw new ApiException(500, 'Không thêm được bản ghi mới vào bảng addresses', err)
+      }
+
+      addressIds.push(result.lastId)
+    }
+
+    for (let addressId of addressIds) {
+      queryString = `INSERT INTO session_address (session_id, address_id) VALUES (?, ?)`
+      values = [sessionId, addressId]
+      try {
+        result = await db.run(queryString, values)
+      } catch (err) {
+        closeDb(db)
+        throw new ApiException(500, 'Không thêm được bản ghi mới vào bảng session_address', err)
+      }
+    }
+
+    queryString = `SELECT id, address_id FROM users WHERE uuid = ?`
+    values = [uid]
+    try {
+      result = await db.get(queryString, values)
+    } catch (err) {
+      closeDb(db)
+      throw new ApiException(500, 'Không thêm được bản ghi mới vào bảng session_address', err)
+    }
+
+    const userId = result.id
+    const addressId = result.address_id
+
+    // insert admin to session_user
+    queryString = `INSERT INTO session_user (session_id, user_id, address_id) VALUES (?, ?, ?)`
+    values = [sessionId, userId, addressId]
+    try {
+      result = await db.run(queryString, values)
+    } catch (err) {
+      closeDb(db)
+      throw new ApiException(500, 'Không thêm được bản ghi mới vào bảng session_user', err)
+    }
+
     await db.close()
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin' })
-    return
+    res.status(200).json({
+      messageCode: messageCodes.SUCCESS,
+      message: 'Tạo session thành công',
+      data: {
+        sid: sid,
+      },
+    })
+  } catch (exception) {
+    if (exception instanceof ApiException) {
+      res.status(exception.statusCode).json({
+        messageCode: messageCodes.ERROR,
+        message: exception.message,
+        err: exception.err,
+      })
+    } else {
+      res.status(500).json({
+        messageCode: messageCodes.ERROR,
+        message: 'Đã xảy ra lỗi',
+        err: exception,
+      })
+    }
   }
-
-  await db.close()
-  res.status(200).json({
-    messageCode: messageCodes.SUCCESS,
-    message: 'Tạo session thành công',
-    data: {
-      sid: sid,
-    },
-  })
 }
