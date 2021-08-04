@@ -4,19 +4,19 @@ import _ from 'lodash'
 import messageCodes from 'consts/messageCodes'
 
 const schema = yup.object().shape({
-  userId: yup.string().required(),
-  sessionId: yup.number().required(),
+  uid: yup.string().required(),
+  sid: yup.string().required(),
 })
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
+  if (req.method !== 'GET') {
     res.status(404).json({ messageCode: messageCodes.ERROR, message: 'Không tìm thấy api route' })
     return
   }
 
-  const { userId, sessionId } = req.body
+  const { uid, sid } = req.query
 
-  const isValid = await schema.isValid({ userId, sessionId })
+  const isValid = await schema.isValid({ uid, sid })
 
   if (!isValid) {
     res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Các thông tin không hợp lệ' })
@@ -25,22 +25,26 @@ export default async function handler(req, res) {
 
   const db = await openDb()
 
-  let isAdmin = false
-  let queryString = `SELECT creator FROM sessions WHERE id = ?`
-  let values = [sessionId]
+  let isCreator = false
+  let queryString = `SELECT creator FROM sessions WHERE sid = ?`
+  let values = [sid]
   let result = await db.get(queryString, values)
 
   if (_.isNil(result)) {
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin' })
+    await db.close()
+    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Session không tồn tại' })
     return
   }
 
-  if (userId === result.creator) isAdmin = true
+  if (uid === result.creator) {
+    isCreator = true
+  }
 
+  await db.close()
   res.status(200).json({
     messageCode: messageCodes.SUCCESS,
     data: {
-      isAdmin,
+      isCreator,
     },
   })
 }

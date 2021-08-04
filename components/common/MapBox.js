@@ -4,6 +4,7 @@ import mapboxgl from 'mapbox-gl'
 import Head from 'next/head'
 import axios from 'axios'
 import Button from './Button'
+import * as turf from '@turf/turf'
 
 const MapBox = ({ show, isOneLocaion, data }) => {
   const [location, setLocation] = useState(null)
@@ -11,6 +12,9 @@ const MapBox = ({ show, isOneLocaion, data }) => {
   const [selectedLocation, setSelectedLocation] = useState('')
   const [listLocation, setListLocation] = useState([])
   const [showListLocation, setShowListLocation] = useState(true)
+  const [arrayCoodinates, setArrayCoodinates] = useState([])
+
+  // console.log(listLocation)
 
   useEffect(() => {
     if (location) {
@@ -40,9 +44,8 @@ const MapBox = ({ show, isOneLocaion, data }) => {
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v11',
         center: [longitude, latitude],
-        zoom: 15,
+        zoom: 12,
       })
-
       listLocation.map((item) => {
         const addMarker = () => {
           const marker = new mapboxgl.Marker()
@@ -53,11 +56,38 @@ const MapBox = ({ show, isOneLocaion, data }) => {
 
           marker.setLngLat([item.center[0], item.center[1]])
           marker.addTo(map)
+
+          setArrayCoodinates([...arrayCoodinates, item.geometry.coordinates])
         }
         map.on('load', addMarker)
       })
     }
   }, [selectedLocation])
+
+  const getBound = () => {
+    var line = turf.lineString([[-74, 40], [-78, 42], [-82, 35]])
+    var bbox = turf.bbox(line)
+    var bboxPolygon = turf.bboxPolygon(bbox)
+    console.log(bboxPolygon)
+
+    // if (arrayCoodinates.length > 2) {
+    //   let map = new mapboxgl.Map({
+    //     container: 'map',
+    //     style: 'mapbox://styles/mapbox/streets-v11',
+    //     center: [105.8, 21.0333],
+    //     zoom: 12,
+    //   })
+
+    //   const line = turf.lineString(arrayCoodinates)
+    //   const bbox = turf.bbox(line)
+    //   const bboxPolygon = turf.bboxPolygon(bbox)
+    //   const bounds = bboxPolygon.geometry.coordinates
+    //   console.log(bounds)
+
+    //   map.fitBounds(bounds[0], { padding: 10 })
+    // }
+  }
+  getBound()
 
   return (
     <>
@@ -118,6 +148,18 @@ const MapBox = ({ show, isOneLocaion, data }) => {
               </svg>
             </span>
             <div className="absolute inline-block right-0">
+              {/* {
+                isOneLocaion === true ? null :
+                  (<div className="mr-2 inline-block">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={getBound}
+                    >
+                      Xem toàn bộ các điểm
+                    </Button>
+                  </div>)
+              } */}
               <Button
                 type="submit"
                 variant="primary"
@@ -125,7 +167,6 @@ const MapBox = ({ show, isOneLocaion, data }) => {
                   if (isOneLocaion) {
                     data(selectedLocation)
                   } else {
-                    console.log(listLocation)
                     data(listLocation)
                   }
                   show()
@@ -150,7 +191,13 @@ const MapBox = ({ show, isOneLocaion, data }) => {
                     if (isOneLocaion) {
                       setListLocation([item])
                     } else {
-                      setListLocation([...listLocation, item])
+                      if (listLocation.length === 0) {
+                        setListLocation([...listLocation, item])
+                      } else {
+                        listLocation.forEach((location) => {
+                          location.id === item.id ? null : setListLocation([...listLocation, item])
+                        })
+                      }
                     }
                     setShowListLocation(false)
                   }}
@@ -182,6 +229,7 @@ MapBox.propTypes = {
   show: PropTypes.func,
   isOneLocaion: PropTypes.bool,
   data: PropTypes.func,
+  listLocation: PropTypes.array,
 }
 
 MapBox.defaultProps = {}

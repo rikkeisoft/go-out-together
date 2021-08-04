@@ -1,20 +1,22 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import mapboxgl from 'mapbox-gl'
 import Head from 'next/head'
 import PropTypes from 'prop-types'
 import Button from './Button'
+import * as turf from '@turf/turf'
 
 const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destination }) => {
-  const [distance, setDistance] = useState(0)
+  const [distance, setDistance] = useState([])
+  const distanceRef = useRef([])
   console.log('currentLocation', currentLocation)
   // console.log('listUserLocation', listUserLocation)
   // console.log('destination', destination)
 
   const expCurrentLocation = {
     name: 'son nguyen',
-    address: 'Khách sạn Cầu Giấy',
-    coordinates: [105.8, 21.0333],
+    address: 'Dong Da, Hanoi, Vietnam',
+    coordinates: [105.8333, 21.0167],
   }
   const expDestination = {
     name: 'son nguyen',
@@ -34,7 +36,18 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
         zoom: 15,
       })
 
-      listUserLocation.map((item) => {
+      // add marker for distance
+      const addDestinationMarker = () => {
+        const marker = new mapboxgl.Marker({ color: '#ff0000' })
+        const markerPopup = new mapboxgl.Popup()
+        markerPopup.setText(`${expDestination.value}`)
+        marker.setPopup(markerPopup)
+        marker.setLngLat([expDestination.coordinates[0], expDestination.coordinates[1]])
+        marker.addTo(map)
+      }
+      map.on('load', addDestinationMarker)
+
+      listUserLocation.map((item, index) => {
         const addMarker = () => {
           const marker = new mapboxgl.Marker()
           const markerPopup = new mapboxgl.Popup()
@@ -46,103 +59,58 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           marker.addTo(map)
         }
         map.on('load', addMarker)
-      })
 
-      let start = [expCurrentLocation.coordinates[0], expCurrentLocation.coordinates[1]]
-      const getRoute = async (end) => {
-        const response = await axios.get(
-          `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
-        )
-        const data = response.data.routes[0]
-        const coordinates = data.geometry.coordinates
-        const geojson = {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'LineString',
-            coordinates: coordinates,
-          },
-        }
-        if (map.getSource('route')) {
-          map.getSource('route').setData(geojson)
-        } else {
-          map.addLayer({
-            id: 'route',
-            type: 'line',
-            source: {
-              type: 'geojson',
-              data: {
-                type: 'Feature',
-                properties: {},
-                geometry: {
-                  type: 'LineString',
-                  coordinates: geojson,
-                },
-              },
+        let start = [listUserLocation[index].coordinates[0], listUserLocation[index].coordinates[1]]
+        const getRoute = async (end) => {
+          const response = await axios.get(
+            `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
+          )
+          const data = response.data.routes[0]
+          const coordinates = data.geometry.coordinates
+          distanceRef.current.push(data.distance)
+          setDistance([...distance, distanceRef.current])
+          const geojson = {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates: coordinates,
             },
-            layout: {
-              'line-join': 'round',
-              'line-cap': 'round',
-            },
-            paint: {
-              'line-color': '#3887be',
-              'line-width': 5,
-              'line-opacity': 0.75,
-            },
-          })
-        }
-        if (start !== end) {
-          const length = response.data.routes[0].distance
-          setDistance(length)
-        }
-      }
-      map.on('load', () => {
-        getRoute(start)
-        map.addLayer({
-          id: 'point',
-          type: 'circle',
-          source: {
-            type: 'geojson',
-            data: {
-              type: 'FeatureCollection',
-              features: [
-                {
+          }
+          if (map.getSource(`route${index}`)) {
+            map.getSource(`route${index}`).setData(geojson)
+          } else {
+            map.addLayer({
+              id: `route${index}`,
+              type: 'line',
+              source: {
+                type: 'geojson',
+                data: {
                   type: 'Feature',
                   properties: {},
                   geometry: {
-                    type: 'Point',
-                    coordinates: start,
+                    type: 'LineString',
+                    coordinates: geojson,
                   },
                 },
-              ],
-            },
-          },
-          paint: {
-            'circle-radius': 10,
-            'circle-color': '#3887be',
-          },
-        })
-      })
-      map.on('load', () => {
-        const coords = [expDestination.coordinates[0], expDestination.coordinates[1]]
-        let end = {
-          type: 'FeatureCollection',
-          features: [
-            {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Point',
-                coordinates: coords,
               },
-            },
-          ],
+              layout: {
+                'line-join': 'round',
+                'line-cap': 'round',
+              },
+              paint: {
+                'line-color': '#3887be',
+                'line-width': 5,
+                'line-opacity': 0.75,
+              },
+            })
+          }
         }
-        if (map.getLayer('end')) {
-          map.getSource('end').setData(end)
-        } else {
+        //add start point
+        map.on('load', () => {
+          getRoute(start)
           map.addLayer({
-            id: 'end',
+            id: `point${index}`,
             type: 'circle',
             source: {
               type: 'geojson',
@@ -154,7 +122,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
                     properties: {},
                     geometry: {
                       type: 'Point',
-                      coordinates: coords,
+                      coordinates: start,
                     },
                   },
                 ],
@@ -162,14 +130,108 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             },
             paint: {
               'circle-radius': 10,
-              'circle-color': '#f30',
+              'circle-color': '#3887be',
             },
           })
-        }
-        getRoute(coords)
+        })
+        // add end point 
+        map.on('load', () => {
+          const coords = [expDestination.coordinates[0], expDestination.coordinates[1]]
+          let end = {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'Point',
+                  coordinates: coords,
+                },
+              },
+            ],
+          }
+          if (map.getLayer('end')) {
+            map.getSource('end').setData(end)
+          } else {
+            map.addLayer({
+              id: 'end',
+              type: 'circle',
+              source: {
+                type: 'geojson',
+                data: {
+                  type: 'FeatureCollection',
+                  features: [
+                    {
+                      type: 'Feature',
+                      properties: {},
+                      geometry: {
+                        type: 'Point',
+                        coordinates: coords,
+                      },
+                    },
+                  ],
+                },
+              },
+              paint: {
+                'circle-radius': 10,
+                'circle-color': '#f30',
+              },
+            })
+          }
+          getRoute(coords)
+        })
       })
+      //xử lý mảng điểm kinh độ vĩ độ có a[0]=a[n-1]
+      const arrayPoint = []
+      const getCenterPoint = () => {
+        listUserLocation.forEach((item) => {
+          arrayPoint.push(item.coordinates)
+        })
+        arrayPoint.push(arrayPoint[0])
+      }
+
+      if (listUserLocation.length > 2) {
+        getCenterPoint()
+        let polygon = turf.polygon([arrayPoint])
+        let centerCoordinates = turf.centerOfMass(polygon)
+
+        map.on('load', function () {
+          let center = turf.point([centerCoordinates.geometry.coordinates[0], centerCoordinates.geometry.coordinates[1]])
+          let radius = 1
+          let options = {
+            steps: 90,
+            units: 'kilometers',
+          }
+
+          let circle = turf.circle(center, radius, options)
+
+          map.addSource('circleData', {
+            type: 'geojson',
+            data: circle,
+          })
+          map.addLayer({
+            id: 'circle-fill',
+            type: 'fill',
+            source: 'circleData',
+            paint: {
+              'fill-color': '#00FFFF',
+              'fill-opacity': 0.2,
+            },
+          })
+        })
+      }
+
     }
   }, [destination])
+
+  const getDistance = () => {
+    if (distance[0] !== undefined) {
+      const total = distance[0].reduce((accumlator, value) => {
+        return accumlator + value
+      }, 0)
+      return (total / distance[0].length) / 500
+    }
+  }
 
   return (
     <>
@@ -237,7 +299,9 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
               d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
             />
           </svg>
-          Chiều dài quãng đường: {(distance / 1000).toFixed(2)} KM
+          {/* Chiều dài quãng đường: {(distance / 1000).toFixed(2)} KM */}
+          Chiều dài quãng đường trung bình: {distance[0] && getDistance().toFixed(2)} KM
+
         </p>
       </div>
     </>

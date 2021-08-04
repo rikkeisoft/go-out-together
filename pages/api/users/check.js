@@ -4,12 +4,13 @@ import _ from 'lodash'
 import * as yup from 'yup'
 import { openDb } from 'lib/db'
 import messageCodes from 'consts/messageCodes'
+import withProtect from 'middware/withProtect'
 
 const schema = yup.object().shape({
   uuid: yup.string().required(),
 })
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(404).json({
       messageCode: messageCodes.ERROR,
@@ -17,13 +18,7 @@ export default async function handler(req, res) {
     })
   }
 
-  if (_.isNil(req?.body?.uuid)) {
-    // error
-    res.status(404).json({ messageCode: messageCodes.ERROR, message: 'Các thông tin không hợp lệ' })
-    return
-  }
-
-  const { uuid } = req.body
+  const uuid = req.userId
 
   const isValid = await schema.isValid({ uuid })
 
@@ -35,7 +30,7 @@ export default async function handler(req, res) {
 
   const db = await openDb()
 
-  let queryString = 'SELECT username, avatar_url, is_online FROM users WHERE uuid = ?'
+  let queryString = 'SELECT username, avatar_url FROM users WHERE uuid = ?'
   let values = [req.body.uuid]
   let result = await db.all(queryString, values)
 
@@ -49,11 +44,6 @@ export default async function handler(req, res) {
     await db.close()
     res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Thông tin người dùng không có trong bảng' })
     return
-  } else if (result.is_online === 0) {
-    // user is offline
-    await db.close()
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Người dùng đang offline' })
-    return
   } else {
     // user is online
     await db.close()
@@ -64,3 +54,5 @@ export default async function handler(req, res) {
     })
   }
 }
+
+export default withProtect(handler)

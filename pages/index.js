@@ -33,7 +33,7 @@ export default function Home({ error }) {
   }, [error])
 
   const handleButtonClick = () => {
-    if (cookies?.uid !== undefined) {
+    if (cookies?.accessToken !== undefined) {
       router.push(redirectURL)
     } else setIsModalOpen(true)
   }
