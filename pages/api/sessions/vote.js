@@ -1,11 +1,11 @@
-import { openDb } from 'lib/db'
+import { mysql, cleanUp } from 'lib/db'
 import * as yup from 'yup'
-import _ from 'lodash'
 import messageCodes from 'consts/messageCodes'
+import ApiException from 'exceptions/ApiException'
 
 const schema = yup.object().shape({
-  userId: yup.string().required(),
-  sessionId: yup.string().required(),
+  uid: yup.string().required(),
+  sid: yup.string().required(),
   address: yup.object({
     aid: yup.string().required(),
     name: yup.string().required(),
@@ -15,85 +15,88 @@ const schema = yup.object().shape({
 })
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(404).json({ messageCode: messageCodes.ERROR, message: 'Không tìm thấy api route' })
-    return
-  }
-
-  const { userId, sessionId, address } = req.body
-
-  const isValid = await schema.isValid({ userId, sessionId, address })
-
-  if (!isValid) {
-    res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Các thông tin không hợp lệ' })
-    return
-  }
-
-  // check user has voted or not
-  // user has voted -> address_id is the same -> not update, address_id is different -> update
-  // user has not voted -> insert
-
-  // get addressId of address sent to server base on aid
-  // if session_id === null -> not have sessionId -> insert
-  // session_id !== null -> userId not in userId array -> insert
-  // address_id !== addressId of userId -> update, else do nothing
-
-  const db = await openDb()
-
-  let queryString = `SELECT id FROM addresses WHERE aid = ?`
-  let values = [address.aid]
-  let result = await db.get(queryString, values)
-
-  if (_.isNil(result)) {
-    await db.close()
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin địa chỉ' })
-    return
-  }
-  let addressId = result.id
-
-  queryString = `SELECT user_id, address_id FROM session_address_user WHERE session_id = ?`
-  values = [sessionId]
-  result = await db.all(queryString, values)
-
-  if (_.isNil(result) || result.every((ele) => ele.user_id !== userId)) {
-    queryString = `INSERT INTO session_address_user VALUES (?, ?, ?)`
-    values = [sessionId, addressId, userId]
-    result = await db.run(queryString, values)
-
-    if (_.isNil(result)) {
-      await db.close()
-      res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không thêm được thông tin' })
-      return
+  try {
+    if (req.method !== 'POST') {
+      throw new ApiException(405, 'Không tìm thấy api route')
     }
-  } else if (result.find((ele) => ele.user_id === userId).address_id !== addressId) {
-    queryString = `UPDATE session_address_user SET address_id = ? WHERE session_id = ? AND user_id = ?`
-    values = [addressId, sessionId, userId]
-    result = await db.run(queryString, values)
 
-    if (_.isNil(result)) {
-      await db.close()
-      res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không cập nhật được thông tin' })
-      return
+    const { uid, sid, address } = req.body
+
+    try {
+      await schema.validate({ uid, sid, address })
+    } catch (err) {
+      throw new ApiException(400, 'Các thông tin không hợp lệ', err)
+    }
+
+    let queryString, values, result
+
+    queryString = `SELECT id FROM users WHERE uuid = ?`
+    values = [uid]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không lấy được id từ bảng users', err)
+    }
+    if (result.length === 0) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không tìm thấy user')
+    }
+    const userId = result[0].id
+
+    queryString = `SELECT id FROM sessions WHERE sid = ?`
+    values = [sid]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không lấy được id từ bảng sessions', err)
+    }
+    if (result.length === 0) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không tìm thấy session')
+    }
+    const sessionId = result[0].id
+
+    queryString = `SELECT id FROM addresses WHERE aid = ?`
+    values = [address.aid]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không lấy được id từ bảng addresses', err)
+    }
+    if (result.length === 0) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không tìm thấy address')
+    }
+    let addressId = result[0].id
+
+    // todos
+
+    cleanUp(mysql)
+    res.status(200).json({
+      messageCode: messageCodes.SUCCESS,
+      message: 'Thêm vote địa chỉ cho người dùng thành công',
+      data: {
+        userId,
+        sessionId,
+        addressId,
+      },
+    })
+  } catch (exception) {
+    if (exception instanceof ApiException) {
+      res.status(exception.statusCode).json({
+        messageCode: messageCodes.ERROR,
+        message: exception.message,
+        err: exception.err,
+      })
+    } else {
+      res.status(500).json({
+        messageCode: messageCodes.ERROR,
+        message: 'Đã xảy ra lỗi',
+        err: exception,
+      })
     }
   }
-
-  // get expire time
-  queryString = `SELECT expire_time FROM sessions WHERE id = ?`
-  values = [sessionId]
-  result = await db.get(queryString, values)
-
-  if (_.isNil(result)) {
-    await db.close()
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không lấy được thông tin' })
-    return
-  }
-
-  await db.close()
-  res.status(200).json({
-    messageCode: messageCodes.SUCCESS,
-    message: 'Thêm vote địa chỉ cho người dùng thành công',
-    data: {
-      expireTime: result.expire_time,
-    },
-  })
 }
