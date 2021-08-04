@@ -3,14 +3,10 @@ import Head from 'next/head'
 import useStep from 'hooks/useStep'
 import { useRouter } from 'next/router'
 import { useCookies } from 'react-cookie'
-import {
-  // useMutation,
-  useQueryClient,
-} from 'react-query'
+import { useQueryClient } from 'react-query'
 import urls from 'consts/urls'
 import queryKeys from 'consts/queryKeys'
 import { auth } from 'lib/firebase'
-// import userAPI from 'api/userAPI'
 import MainLayout from 'layouts/MainLayout'
 import Container from 'components/common/Container'
 import Button from 'components/common/Button'
@@ -23,10 +19,9 @@ import UserAvatar from 'components/avatar/UserAvatar'
 import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
 
 export default function Create() {
-  const router = useRouter()
-  const [cookies, , removeCookie] = useCookies(['uid', 'username', 'imgURL'])
+  const [cookies, , removeCookie] = useCookies(['username', 'imgURL', 'accessToken'])
   const queryClient = useQueryClient()
-  // const { mutateAsync } = useMutation((param) => userAPI.logout(param))
+  const router = useRouter()
   const { step, formData, backwardStep, prevStep, nextStep, setFormData } = useStep()
   const [sid, setSid] = useState(null)
 
@@ -54,7 +49,6 @@ export default function Create() {
     queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedOut: true })
     localStorage.removeItem('redirectURL')
     removeCookie('accessToken', { path: '/' })
-    removeCookie('uid', { path: '/' })
     removeCookie('username', { path: '/' })
     removeCookie('imgURL', { path: '/' })
     auth.signOut()

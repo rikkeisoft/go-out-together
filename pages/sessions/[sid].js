@@ -20,7 +20,7 @@ import UserAvatar from 'components/avatar/UserAvatar'
 import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
 
 export default function Details() {
-  const [cookies, , removeCookie] = useCookies()
+  const [cookies, , removeCookie] = useCookies(['username', 'imgURL', 'accessToken'])
   const router = useRouter()
   const queryClient = useQueryClient()
   const { sid } = router.query
@@ -54,7 +54,6 @@ export default function Details() {
     queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedOut: true })
     localStorage.removeItem('redirectURL')
     removeCookie('accessToken', { path: '/' })
-    removeCookie('uid', { path: '/' })
     removeCookie('username', { path: '/' })
     removeCookie('imgURL', { path: '/' })
     auth.signOut()

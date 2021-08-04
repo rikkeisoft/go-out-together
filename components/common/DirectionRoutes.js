@@ -134,7 +134,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             },
           })
         })
-        // add end point 
+        // add end point
         map.on('load', () => {
           const coords = [expDestination.coordinates[0], expDestination.coordinates[1]]
           let end = {
@@ -196,7 +196,10 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
         let centerCoordinates = turf.centerOfMass(polygon)
 
         map.on('load', function () {
-          let center = turf.point([centerCoordinates.geometry.coordinates[0], centerCoordinates.geometry.coordinates[1]])
+          let center = turf.point([
+            centerCoordinates.geometry.coordinates[0],
+            centerCoordinates.geometry.coordinates[1],
+          ])
           let radius = 1
           let options = {
             steps: 90,
@@ -220,7 +223,6 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           })
         })
       }
-
     }
   }, [destination])
 
@@ -229,7 +231,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
       const total = distance[0].reduce((accumlator, value) => {
         return accumlator + value
       }, 0)
-      return (total / distance[0].length) / 500
+      return total / distance[0].length / 500
     }
   }
 
@@ -301,7 +303,6 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           </svg>
           {/* Chiều dài quãng đường: {(distance / 1000).toFixed(2)} KM */}
           Chiều dài quãng đường trung bình: {distance[0] && getDistance().toFixed(2)} KM
-
         </p>
       </div>
     </>

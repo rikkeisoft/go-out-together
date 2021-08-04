@@ -32,7 +32,7 @@ async function handler(req, res) {
 
   let queryString = 'SELECT username, avatar_url FROM users WHERE uuid = ?'
   let values = [req.body.uuid]
-  let result = await db.all(queryString, values)
+  let result = await db.get(queryString, values)
 
   if (_.isNil(result)) {
     await db.close()
@@ -42,17 +42,17 @@ async function handler(req, res) {
   if (!result) {
     // user not in table
     await db.close()
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Thông tin người dùng không có trong bảng' })
+    res.status(400).json({ messageCode: messageCodes.ERROR, message: 'Thông tin người dùng không có trong bảng' })
     return
-  } else {
-    // user is online
-    await db.close()
-    res.status(200).json({
-      messageCode: messageCodes.SUCCESS,
-      message: 'Người dùng đang online',
-      data: result[0],
-    })
   }
+
+  // user is online
+  await db.close()
+  res.status(200).json({
+    messageCode: messageCodes.SUCCESS,
+    message: 'Người dùng đang online',
+    data: result,
+  })
 }
 
 export default withProtect(handler)

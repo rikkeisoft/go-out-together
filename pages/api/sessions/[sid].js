@@ -2,11 +2,12 @@ import { openDb } from 'lib/db'
 import * as yup from 'yup'
 import _ from 'lodash'
 import messageCodes from 'consts/messageCodes'
+import withProtect from 'middware/withProtect'
 const schema = yup.object().shape({
   sid: yup.string().required(),
 })
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'GET') {
     res.status(404).json({ messageCode: messageCodes.ERROR, message: 'Không tìm thấy api route' })
     return
@@ -97,3 +98,5 @@ export default async function handler(req, res) {
     data: data,
   })
 }
+
+export default withProtect(handler)

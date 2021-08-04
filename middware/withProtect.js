@@ -13,7 +13,7 @@ export default function withProtect(handler) {
     if (!token) {
       res.status(401).json({
         messageCode: messageCodes.ERROR,
-        message: 'You need to login to get access',
+        message: 'Access token not found. You need to login to get access',
       })
       return
     }

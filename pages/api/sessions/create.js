@@ -4,6 +4,7 @@ import _ from 'lodash'
 import { nanoid } from 'nanoid'
 import messageCodes from 'consts/messageCodes'
 import { getExpireTime } from 'lib/date'
+import withProtect from 'middware/withProtect'
 
 const schema = yup.object().shape({
   uid: yup.string().required(),
@@ -20,7 +21,7 @@ const schema = yup.object().shape({
   ),
 })
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(404).json({ messageCode: messageCodes.ERROR, message: 'Không tìm thấy api route' })
     return
@@ -93,3 +94,5 @@ export default async function handler(req, res) {
     },
   })
 }
+
+export default withProtect(handler)

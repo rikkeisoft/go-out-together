@@ -8,7 +8,7 @@ import { useCookies } from 'react-cookie'
 import { useQuery, useQueryClient } from 'react-query'
 
 export default function ProtectedComponent({ children }) {
-  const [, , removeCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
+  const [, , removeCookie] = useCookies(['username', 'imgURL', 'accessToken'])
   const queryClient = useQueryClient()
   const { error, isLoading } = useQuery(
     [queryKeys.CHECK_USER],
@@ -25,7 +25,6 @@ export default function ProtectedComponent({ children }) {
         queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedIn: true })
       } catch (error) {
         removeCookie('username', { path: '/' })
-        removeCookie('uid', { path: '/' })
         removeCookie('imgURL', { path: '/' })
         removeCookie('accessToken', { path: '/' })
         throw new Error(error.response.data.message)

@@ -13,7 +13,7 @@ import { useMutation, useQueryClient } from 'react-query'
 function GoogleLoginModal({ isOpen, onRequestClose }) {
   const queryClient = useQueryClient()
   const router = useRouter()
-  const [cookies, setCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
+  const [cookies, setCookie] = useCookies(['username', 'imgURL', 'accessToken'])
   const { mutate } = useMutation((userInfo) => userAPI.login(userInfo), {
     onSuccess: (data) => setCookie('accessToken', data.data.accessToken, { path: '/' }),
   })
@@ -28,7 +28,6 @@ function GoogleLoginModal({ isOpen, onRequestClose }) {
           username: displayName,
           avatar_url: photoURL,
         })
-        setCookie('uid', uid, { path: '/' })
         setCookie('username', displayName, { path: '/' })
         setCookie('imgURL', photoURL, { path: '/' })
         queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedIn: true })
