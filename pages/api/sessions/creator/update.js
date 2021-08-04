@@ -1,6 +1,5 @@
-import { openDb, closeDb } from 'lib/db'
+import { mysql, cleanUp } from 'lib/db'
 import * as yup from 'yup'
-import _ from 'lodash'
 import messageCodes from 'consts/messageCodes'
 import ApiException from 'exceptions/ApiException'
 
@@ -29,42 +28,40 @@ export default async function handler(req, res) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    const db = await openDb()
-
     let queryString, values, result
 
     queryString = 'SELECT id FROM addresses WHERE aid = ?'
     values = [address.aid]
     try {
-      result = await db.get(queryString, values)
+      result = await mysql.query(queryString, values)
     } catch (err) {
-      closeDb(db)
+      cleanUp(mysql)
       throw new ApiException(500, 'Không lấy được id từ bảng addresses', err)
     }
 
     let addressId
-    if (_.isNil(result)) {
+    if (result.length === 0) {
       queryString = 'INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)'
       values = [address.aid, address.name, address.latitude, address.longitude]
 
       try {
-        result = await db.run(queryString, values)
-        addressId = result.lastID
+        result = await mysql.query(queryString, values)
+        addressId = result.insertId
       } catch (err) {
-        closeDb(db)
+        cleanUp(mysql)
         throw new ApiException(500, 'Không chèn được bản ghi vào bảng addresses', err)
       }
+      addressId = result.insertId
     } else {
-      addressId = result.id
+      addressId = result[0].id
     }
 
     queryString = `UPDATE users SET address_id = ?, name = ? WHERE uuid = ?`
     values = [addressId, name, uid]
-
     try {
-      await db.run(queryString, values)
+      await mysql.query(queryString, values)
     } catch (err) {
-      closeDb(db)
+      cleanUp(mysql)
       throw new ApiException(500, 'Không cập nhật được address_id của bảng user', err)
     }
 

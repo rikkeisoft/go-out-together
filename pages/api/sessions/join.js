@@ -1,7 +1,7 @@
-import { openDb } from 'lib/db'
+import { mysql, cleanUp } from 'lib/db'
 import * as yup from 'yup'
-import _ from 'lodash'
 import messageCodes from 'consts/messageCodes'
+import ApiException from 'exceptions/ApiException'
 
 const schema = yup.object().shape({
   sid: yup.string().required(),
@@ -16,90 +16,119 @@ const schema = yup.object().shape({
 })
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(404).json({ messageCode: messageCodes.ERROR, message: 'Không tìm thấy api route' })
-    return
-  }
-
-  const { sid, uid, name, address } = req.body
-
-  const isValid = await schema.isValid({ uid, sid, name, address })
-
-  if (!isValid) {
-    res.status(400).json({
-      messageCode: messageCodes.ERROR,
-      message: 'Các thông tin không hợp lệ',
-    })
-    return
-  }
-
-  const db = await openDb()
-  // check address is already in addresses table ?
-  let queryString = `SELECT id FROM addresses WHERE aid = ?`
-  let values = [address.aid]
-  let result = await db.get(queryString, values)
-
-  if (_.isNil(result)) {
-    // insert address to table
-    queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
-    values = [address.aid, address.name, address.latitude, address.longitude]
-    result = await db.run(queryString, values)
-
-    if (_.isNil(result)) {
-      await db.close()
-      res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không thêm được địa chỉ mới' })
-      return
+  try {
+    if (req.method !== 'POST') {
+      throw new ApiException(405, 'Không tìm thấy api route')
     }
-  }
 
-  // address already in table -> save user's address
-  const addressId = result.id ?? result.lastID
-  queryString = `UPDATE users SET address_id = ?, name = ? WHERE uuid = ?`
-  values = [addressId, name, uid]
-  result = await db.run(queryString, values)
-  if (_.isNil(result)) {
-    await db.close()
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không cập nhật được tên và địa chỉ người dùng' })
-    return
-  }
+    const { sid, uid, name, address } = req.body
 
-  queryString = `SELECT id FROM sessions WHERE sid = ?`
-  values = [sid]
-  result = await db.get(queryString, values)
-  if (_.isNil(result)) {
-    await db.close()
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không tìm thấy session' })
-    return
-  }
-  const sessionId = result.id
+    try {
+      await schema.validate({ sid, uid, name, address })
+    } catch (err) {
+      throw new ApiException(400, 'Các thông tin không hợp lệ', err)
+    }
 
-  queryString = `SELECT id FROM users WHERE uuid = ?`
-  values = [uid]
-  result = await db.get(queryString, values)
-  if (_.isNil(result)) {
-    await db.close()
-    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không tìm thấy người dùng' })
-    return
-  }
-  const userId = result.id
+    let queryString, values, result
 
-  queryString = `SELECT session_id, user_id FROM  session_user WHERE session_id = ? AND user_id = ?`
-  values = [sessionId, userId]
-  result = await db.get(queryString, values)
-  if (_.isNil(result)) {
-    queryString = `INSERT INTO session_user (session_id, user_id) VALUES (?, ?)`
+    queryString = `SELECT id FROM addresses WHERE aid = ?`
+    values = [address.aid]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không lấy được id từ bảng addresses', err)
+    }
+
+    let addressId
+    if (result.length === 0) {
+      queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
+      values = [address.aid, address.name, address.latitude, address.longitude]
+      try {
+        result = await mysql.query(queryString, values)
+      } catch (err) {
+        cleanUp(mysql)
+        throw new ApiException(500, 'Không chèn được bản ghi vào bảng addresses', err)
+      }
+      addressId = result.insertId
+    } else {
+      addressId = result[0].id
+    }
+
+    queryString = `UPDATE users SET address_id = ?, name = ? WHERE uuid = ?`
+    values = [addressId, name, uid]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không cập nhật được tên và địa chỉ người dùng', err)
+    }
+
+    queryString = `SELECT id FROM sessions WHERE sid = ?`
+    values = [sid]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không lấy được id từ bảng sessions', err)
+    }
+    if (result.length === 0) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không tìm thấy session')
+    }
+    const sessionId = result[0].id
+
+    queryString = `SELECT id FROM users WHERE uuid = ?`
+    values = [uid]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không lấy được id từ bảng users', err)
+    }
+    if (result.length === 0) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không tìm thấy người dùng')
+    }
+    const userId = result[0].id
+
+    queryString = `SELECT session_id, user_id FROM  session_user WHERE session_id = ? AND user_id = ?`
     values = [sessionId, userId]
-    result = await db.run(queryString, values)
-    if (_.isNil(result)) {
-      await db.close()
-      res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không join được session' })
-      return
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không lấy được session_id, user_id từ bảng session_user', err)
+    }
+    if (result.length === 0) {
+      queryString = `INSERT INTO session_user (session_id, user_id, address_id) VALUES (?, ?, ?)`
+      values = [sessionId, userId, addressId]
+      try {
+        result = await mysql.query(queryString, values)
+      } catch (err) {
+        cleanUp(mysql)
+        throw new ApiException(500, 'Không join được session', err)
+      }
+    }
+
+    cleanUp(mysql)
+    res.status(200).json({
+      messageCode: messageCodes.SUCCESS,
+      message: 'Join session thành công',
+    })
+  } catch (exception) {
+    if (exception instanceof ApiException) {
+      res.status(exception.statusCode).json({
+        messageCode: messageCodes.ERROR,
+        message: exception.message,
+        err: exception.err,
+      })
+    } else {
+      res.status(500).json({
+        messageCode: messageCodes.ERROR,
+        message: 'Đã xảy ra lỗi',
+        err: exception,
+      })
     }
   }
-
-  await db.close()
-  res.status(200).json({
-    messageCode: messageCodes.SUCCESS,
-    message: 'Join session thành công',
-  })
 }

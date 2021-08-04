@@ -1,6 +1,5 @@
-import { openDb, closeDb } from 'lib/db'
+import { mysql, cleanUp } from 'lib/db'
 import * as yup from 'yup'
-import _ from 'lodash'
 import { nanoid } from 'nanoid'
 import messageCodes from 'consts/messageCodes'
 import { getExpireTime } from 'lib/date'
@@ -35,8 +34,6 @@ export default async function handler(req, res) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    const db = await openDb()
-
     const expireTime = getExpireTime(timeLimit)
 
     const sid = nanoid()
@@ -44,28 +41,27 @@ export default async function handler(req, res) {
 
     queryString = `INSERT INTO sessions (sid, title, content, expire_time, creator) VALUES (?, ?, ?, ?, ?) `
     values = [sid, title, content, expireTime, uid]
-
     try {
-      result = await db.run(queryString, values)
+      result = await mysql.query(queryString, values)
     } catch (err) {
-      closeDb(db)
-      throw new ApiException(500, 'Không chèn được dữ liệu vào bảng addresses', err)
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không chèn được dữ liệu vào bảng sessions', err)
     }
 
-    const sessionId = result.lastID
+    const sessionId = result.insertId
 
     let addressIds = []
     for (let address of addresses) {
       queryString = `SELECT id FROM addresses WHERE aid = ?`
       values = [address.aid]
       try {
-        result = await db.get(queryString, values)
+        result = await mysql.query(queryString, values)
       } catch (err) {
-        closeDb(db)
+        cleanUp(mysql)
         throw new ApiException(500, 'Không lấy được id từ bảng addresses', err)
       }
 
-      if (!_.isNil(result)) {
+      if (result.length > 0) {
         addressIds.push(result.id)
         continue
       }
@@ -73,9 +69,9 @@ export default async function handler(req, res) {
       queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
       values = [address.aid, address.name, address.latitude, address.longitude]
       try {
-        result = await db.run(queryString, values)
+        result = await mysql.query(queryString, values)
       } catch (err) {
-        closeDb(db)
+        cleanUp(mysql)
         throw new ApiException(500, 'Không thêm được bản ghi mới vào bảng addresses', err)
       }
 
@@ -86,9 +82,9 @@ export default async function handler(req, res) {
       queryString = `INSERT INTO session_address (session_id, address_id) VALUES (?, ?)`
       values = [sessionId, addressId]
       try {
-        result = await db.run(queryString, values)
+        result = await mysql.query(queryString, values)
       } catch (err) {
-        closeDb(db)
+        cleanUp(mysql)
         throw new ApiException(500, 'Không thêm được bản ghi mới vào bảng session_address', err)
       }
     }
@@ -96,26 +92,29 @@ export default async function handler(req, res) {
     queryString = `SELECT id, address_id FROM users WHERE uuid = ?`
     values = [uid]
     try {
-      result = await db.get(queryString, values)
+      result = await mysql.query(queryString, values)
     } catch (err) {
-      closeDb(db)
-      throw new ApiException(500, 'Không thêm được bản ghi mới vào bảng session_address', err)
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không lấy được id, address_id từ bảng users', err)
     }
-
-    const userId = result.id
-    const addressId = result.address_id
+    if (result.length === 0) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không tìm thấy người dùng')
+    }
+    const userId = result[0].id
+    const addressId = result[0].address_id
 
     // insert admin to session_user
     queryString = `INSERT INTO session_user (session_id, user_id, address_id) VALUES (?, ?, ?)`
     values = [sessionId, userId, addressId]
     try {
-      result = await db.run(queryString, values)
+      result = await mysql.query(queryString, values)
     } catch (err) {
-      closeDb(db)
+      cleanUp(mysql)
       throw new ApiException(500, 'Không thêm được bản ghi mới vào bảng session_user', err)
     }
 
-    await db.close()
+    cleanUp(mysql)
     res.status(200).json({
       messageCode: messageCodes.SUCCESS,
       message: 'Tạo session thành công',
