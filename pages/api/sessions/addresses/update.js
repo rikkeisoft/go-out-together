@@ -4,13 +4,15 @@ import messageCodes from 'consts/messageCodes'
 import ApiException from 'exceptions/ApiException'
 
 const schema = yup.object().shape({
-  sessionId: yup.number().required(),
-  address: yup.object({
-    aid: yup.string().required(),
-    name: yup.string().required(),
-    latitude: yup.number().required(),
-    longitude: yup.number().required(),
-  }),
+  sID: yup.string().required(),
+  addresses: yup.array().of(
+    yup.object().shape({
+      aid: yup.string().required(),
+      name: yup.string().required(),
+      latitude: yup.number().required(),
+      longitude: yup.number().required(),
+    }),
+  ),
 })
 
 export default async function handler(req, res) {
@@ -19,58 +21,70 @@ export default async function handler(req, res) {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { sessionId, address } = req.body
+    const { sID, addresses } = req.body
 
     try {
-      await schema.validate({ sessionId, address })
+      await schema.validate({ sID, addresses })
     } catch (err) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
     let queryString, values, result
 
-    queryString = `SELECT id FROM addresses WHERE aid = ?`
-    values = [address.aid]
+    queryString = `SELECT id FROM sessions WHERE sid = ?`
+    values = [sID]
     try {
       result = await mysql.query(queryString, values)
     } catch (err) {
       cleanUp(mysql)
-      throw new ApiException(500, 'Không lấy được id từ bảng addresses', err)
+      throw new ApiException(500, 'Không lấy được id từ bảng sessions', err)
     }
+    const sessionId = result[0].id
 
-    let addressId
-    if (result.length === 0) {
-      queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
-      values = [address.aid, address.name, address.latitude, address.longitude]
+    for (let address of addresses) {
+      queryString = `SELECT id FROM addresses WHERE aid = ?`
+      values = [address.aid]
       try {
         result = await mysql.query(queryString, values)
       } catch (err) {
         cleanUp(mysql)
-        throw new ApiException(500, 'Không thêm được thông tin địa chỉ', err)
+        throw new ApiException(500, 'Không lấy được id từ bảng addresses', err)
       }
-      addressId = result.insertId
-    } else {
-      addressId = result[0].id
-    }
 
-    queryString = `SELECT DISTINCT session_id FROM session_address WHERE address_id = ?`
-    values = [addressId]
-    try {
-      result = await mysql.query(queryString, values)
-    } catch (err) {
-      cleanUp(mysql)
-      throw new ApiException(500, 'Không lấy được session_id từ session_address', err)
-    }
+      let addressId
+      if (result.length === 0) {
+        queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
+        values = [address.aid, address.name, address.latitude, address.longitude]
+        try {
+          result = await mysql.query(queryString, values)
+        } catch (err) {
+          cleanUp(mysql)
+          throw new ApiException(500, 'Không thêm được thông tin địa chỉ', err)
+        }
+        addressId = result[0].insertId
+      } else {
+        addressId = result[0].id
+      }
 
-    if (result.findIndex((ele) => ele.session_id === sessionId) === -1) {
-      // not in table
-      queryString = `INSERT INTO session_address (session_id, address_id) VALUES (?, ?)`
-      values = [sessionId, addressId]
+      queryString = `SELECT DISTINCT session_id FROM session_address WHERE address_id = ?`
+      values = [addressId]
       try {
         result = await mysql.query(queryString, values)
       } catch (err) {
         cleanUp(mysql)
-        throw new ApiException(500, 'Không thêm được thông tin', err)
+        throw new ApiException(500, 'Không lấy được session_id từ session_address', err)
+      }
+
+      if (result.findIndex((ele) => ele.session_id === sessionId) === -1) {
+        // not in table
+        queryString = `INSERT INTO session_address (session_id, address_id) VALUES (?, ?)`
+        values = [sessionId, addressId]
+        try {
+          result = await mysql.query(queryString, values)
+        } catch (err) {
+          cleanUp(mysql)
+          throw new ApiException(500, 'Không thêm được thông tin', err)
+        }
       }
     }
 
