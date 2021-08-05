@@ -62,7 +62,7 @@ export default async function handler(req, res) {
       }
 
       if (result.length > 0) {
-        addressIds.push(result.id)
+        addressIds.push(result[0].id)
         continue
       }
 
@@ -75,7 +75,7 @@ export default async function handler(req, res) {
         throw new ApiException(500, 'Không thêm được bản ghi mới vào bảng addresses', err)
       }
 
-      addressIds.push(result.lastId)
+      addressIds.push(result.insertId)
     }
 
     for (let addressId of addressIds) {
