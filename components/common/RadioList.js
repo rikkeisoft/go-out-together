@@ -31,11 +31,11 @@ const RadioList = memo(({ name, data, onDelete, onClick }) => {
                       onClick(item)
                     }}
                   />
-                  {item.label}
+                  {item.name}
                 </label>
               </td>
               <td className="p-2 w-10 cursor-pointer">
-              <button type="button" onClick={() => setOpenPopup(true)}>
+                <button type="button" onClick={() => setOpenPopup(true)}>
                   <TrashIcon className="w-6" />
                 </button>
               </td>

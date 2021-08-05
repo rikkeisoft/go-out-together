@@ -10,18 +10,13 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
   const [distance, setDistance] = useState([])
   const distanceRef = useRef([])
   console.log('currentLocation', currentLocation)
-  // console.log('listUserLocation', listUserLocation)
+  console.log('listUserLocation', listUserLocation)
   // console.log('destination', destination)
 
-  const expCurrentLocation = {
-    name: 'son nguyen',
-    address: 'Dong Da, Hanoi, Vietnam',
-    coordinates: [105.8333, 21.0167],
-  }
   const expDestination = {
     name: 'Destination',
-    address: 'Bên xe Mỹ Đình',
-    coordinates: [105.777909, 21.028412],
+    address: destination.name,
+    coordinates: [destination.longitude, destination.latitude],
   }
 
   useEffect(() => {
@@ -268,7 +263,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
               clipRule="evenodd"
             />
           </svg>
-          Từ: {expCurrentLocation.address}
+          Từ: {currentLocation.address}
         </p>
         <p>
           <svg

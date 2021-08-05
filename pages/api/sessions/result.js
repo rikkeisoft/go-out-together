@@ -74,8 +74,7 @@ export default async function handler(req, res) {
         voteCount,
         address: result[0],
       }
-    }
-    else {
+    } else {
       // time is not expired
       data = { expireTime }
     }
