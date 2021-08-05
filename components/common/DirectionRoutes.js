@@ -19,7 +19,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
     coordinates: [105.8333, 21.0167],
   }
   const expDestination = {
-    name: 'son nguyen',
+    name: 'Destination',
     address: 'Bên xe Mỹ Đình',
     coordinates: [105.777909, 21.028412],
   }
@@ -40,7 +40,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
       const addDestinationMarker = () => {
         const marker = new mapboxgl.Marker({ color: '#ff0000' })
         const markerPopup = new mapboxgl.Popup()
-        markerPopup.setText(`${expDestination.value}`)
+        markerPopup.setText(`${expDestination.name} - (${expDestination.address})`)
         marker.setPopup(markerPopup)
         marker.setLngLat([expDestination.coordinates[0], expDestination.coordinates[1]])
         marker.addTo(map)
@@ -52,7 +52,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           const marker = new mapboxgl.Marker()
           const markerPopup = new mapboxgl.Popup()
 
-          markerPopup.setText(`${item.value}`)
+          markerPopup.setText(`${item.name} - (${item.address})`)
           marker.setPopup(markerPopup)
 
           marker.setLngLat([item.coordinates[0], item.coordinates[1]])
@@ -255,7 +255,6 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             Xong
           </Button>
         </div>
-        <div id="map" className="absolute top-20" style={{ width: '100%', height: '70vh' }}></div>
         <p>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -304,6 +303,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           {/* Chiều dài quãng đường: {(distance / 1000).toFixed(2)} KM */}
           Chiều dài quãng đường trung bình: {distance[0] && getDistance().toFixed(2)} KM
         </p>
+        <div id="map" style={{ width: '100%', height: '60vh' }} />
       </div>
     </>
   )

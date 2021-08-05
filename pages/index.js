@@ -21,7 +21,7 @@ export default function Home({ error }) {
   const router = useRouter()
 
   useEffect(() => {
-    const url = localStorage.getItem('redirectURL')
+    const url = sessionStorage.getItem('redirectURL')
     if (url !== null) {
       setRedirectURL(url)
     }
