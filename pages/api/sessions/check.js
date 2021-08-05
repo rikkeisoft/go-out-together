@@ -41,10 +41,54 @@ export default async function handler(req, res) {
       isCreator = true
     }
 
+    queryString = `SELECT id FROM sessions WHERE sid = ?`
+    values = [sid]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không lấy được id từ bảng sessions', err)
+    }
+    if (result.length === 0) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không tìm thấy session')
+    }
+    const sessionId = result[0].id
+
+    queryString = `SELECT id FROM users WHERE uuid = ?`
+    values = [uid]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không lấy được id từ bảng users', err)
+    }
+    if (result.length === 0) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không tìm thấy người dùng')
+    }
+    const userId = result[0].id
+
+    let voted
+    queryString = `SELECT session_id, address_id, user_id FROM session_address_user WHERE session_id =? AND user_id = ?`
+    values = [sessionId, userId]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không lấy được thông tin từ bảng session_address_user', err)
+    }
+    if (result.length === 0) {
+      voted = false
+    } else {
+      voted = true
+    }
+
     cleanUp(mysql)
     res.status(200).json({
       messageCode: messageCodes.SUCCESS,
       data: {
+        voted,
         isCreator,
       },
     })

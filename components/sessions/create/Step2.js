@@ -187,6 +187,18 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
                   name="timeLimit"
                   data={[
                     {
+                      label: '1 phút',
+                      value: 1,
+                    },
+                    {
+                      label: '2 phút',
+                      value: 2,
+                    },
+                    {
+                      label: '5 phút',
+                      value: 5,
+                    },
+                    {
                       label: '10 phút',
                       value: 10,
                     },

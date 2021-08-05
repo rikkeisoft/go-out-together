@@ -54,7 +54,7 @@ export default async function handler(req, res) {
         cleanUp(mysql)
         throw new ApiException(500, 'Không tìm thấy session')
       }
-      const voteCount = result[0].vote_count
+      const voters = result[0].vote_count
       const addressId = result[0].address_id
 
       // get this address
@@ -71,11 +71,10 @@ export default async function handler(req, res) {
         throw new ApiException(500, 'Không tìm thấy session')
       }
       data = {
-        voteCount,
+        voters,
         address: result[0],
       }
-    }
-    else {
+    } else {
       // time is not expired
       data = { expireTime }
     }

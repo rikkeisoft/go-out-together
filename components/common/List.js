@@ -16,7 +16,7 @@ const List = memo(({ name }) => {
           <tbody>
             {value.map((item, index) => {
               return (
-                <tr key={`list-item-` + index} className="hover:bg-gray-100">
+                <tr key={`item-` + index} className="hover:bg-gray-100">
                   <td className="p-2">{item.name}</td>
                   <td className="p-2 w-10">
                     <button
