@@ -53,7 +53,7 @@ const Step2 = memo(({ sid, prevStep, setVoteResult }) => {
   const { mutateAsync: deleteAsync } = useMutation((info) => deleteSessionAddress(info), {
     onSuccess: () => queryClient.invalidateQueries(queryKeys.SESSION_DETAIL),
   })
-  const { data: addressData } = useQuery([queryKeys.GET_ADDRESS, { sID: sid }], () => getAllAddresses({ sID: sid }), { retry: 1 })
+  const { data: addressData } = useQuery([queryKeys.GET_ADDRESS, { sid }], () => getAllAddresses({ sid }), { retry: 1 })
 
   useEffect(() => {
     if (addressData && addressData?.data.length !== 0) {
