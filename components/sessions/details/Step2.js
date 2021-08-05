@@ -119,7 +119,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
     try {
       await mutateAsync({
-        sessionId: sid,
+        sid,
         addresses: newData,
       })
     } catch (error) {
@@ -131,7 +131,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
     try {
       await deleteAsync({
         addressId,
-        sessionId: sid,
+        sid,
       })
     } catch (error) {
       console.error(error)
