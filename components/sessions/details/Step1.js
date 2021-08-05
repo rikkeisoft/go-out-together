@@ -59,12 +59,16 @@ const Step1 = memo(({ sid, formData, setFormData, nextStep }) => {
 
   useEffect(() => {
     if (userLocation) {
-      methods.setValue('address', {
-        aid: userLocation.id,
-        name: userLocation.place_name,
-        longitude: userLocation.center[0],
-        latitude: userLocation.center[1],
-      })
+      methods.setValue(
+        'address',
+        {
+          aid: userLocation.id,
+          name: userLocation.place_name,
+          longitude: userLocation.center[0],
+          latitude: userLocation.center[1],
+        },
+        { shouldValidate: true },
+      )
     }
   }, [userLocation])
 

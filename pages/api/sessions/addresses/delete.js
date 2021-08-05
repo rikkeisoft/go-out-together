@@ -5,7 +5,7 @@ import ApiException from 'exceptions/ApiException'
 
 const schema = yup.object().shape({
   addressId: yup.number().required(),
-  sessionId: yup.number().required(),
+  sid: yup.string().required(),
 })
 
 export default async function handler(req, res) {
@@ -14,29 +14,48 @@ export default async function handler(req, res) {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { addressId, sessionId } = req.body
+    const { sid, addressId } = req.body
 
     try {
-      await schema.validate({ addressId, sessionId })
+      await schema.validate({ sid, addressId })
     } catch (err) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    let queryString, values
+    let queryString, values, result
 
-    queryString = `DELETE session_address_user, session_address FROM session_address_user INNER JOIN session_address ON session_address_user.session_id = session_address.session_id WHERE session_id = ? AND address_id = ?`
-    values = [sessionId, addressId]
+    queryString = `SELECT id FROM sessions WHERE sid = ?`
+    values = [sid]
     try {
-      await mysql.query(queryString, values)
+      result = await mysql.query(queryString, values)
     } catch (err) {
       cleanUp(mysql)
-      throw new ApiException(500, 'Không xóa được thông tin', err)
+      throw new ApiException(500, 'Không lấy được id từ bảng sessions', err)
+    }
+    const sessionId = result[0].id
+
+    queryString = `DELETE FROM session_address_user WHERE session_id = ? AND address_id = ?`
+    values = [sessionId, addressId]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không xoa được address', err)
+    }
+
+    queryString = `DELETE FROM session_address WHERE session_id = ? AND address_id = ?`
+    values = [sessionId, addressId]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không xoa được address', err)
     }
 
     cleanUp(mysql)
     res.status(200).json({
       messageCode: messageCodes.SUCCESS,
-      message: 'Xóa địa chỉ trong session thành công',
+      message: 'Thêm địa chỉ vào session thành công',
     })
   } catch (exception) {
     if (exception instanceof ApiException) {

@@ -4,8 +4,8 @@ import messageCodes from 'consts/messageCodes'
 import ApiException from 'exceptions/ApiException'
 
 const schema = yup.object().shape({
-  uid: yup.string().required(),
   sid: yup.string().required(),
+  uid: yup.string().required(),
   address: yup.object({
     aid: yup.string().required(),
     name: yup.string().required(),
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { uid, sid, address } = req.body
+    const { sid, uid, address } = req.body
 
     try {
       await schema.validate({ uid, sid, address })
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
     }
     const userId = result[0].id
 
-    queryString = `SELECT id FROM sessions WHERE sid = ?`
+    queryString = `SELECT id, expire_time FROM sessions WHERE sid = ?`
     values = [sid]
     try {
       result = await mysql.query(queryString, values)
@@ -72,17 +72,29 @@ export default async function handler(req, res) {
     }
     let addressId = result[0].id
 
-    // todos
+    queryString = `SELECT session_id, address_id, user_id FROM session_address_user WHERE session_id = ? AND address_id = ? AND user_id = ?`
+    values = [sessionId, addressId, userId]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không lấy được thông tin từ bảng session_address_user', err)
+    }
+    if (result.length === 0) {
+      queryString = `INSERT INTO session_address_user (session_id, address_id, user_id) VALUES (?, ?, ?)`
+      values = [sessionId, addressId, userId]
+      try {
+        result = await mysql.query(queryString, values)
+      } catch (err) {
+        cleanUp(mysql)
+        throw new ApiException(500, 'Không thêm được bản ghi mới vào bảng session_address_user', err)
+      }
+    }
 
     cleanUp(mysql)
     res.status(200).json({
       messageCode: messageCodes.SUCCESS,
-      message: 'Thêm vote địa chỉ cho người dùng thành công',
-      data: {
-        userId,
-        sessionId,
-        addressId,
-      },
+      message: 'Vote địa điểm thành công',
     })
   } catch (exception) {
     if (exception instanceof ApiException) {
