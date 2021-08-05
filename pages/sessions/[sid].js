@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import Head from 'next/head'
 import useStep from 'hooks/useStep'
 import { useRouter } from 'next/router'
@@ -26,7 +25,6 @@ export default function Details() {
   const { sid } = router.query
 
   const { step, formData, setStep, prevStep, nextStep, setFormData } = useStep(0)
-  const [voteResult, setVoteResult] = useState('')
   let stepElement = <></>
   switch (step) {
     case 0:
@@ -36,12 +34,10 @@ export default function Details() {
       stepElement = <Step1 sid={sid} formData={formData} setFormData={setFormData} nextStep={nextStep} />
       break
     case 2:
-      stepElement = (
-        <Step2 sid={sid} formData={formData} prevStep={prevStep} nextStep={nextStep} setVoteResult={setVoteResult} />
-      )
+      stepElement = <Step2 sid={sid} prevStep={prevStep} nextStep={nextStep} />
       break
     case 3:
-      stepElement = <Step3 voteResult={voteResult} />
+      stepElement = <Step3 sid={sid} />
       break
     default:
       break

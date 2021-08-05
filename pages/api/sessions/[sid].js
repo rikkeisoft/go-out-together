@@ -78,7 +78,7 @@ export default async function handler(req, res) {
 
     let addresses = []
     queryString = `SELECT address_id FROM session_address WHERE session_id = ?`
-    values = [sid]
+    values = [sessionId]
     try {
       result = await mysql.query(queryString, values)
     } catch (err) {

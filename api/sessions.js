@@ -5,8 +5,8 @@ export const createSession = (data) => {
   return axiosClient.post(url, data)
 }
 
-export const checkSessionCreator = (data) => {
-  const url = `sessions/creator/check?sid=${data.sid}&uid=${data.uid}`
+export const checkSession = (data) => {
+  const url = `sessions/check?sid=${data.sid}&uid=${data.uid}`
   return axiosClient.get(url)
 }
 
@@ -33,4 +33,9 @@ export const deleteSessionAddress = (data) => {
 export const getSessionResult = (data) => {
   const url = `sessions/result?sid=${data.sid}`
   return axiosClient.get(url)
+}
+
+export const voteSession = (data) => {
+  const url = 'sessions/vote'
+  return axiosClient.post(url, data)
 }
