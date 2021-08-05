@@ -3,12 +3,13 @@ import Loading from 'components/common/Loading'
 import queryKeys from 'consts/queryKeys'
 import { useRouter } from 'next/router'
 import Home from 'pages'
+import Details from 'pages/sessions/[sid]'
 import { useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import { useQuery, useQueryClient } from 'react-query'
 
 export default function ProtectedComponent({ children }) {
-  const [, , removeCookie] = useCookies(['username', 'imgURL', 'accessToken'])
+  const [, , removeCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
   const queryClient = useQueryClient()
   const { error, isLoading } = useQuery(
     [queryKeys.CHECK_USER],
@@ -25,6 +26,7 @@ export default function ProtectedComponent({ children }) {
         queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedIn: true })
       } catch (error) {
         removeCookie('username', { path: '/' })
+        removeCookie('uid', { path: '/' })
         removeCookie('imgURL', { path: '/' })
         removeCookie('accessToken', { path: '/' })
         throw new Error(error.response.data.message)
@@ -40,11 +42,14 @@ export default function ProtectedComponent({ children }) {
 
   useEffect(() => {
     if (!router.isReady) return
-    if (router.query.id === undefined && router.asPath !== '/') {
-      localStorage.setItem('redirectURL', router.asPath)
-    } else if (router.query.id !== undefined && router.pathname === '/sessions/[id]') {
-      localStorage.setItem('redirectURL', `/sessions/${router.query.id}`)
-    }
+    const pageAccessedByReload = window.performance.getEntriesByType('navigation')
+    if (pageAccessedByReload[0].type === 'reload') {
+      sessionStorage.getItem('redirectURL') && sessionStorage.removeItem('redirectURL')
+    } else if (router.query.id === undefined && router.asPath !== '/') {
+      sessionStorage.setItem('redirectURL', router.asPath)
+    } else if (router.query.id !== undefined && router.pathname === '/sessions/[sid]') {
+      sessionStorage.setItem('redirectURL', `/sessions/${router.query.id}`)
+    } else return
   }, [router.isReady])
 
   if (isLoading) {
@@ -52,6 +57,8 @@ export default function ProtectedComponent({ children }) {
   }
 
   if (error) {
+    console.log(router.pathname)
+    if (router.pathname === '/sessions/[sid]') return <Details error={error.message} />
     return <Home error={error.message} />
   }
 

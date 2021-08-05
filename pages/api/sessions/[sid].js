@@ -74,7 +74,7 @@ async function handler(req, res) {
 
   let addresses = []
   queryString = `SELECT address_id FROM session_address WHERE session_id = ?`
-  values = [sid]
+  values = [sessionId]
   result = await db.all(queryString, values)
   let addressIds = result.map((row) => row.address_id)
   for (let addressId of addressIds) {

@@ -6,7 +6,7 @@ import withProtect from 'middware/withProtect'
 
 const schema = yup.object().shape({
   addressId: yup.number().required(),
-  sessionId: yup.number().required(),
+  sessionId: yup.string().required(),
 })
 
 async function handler(req, res) {
@@ -28,9 +28,21 @@ async function handler(req, res) {
 
   const db = await openDb()
 
-  let queryString = `DELETE FROM session_address_user WHERE session_id = ? AND address_id = ?`
-  let values = [sessionId, addressId]
-  let result = await db.run(queryString, values)
+  let queryString = `SELECT id FROM sessions WHERE sid = ?`
+  let values = [sessionId]
+  let result = await db.get(queryString, values)
+
+  if (_.isNil(result)) {
+    await db.close()
+    res.status(500).json({ messageCode: messageCodes.ERROR, message: 'Không xóa được thông tin' })
+    return
+  }
+
+  const sid = result.id
+
+  queryString = `DELETE FROM session_address_user WHERE session_id = ? AND address_id = ?`
+  values = [sid, addressId]
+  result = await db.run(queryString, values)
 
   if (_.isNil(result)) {
     await db.close()
@@ -39,7 +51,7 @@ async function handler(req, res) {
   }
 
   queryString = `DELETE FROM session_address WHERE session_id = ? AND address_id = ?`
-  values = [sessionId, addressId]
+  values = [sid, addressId]
   result = await db.run(queryString, values)
 
   if (_.isNil(result)) {

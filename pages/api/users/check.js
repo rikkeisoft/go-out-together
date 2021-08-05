@@ -31,7 +31,7 @@ async function handler(req, res) {
   const db = await openDb()
 
   let queryString = 'SELECT username, avatar_url FROM users WHERE uuid = ?'
-  let values = [req.body.uuid]
+  let values = [uuid]
   let result = await db.get(queryString, values)
 
   if (_.isNil(result)) {

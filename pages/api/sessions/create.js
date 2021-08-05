@@ -60,7 +60,7 @@ async function handler(req, res) {
     queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
     values = [address.aid, address.name, address.latitude, address.longitude]
     result = await db.run(queryString, values)
-    addressIds.push(result.lastId)
+    addressIds.push(result.lastID)
   }
 
   for (let addressId of addressIds) {
