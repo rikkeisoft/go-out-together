@@ -5,7 +5,7 @@ import ApiException from 'exceptions/ApiException'
 
 const schema = yup.object().shape({
   addressId: yup.number().required(),
-  sID: yup.string().required(),
+  sid: yup.string().required(),
 })
 
 export default async function handler(req, res) {
@@ -14,10 +14,10 @@ export default async function handler(req, res) {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { sID, addressId } = req.body
+    const { sid, addressId } = req.body
 
     try {
-      await schema.validate({ sID, addressId })
+      await schema.validate({ sid, addressId })
     } catch (err) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     let queryString, values, result
 
     queryString = `SELECT id FROM sessions WHERE sid = ?`
-    values = [sID]
+    values = [sid]
     try {
       result = await mysql.query(queryString, values)
     } catch (err) {

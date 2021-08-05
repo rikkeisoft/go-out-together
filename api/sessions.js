@@ -29,3 +29,8 @@ export const deleteSessionAddress = (data) => {
   const url = `sessions/addresses/delete`
   return axiosClient.delete(url, { data })
 }
+
+export const getSessionResult = (data) => {
+  const url = `sessions/result?sid=${data.sid}`
+  return axiosClient.get(url)
+}

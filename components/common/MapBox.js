@@ -65,7 +65,11 @@ const MapBox = ({ show, isOneLocaion, data }) => {
   }, [selectedLocation])
 
   const getBound = () => {
-    var line = turf.lineString([[-74, 40], [-78, 42], [-82, 35]])
+    var line = turf.lineString([
+      [-74, 40],
+      [-78, 42],
+      [-82, 35],
+    ])
     var bbox = turf.bbox(line)
     var bboxPolygon = turf.bboxPolygon(bbox)
     console.log(bboxPolygon)
