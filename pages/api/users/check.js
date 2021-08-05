@@ -14,7 +14,7 @@ async function handler(req, res) {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { uuid } = req.body
+    const uuid = req.userId
 
     try {
       await schema.validate({ uuid })
