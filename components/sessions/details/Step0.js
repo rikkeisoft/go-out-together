@@ -14,6 +14,14 @@ const Step0 = memo(({ sid, uid, setStep }) => {
   useEffect(() => {
     if (isSuccess) {
       if (data.messageCode === messageCodes.SUCCESS) {
+        if (!data.data.canVote) {
+          if (!data.data.voted) {
+            alert('Rất tiếc, đã hết thời gian vote')
+          }
+          setStep(3)
+          return
+        }
+
         if (data.data.voted) {
           setStep(3)
           return

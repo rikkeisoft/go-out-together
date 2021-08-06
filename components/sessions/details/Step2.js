@@ -6,6 +6,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import _ from 'lodash'
 import { useCookies } from 'react-cookie'
+import Countdown from 'react-countdown'
 import queryKeys from 'consts/queryKeys'
 import messageCodes from 'consts/messageCodes'
 import AddressVoter from 'components/common/AddressVoter'
@@ -18,6 +19,7 @@ import {
   deleteSessionAddress,
   voteSession,
 } from 'api/sessions'
+
 import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
@@ -31,8 +33,6 @@ import LoadingOverlay from 'components/common/LoadingOverlay'
 import DirectionRoutes from 'components/common/DirectionRoutes'
 
 const schema = yup.object().shape({
-  sessionId: yup.string().required(),
-  userId: yup.string().required(),
   votedAddress: yup.object({
     aid: yup.string().required(),
     name: yup.string().required(),
@@ -89,6 +89,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const { isLoading, isSuccess, data } = useQuery([queryKeys.CHECK_SESSION, { sid }], () => getSessionDetails({ sid }))
 
   const onSubmit = (data) => {
+    console.log(data)
     voteSessionMutation.mutate({
       sid: sid,
       uid: cookies.uid,
@@ -167,6 +168,16 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
       {!showMap && isSuccess && data.messageCode === messageCodes.SUCCESS && (
         <>
+          <MessageText>
+            Vote sẽ kết thúc sau:
+            <Countdown
+              date={new Date(data.data.expireTime)}
+              onComplete={() => {
+                alert('Rất tiếc , đã hết thời gian vote')
+                nextStep()
+              }}
+            />
+          </MessageText>
           <MessageText>Tiêu đề: {data.data.title}</MessageText>
           <MessageText>Nội dung: {data.data.content}</MessageText>
           <MessageText>
