@@ -4,4 +4,5 @@ export default {
   LOGOUT: 'logout',
   CHECK_SESSION: 'checkSession',
   GET_SESSION_RESULT: 'getSessionResult',
+  GET_ADDRESS: 'getAddress',
 }

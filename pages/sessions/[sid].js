@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import useStep from 'hooks/useStep'
 import { useRouter } from 'next/router'
@@ -17,8 +18,12 @@ import Step2 from 'components/sessions/details/Step2'
 import Step3 from 'components/sessions/details/Step3'
 import UserAvatar from 'components/avatar/UserAvatar'
 import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
+import Popup from 'components/common/Popup'
+import GoogleLoginModal from 'components/auth/GoogleLoginModal'
 
-export default function Details() {
+export default function Details({ error }) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isError, setIsError] = useState(false)
   const [cookies, , removeCookie] = useCookies()
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -43,12 +48,17 @@ export default function Details() {
       break
   }
 
+  useEffect(() => {
+    if (error) setIsError(true)
+    else setIsError(false)
+  }, [error])
+
   const goToHomePage = () => router.push(urls.HOME)
 
   const handleSignOut = () => {
     goToHomePage()
     queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedOut: true })
-    localStorage.removeItem('redirectURL')
+    sessionStorage.removeItem('redirectURL')
     removeCookie('accessToken', { path: '/' })
     removeCookie('uid', { path: '/' })
     removeCookie('username', { path: '/' })
@@ -63,6 +73,9 @@ export default function Details() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container>
+        <Popup isOpen={isError} onRequestClose={() => setIsError(false)}>
+          <h1>{error}</h1>
+        </Popup>
         <div className="flex items-center justify-around">
           <Button type="button" variant="danger" onClick={goToHomePage}>
             <ArrowLeftIcon className="w-7" /> Về trang chủ
@@ -74,7 +87,16 @@ export default function Details() {
             Bạn đang tham gia nhóm: <span className="text-blue-500">{sid}</span>
           </TitleText>
         </Center>
-        {stepElement}
+        {error ? (
+          <div className="text-center">
+            <Button type="button" variant="primary" onClick={() => setIsModalOpen(true)}>
+              Login
+            </Button>
+            <GoogleLoginModal isOpen={isModalOpen} onRequestClose={() => setIsModalOpen(false)} />
+          </div>
+        ) : (
+          stepElement
+        )}
       </Container>
     </MainLayout>
   )
