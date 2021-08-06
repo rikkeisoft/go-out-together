@@ -11,7 +11,13 @@ import messageCodes from 'consts/messageCodes'
 import AddressVoter from 'components/common/AddressVoter'
 // import { ErrorMessage } from '@hookform/error-message'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import { getAllAddresses, getSessionDetails, updateSessionAddresses, deleteSessionAddress, voteSession } from 'api/sessions'
+import {
+  getAllAddresses,
+  getSessionDetails,
+  updateSessionAddresses,
+  deleteSessionAddress,
+  voteSession,
+} from 'api/sessions'
 import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
