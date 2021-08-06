@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import PropTypes from 'prop-types'
 
-const Button = memo(({ type, variant, children, onClick }) => {
+const Button = memo(({ type, variant, children, onClick, disabled }) => {
   let className = 'inline-flex items-center px-5 py-2 text-white rounded-md'
   if (variant === 'primary') {
     className += ' bg-blue-500 hover:bg-blue-400'
@@ -16,6 +16,7 @@ const Button = memo(({ type, variant, children, onClick }) => {
       onClick={() => {
         onClick && onClick()
       }}
+      disabled={disabled}
     >
       {children}
     </button>
@@ -27,8 +28,11 @@ Button.propTypes = {
   variant: PropTypes.oneOf(['primary', 'danger']),
   children: PropTypes.any,
   onClick: PropTypes.func,
+  disabled: PropTypes.bool,
 }
 
-Button.defaultProps = {}
+Button.defaultProps = {
+  disabled: false,
+}
 
 export default Button

@@ -52,7 +52,7 @@ export default function Create() {
   const handleSignOut = () => {
     goToHomePage()
     queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedOut: true })
-    localStorage.removeItem('redirectURL')
+    sessionStorage.removeItem('redirectURL')
     removeCookie('accessToken', { path: '/' })
     removeCookie('uid', { path: '/' })
     removeCookie('username', { path: '/' })
