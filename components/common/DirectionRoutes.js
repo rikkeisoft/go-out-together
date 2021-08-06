@@ -201,27 +201,29 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
       })
     })
     //xử lý mảng điểm kinh độ vĩ độ có a[0]=a[n-1]
-    const arrayPoint = []
+    let arrayPoint = []
     const getCenterPoint = () => {
       listUserLocation.forEach((item) => {
         arrayPoint.push(item.coordinates)
       })
+      arrayPoint.push(destination.coordinates)
       arrayPoint.push(arrayPoint[0])
     }
 
-    if (listUserLocation.length >= 2) {
+    if (listUserLocation.length > 2) {
       getCenterPoint()
       let polygon = turf.polygon([arrayPoint])
-      let centerCoordinates = turf.centerOfMass(polygon)
-      console.log(centerCoordinates)
+      let centerCoordinates = turf.center(polygon)
 
       map.on('load', function () {
-        let center = turf.point([centerCoordinates.geometry.coordinates[0], centerCoordinates.geometry.coordinates[1]])
-        let radius = 1
-        let options = {
-          steps: 90,
-          units: 'kilometers',
-        }
+        const coords = arrayPoint.slice(0, arrayPoint.length - 1)
+        const from = turf.point(centerCoordinates.geometry.coordinates)
+        const to = turf.point(arrayPoint[0])
+        const distanceOption = { unit: 'radian' }
+        const distanceRadius = turf.distance(from, to, distanceOption)
+        let center = turf.point(centerCoordinates.geometry.coordinates)
+        let radius = distanceRadius + 0.5
+        let options = { steps: 100 }
 
         let circle = turf.circle(center, radius, options)
 
@@ -238,6 +240,11 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             'fill-opacity': 0.2,
           },
         })
+        const bounds = coords.reduce(
+          (bounds, coord) => bounds.extend(coord),
+          new mapboxgl.LngLatBounds(coords[0], coords[coords.length - 1]),
+        )
+        map.fitBounds(bounds, { padding: 50 })
       })
     }
   }, [destination.id])

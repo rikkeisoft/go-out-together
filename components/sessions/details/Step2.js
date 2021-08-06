@@ -147,27 +147,12 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
       {showMap && (
         <MapBox
-          addressCount={data.data.addresses.length}
+          listAddress={data.data.addresses}
           data={(data) => {
             handleOnAddLocation(data)
           }}
           show={() => {
             setShowMap(false)
-          }}
-        />
-      )}
-      {showDirectionRoutes && (
-        <DirectionRoutes
-          currentLocation={locations.userLocation}
-          listUserLocation={locations.listUserLocation}
-          destination={{
-            id: voteAddress.id,
-            name: 'Destination',
-            address: voteAddress.name,
-            coordinates: [voteAddress.longitude, voteAddress.latitude],
-          }}
-          showMap={() => {
-            setShowDirectionRoutes(false)
           }}
         />
       )}
@@ -190,6 +175,21 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
           <MessageText>
             Các thành viên đang tham gia: <MemberList members={data.data.members} />
           </MessageText>
+          {showDirectionRoutes && (
+            <DirectionRoutes
+              currentLocation={locations.userLocation}
+              listUserLocation={locations.listUserLocation}
+              destination={{
+                id: voteAddress.id,
+                name: 'Destination',
+                address: voteAddress.name,
+                coordinates: [voteAddress.longitude, voteAddress.latitude],
+              }}
+              showMap={() => {
+                setShowDirectionRoutes(false)
+              }}
+            />
+          )}
           <FormCard>
             <FormProvider {...methods}>
               <form onSubmit={methods.handleSubmit(onSubmit)}>
