@@ -23,25 +23,8 @@ export default async function handler(req, res) {
     }
 
     let queryString, values, result
-    let isCreator = false
-    queryString = `SELECT creator FROM sessions WHERE sid = ?`
-    values = [sid]
-    try {
-      result = await mysql.query(queryString, values)
-    } catch (err) {
-      cleanUp(mysql)
-      throw new ApiException(500, 'Không lấy được creator từ bảng addresses', err)
-    }
-    if (result.length === 0) {
-      cleanUp(mysql)
-      throw new ApiException(500, 'Không tìm thấy session')
-    }
 
-    if (uid === result[0].creator) {
-      isCreator = true
-    }
-
-    queryString = `SELECT id FROM sessions WHERE sid = ?`
+    queryString = `SELECT id, expire_time FROM sessions WHERE sid = ?`
     values = [sid]
     try {
       result = await mysql.query(queryString, values)
@@ -54,6 +37,14 @@ export default async function handler(req, res) {
       throw new ApiException(500, 'Không tìm thấy session')
     }
     const sessionId = result[0].id
+    const expireTime = new Date(result[0].expire_time)
+    const now = new Date()
+    let canVote
+    if (expireTime.getTime() < now.getTime()) {
+      canVote = false
+    } else {
+      canVote = true
+    }
 
     queryString = `SELECT id FROM users WHERE uuid = ?`
     values = [uid]
@@ -84,10 +75,31 @@ export default async function handler(req, res) {
       voted = true
     }
 
+    let isCreator
+    queryString = `SELECT creator FROM sessions WHERE sid = ?`
+    values = [sid]
+    try {
+      result = await mysql.query(queryString, values)
+    } catch (err) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không lấy được creator từ bảng addresses', err)
+    }
+    if (result.length === 0) {
+      cleanUp(mysql)
+      throw new ApiException(500, 'Không tìm thấy session')
+    }
+
+    if (uid === result[0].creator) {
+      isCreator = true
+    } else {
+      isCreator = false
+    }
+
     cleanUp(mysql)
     res.status(200).json({
       messageCode: messageCodes.SUCCESS,
       data: {
+        canVote,
         voted,
         isCreator,
       },

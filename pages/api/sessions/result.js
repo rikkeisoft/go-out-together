@@ -53,7 +53,15 @@ export default async function handler(req, res) {
       }
       if (result.length === 0) {
         cleanUp(mysql)
-        throw new ApiException(500, 'Không lay duoc thong tin vote')
+        res.status(200).json({
+          messageCode: messageCodes.SUCCESS,
+          message: 'Lấy kết quả vote thành công',
+          data: {
+            address: null,
+            voters: null,
+          },
+        })
+        return
       }
       const voters = result[0].vote_count
       const addressId = result[0].address_id

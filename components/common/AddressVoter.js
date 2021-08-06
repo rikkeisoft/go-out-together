@@ -11,11 +11,11 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
   const [openPopup, setOpenPopup] = useState(false)
 
   if (!_.isNil(watch(name)) && _.isNil(data.find((item) => item.aid === watch(name)?.aid))) {
-    setValue(name, null)
+    setValue(name, null, { shouldValidate: true })
   }
 
   const onSelect = (item) => {
-    setValue(name, item)
+    setValue(name, item, { shouldValidate: true })
   }
 
   return (
