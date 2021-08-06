@@ -64,6 +64,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   useEffect(() => {
     if (addressData && addressData?.data.length !== 0) {
       const newListUserLocations = addressData?.data.map((location) => ({
+        userId: location.userId,
         name: location.username,
         address: location.name,
         coordinates: [location.longitude, location.latitude],
@@ -71,6 +72,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
       const userLocation = addressData?.data.find((location) => location.userId === cookies.uid)
       const newUserLocation = {
+        userId: userLocation.userId,
         name: userLocation.username,
         address: userLocation.name,
         coordinates: [userLocation.longitude, userLocation.latitude],
@@ -158,7 +160,12 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
         <DirectionRoutes
           currentLocation={locations.userLocation}
           listUserLocation={locations.listUserLocation}
-          destination={voteAddress}
+          destination={{
+            id: voteAddress.id,
+            name: 'Destination',
+            address: voteAddress.name,
+            coordinates: [voteAddress.longitude, voteAddress.latitude],
+          }}
           showMap={() => {
             setShowDirectionRoutes(false)
           }}
