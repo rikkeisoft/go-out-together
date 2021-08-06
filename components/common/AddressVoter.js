@@ -1,11 +1,14 @@
-import React, { memo } from 'react'
+import React, { memo, useState } from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { useFormContext, Controller } from 'react-hook-form'
 import TrashIcon from 'components/icons/TrashIcon'
+import Popup from './Popup'
+import Button from './Button'
 
-const AddressVoter = memo(({ name, data, onDelete }) => {
+const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
   const { control, watch, setValue } = useFormContext()
+  const [openPopup, setOpenPopup] = useState(false)
 
   if (!_.isNil(watch(name)) && _.isNil(data.find((item) => item.aid === watch(name)?.aid))) {
     setValue(name, null)
@@ -32,6 +35,7 @@ const AddressVoter = memo(({ name, data, onDelete }) => {
                         type="radio"
                         className="mr-4"
                         onClick={() => {
+                          onClick(item)
                           onSelect(item)
                         }}
                         checked={item.aid === value?.aid}
@@ -40,15 +44,28 @@ const AddressVoter = memo(({ name, data, onDelete }) => {
                     </label>
                   </td>
                   <td className="p-2 w-10 cursor-pointer">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onDelete(item.aid)
-                      }}
-                    >
+                    <button type="button" onClick={() => setOpenPopup(true)}>
                       <TrashIcon className="w-6" />
                     </button>
                   </td>
+                  <Popup isOpen={openPopup} onRequestClose={() => setOpenPopup(false)}>
+                    <div>
+                      <h1 className="mb-4">Are you sure to delete this address?</h1>
+                      <div className="w-full flex items-center justify-around">
+                        <Button variant="primary" onClick={() => setOpenPopup(false)}>
+                          No
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onClick={() => {
+                            setOpenPopup(false), onDelete(item.id)
+                          }}
+                        >
+                          Yes
+                        </Button>
+                      </div>
+                    </div>
+                  </Popup>
                 </tr>
               )
             })}

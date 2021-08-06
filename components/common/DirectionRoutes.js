@@ -11,7 +11,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
   const distanceRef = useRef([])
   console.log('currentLocation', currentLocation)
   console.log('listUserLocation', listUserLocation)
-  // console.log('destination', destination)
+  console.log('destination', destination)
 
   const expDestination = {
     name: 'Destination',

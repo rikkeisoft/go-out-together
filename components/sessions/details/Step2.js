@@ -46,6 +46,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const [cookies] = useCookies(['uid'])
   const [showMap, setShowMap] = useState(false)
   const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
+  const [voteAddress, setVoteAddress] = useState(null)
   const [locations, setLocations] = useState({
     userLocation: {},
     listUserLocation: [],
@@ -81,13 +82,8 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
     }
   }, [addressData])
 
-  // const defaultValues = Object.assign({}, formData, {
-  //   sessionId: sid,
-  //   userId: cookies.uid,
-  // })
   const methods = useForm({
     resolver: yupResolver(schema),
-    // defaultValues: defaultValues,
   })
 
   const { isLoading, isSuccess, data } = useQuery([queryKeys.CHECK_SESSION, { sid }], () => getSessionDetails({ sid }))
@@ -109,6 +105,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
       }
     }
   }, [voteSessionMutation.isSuccess])
+
   const handleOnAddLocation = async (newLocations) => {
     const newData = newLocations.map((location) => ({
       aid: location.id,
@@ -160,11 +157,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
         <DirectionRoutes
           currentLocation={locations.userLocation}
           listUserLocation={locations.listUserLocation}
-          destination={{
-            sid: sid,
-            uid: cookies.uid,
-            address: data.votedAddress,
-          }}
+          destination={voteAddress}
           showMap={() => {
             setShowDirectionRoutes(false)
           }}
@@ -190,7 +183,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                       type="button"
                       variant="primary"
                       onClick={() => {
-                        // setShowMap(true)
+                        setShowMap(true)
                       }}
                     >
                       Thêm địa điểm
@@ -200,7 +193,15 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
                 <Field>
                   <Label htmlFor="votedAddress">Chọn địa điểm ăn chơi:</Label>
-                  <AddressVoter name="votedAddress" data={data.data.addresses} onDelete={deleteAddress} />
+                  <AddressVoter
+                    name="votedAddress"
+                    data={data.data.addresses}
+                    onClick={(item) => {
+                      setVoteAddress(item)
+                      setShowDirectionRoutes(true)
+                    }}
+                    onDelete={deleteAddress}
+                  />
                   {!_.isNil(methods.formState.errors.votedAddress) && <ErrorText>Chọn địa chỉ để vote</ErrorText>}
                 </Field>
 
