@@ -1,4 +1,4 @@
-import userAPI from 'api/userAPI'
+import { login } from 'api/users'
 import GoogleLogin from 'components/common/GoogleLogin'
 import Popup from 'components/common/Popup'
 import queryKeys from 'consts/queryKeys'
@@ -14,7 +14,7 @@ function GoogleLoginModal({ isOpen, onRequestClose }) {
   const queryClient = useQueryClient()
   const router = useRouter()
   const [cookies, setCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
-  const { mutate } = useMutation((userInfo) => userAPI.login(userInfo), {
+  const { mutate } = useMutation((userInfo) => login(userInfo), {
     onSuccess: (data) => setCookie('accessToken', data.data.accessToken, { path: '/' }),
   })
 

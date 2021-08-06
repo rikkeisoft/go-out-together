@@ -1,4 +1,4 @@
-import userAPI from 'api/userAPI'
+import { checkUser } from 'api/users'
 import Loading from 'components/common/Loading'
 import queryKeys from 'consts/queryKeys'
 import { useRouter } from 'next/router'
@@ -21,7 +21,7 @@ export default function ProtectedComponent({ children }) {
         return new Promise((rs) => rs())
       }
       try {
-        await userAPI.checkUser()
+        await checkUser()
         queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedIn: true })
       } catch (error) {
         removeCookie('username', { path: '/' })

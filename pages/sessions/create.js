@@ -10,7 +10,7 @@ import {
 import urls from 'consts/urls'
 import queryKeys from 'consts/queryKeys'
 import { auth } from 'lib/firebase'
-// import userAPI from 'api/userAPI'
+// import {logout} from 'api/users'
 import MainLayout from 'layouts/MainLayout'
 import Container from 'components/common/Container'
 import Button from 'components/common/Button'
@@ -26,7 +26,7 @@ export default function Create() {
   const router = useRouter()
   const [cookies, , removeCookie] = useCookies(['uid', 'username', 'imgURL'])
   const queryClient = useQueryClient()
-  // const { mutateAsync } = useMutation((param) => userAPI.logout(param))
+  // const { mutateAsync } = useMutation((param) => logout(param))
   const { step, formData, backwardStep, prevStep, nextStep, setFormData } = useStep()
   const [sid, setSid] = useState(null)
 
