@@ -1,8 +1,4 @@
-import {
-  memo,
-  useEffect,
-  // useState
-} from 'react'
+import { memo, useEffect, useState } from 'react'
 import Head from 'next/head'
 import PropTypes from 'prop-types'
 import { useForm, FormProvider } from 'react-hook-form'
@@ -10,24 +6,33 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import _ from 'lodash'
 import { useCookies } from 'react-cookie'
-import { useQuery, useMutation } from 'react-query'
 import queryKeys from 'consts/queryKeys'
 import messageCodes from 'consts/messageCodes'
-import { getSessionDetails, voteSession } from 'api/sessions'
+import AddressVoter from 'components/common/AddressVoter'
+// import { ErrorMessage } from '@hookform/error-message'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+import {
+  getAllAddresses,
+  getSessionDetails,
+  updateSessionAddresses,
+  deleteSessionAddress,
+  voteSession,
+} from 'api/sessions'
 import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
-import AddressVoter from 'components/common/AddressVoter'
 import ErrorText from 'components/common/ErrorText'
 import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MessageText from 'components/common/MessageText'
 import MemberList from 'components/common/MemberList'
-// import MapBox from 'components/common/MapBox'
+import MapBox from 'components/common/MapBox'
 import LoadingOverlay from 'components/common/LoadingOverlay'
-// import DirectionRoutes from 'components/common/DirectionRoutes'
+import DirectionRoutes from 'components/common/DirectionRoutes'
 
 const schema = yup.object().shape({
+  sessionId: yup.string().required(),
+  userId: yup.string().required(),
   votedAddress: yup.object({
     aid: yup.string().required(),
     name: yup.string().required(),
@@ -37,37 +42,51 @@ const schema = yup.object().shape({
 })
 
 const Step2 = memo(({ sid, prevStep, nextStep }) => {
-  const [cookies] = useCookies()
-  // const [showMap, setShowMap] = useState(false)
-  // const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
-  // const [listDataLocation, setListDataLocation] = useState(null)
-
   const voteSessionMutation = useMutation(voteSession)
+  const [cookies] = useCookies(['uid'])
+  const [showMap, setShowMap] = useState(false)
+  const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
+  const [voteAddress, setVoteAddress] = useState(null)
+  const [locations, setLocations] = useState({
+    userLocation: {},
+    listUserLocation: [],
+  })
+
+  const queryClient = useQueryClient()
+  const { mutateAsync } = useMutation((address) => updateSessionAddresses(address), {
+    onSuccess: () => queryClient.invalidateQueries(queryKeys.SESSION_DETAIL),
+  })
+  const { mutateAsync: deleteAsync } = useMutation((info) => deleteSessionAddress(info), {
+    onSuccess: () => queryClient.invalidateQueries(queryKeys.SESSION_DETAIL),
+  })
+  const { data: addressData } = useQuery([queryKeys.GET_ADDRESS, { sid }], () => getAllAddresses({ sid }), { retry: 1 })
+
+  useEffect(() => {
+    if (addressData && addressData?.data.length !== 0) {
+      const newListUserLocations = addressData?.data.map((location) => ({
+        name: location.username,
+        address: location.name,
+        coordinates: [location.longitude, location.latitude],
+      }))
+
+      const userLocation = addressData?.data.find((location) => location.userId === cookies.uid)
+      const newUserLocation = {
+        name: userLocation.username,
+        address: userLocation.name,
+        coordinates: [userLocation.longitude, userLocation.latitude],
+      }
+      setLocations({
+        userLocation: newUserLocation,
+        listUserLocation: newListUserLocations,
+      })
+    }
+  }, [addressData])
 
   const methods = useForm({
     resolver: yupResolver(schema),
   })
 
-  // const expListUserLocation = [
-  //   {
-  //     label: 'Khách sạn Cầu Giấy (0 người vote)',
-  //     value: 'Khách sạn Cầu Giấy',
-  //     amountVote: 0,
-  //     coordinates: [105.8, 21.0333],
-  //   },
-  //   {
-  //     label: 'Đại học Quốc Gia (2 người vote)',
-  //     value: 'Đại học Quốc Gia',
-  //     amountVote: 2,
-  //     coordinates: [105.782214, 21.037867],
-  //   },
-  // ]
-
   const { isLoading, isSuccess, data } = useQuery([queryKeys.CHECK_SESSION, { sid }], () => getSessionDetails({ sid }))
-
-  const deleteAddress = (aid) => {
-    console.log(aid)
-  }
 
   const onSubmit = (data) => {
     voteSessionMutation.mutate({
@@ -86,6 +105,36 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
       }
     }
   }, [voteSessionMutation.isSuccess])
+
+  const handleOnAddLocation = async (newLocations) => {
+    const newData = newLocations.map((location) => ({
+      aid: location.id,
+      name: location.place_name,
+      longitude: location.center[0],
+      latitude: location.center[1],
+    }))
+
+    try {
+      await mutateAsync({
+        sid,
+        addresses: newData,
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const deleteAddress = async (addressId) => {
+    try {
+      await deleteAsync({
+        addressId,
+        sid,
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   return (
     <>
       <Head>
@@ -93,29 +142,30 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {/* {showMap && (
+      {showMap && (
         <MapBox
+          addressCount={data.data.addresses.length}
           data={(data) => {
-            setListDataLocation(data)
+            handleOnAddLocation(data)
           }}
           show={() => {
             setShowMap(false)
           }}
         />
-      )} */}
-      {/* {showDirectionRoutes && (
+      )}
+      {showDirectionRoutes && (
         <DirectionRoutes
-          currentLocation={formData}
-          listUserLocation={expListUserLocation}
-          destination={votedAddress}
+          currentLocation={locations.userLocation}
+          listUserLocation={locations.listUserLocation}
+          destination={voteAddress}
           showMap={() => {
             setShowDirectionRoutes(false)
           }}
         />
-      )} */}
+      )}
       <LoadingOverlay isOpen={isLoading} message="Đang lấy thông tin session..." />
 
-      {isSuccess && data.messageCode === messageCodes.SUCCESS && (
+      {!showMap && isSuccess && data.messageCode === messageCodes.SUCCESS && (
         <>
           <MessageText>Tiêu đề: {data.data.title}</MessageText>
           <MessageText>Nội dung: {data.data.content}</MessageText>
@@ -133,7 +183,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                       type="button"
                       variant="primary"
                       onClick={() => {
-                        // setShowMap(true)
+                        setShowMap(true)
                       }}
                     >
                       Thêm địa điểm
@@ -143,7 +193,15 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
                 <Field>
                   <Label htmlFor="votedAddress">Chọn địa điểm ăn chơi:</Label>
-                  <AddressVoter name="votedAddress" data={data.data.addresses} onDelete={deleteAddress} />
+                  <AddressVoter
+                    name="votedAddress"
+                    data={data.data.addresses}
+                    onClick={(item) => {
+                      setVoteAddress(item)
+                      setShowDirectionRoutes(true)
+                    }}
+                    onDelete={deleteAddress}
+                  />
                   {!_.isNil(methods.formState.errors.votedAddress) && <ErrorText>Chọn địa chỉ để vote</ErrorText>}
                 </Field>
 

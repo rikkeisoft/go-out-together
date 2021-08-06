@@ -32,7 +32,7 @@ function GoogleLoginModal({ isOpen, onRequestClose }) {
         setCookie('username', displayName, { path: '/' })
         setCookie('imgURL', photoURL, { path: '/' })
         queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedIn: true })
-        const url = localStorage.getItem('redirectURL')
+        const url = sessionStorage.getItem('redirectURL')
         if (url !== null) router.push(url)
         else router.push(urls.SESSIONS_CREATE)
       }

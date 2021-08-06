@@ -61,7 +61,8 @@ export default async function handler(req, res) {
           cleanUp(mysql)
           throw new ApiException(500, 'Không thêm được thông tin địa chỉ', err)
         }
-        addressId = result[0].insertId
+        addressId = result.insertId
+        console.log(result)
       } else {
         addressId = result[0].id
       }
