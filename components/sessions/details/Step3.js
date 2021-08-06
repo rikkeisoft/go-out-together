@@ -11,7 +11,7 @@ import MessageText from 'components/common/MessageText'
 import LoadingOverlay from 'components/common/LoadingOverlay'
 
 const Step3 = memo(({ sid }) => {
-  const { isLoading, isSuccess, data, refetch } = useQuery([queryKeys.CHECK_SESSION, { sid }], () =>
+  const { isLoading, isSuccess, data, refetch } = useQuery([queryKeys.GET_SESSION_RESULT, { sid }], () =>
     getSessionResult({ sid }),
   )
   let resultElement = <></>

@@ -11,7 +11,7 @@ export const checkSession = (data) => {
 }
 
 export const getSessionDetails = (data) => {
-  const url = `/sessions/${data.sid}`
+  const url = `/sessions/details?sid=${data.sid}`
   return axiosClient.get(url)
 }
 
