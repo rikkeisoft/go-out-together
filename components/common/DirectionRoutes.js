@@ -5,107 +5,176 @@ import Head from 'next/head'
 import PropTypes from 'prop-types'
 import Button from './Button'
 import * as turf from '@turf/turf'
+import Marker from './Marker'
+import ThreeDots from './ThreeDots'
 
 const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destination }) => {
   const [distance, setDistance] = useState([])
   const distanceRef = useRef([])
-  console.log('currentLocation', currentLocation)
-  console.log('listUserLocation', listUserLocation)
-  console.log('destination', destination)
 
-  const expDestination = {
-    name: 'Destination',
-    address: destination.name,
-    coordinates: [destination.longitude, destination.latitude],
+  const saveDistance = (item, newDistance) => {
+    if (
+      distanceRef.current &&
+      (distanceRef.current.length === 0 || distanceRef.current.every((ele) => ele.userId !== item.userId))
+    ) {
+      distanceRef.current.push({
+        userId: item.userId,
+        address: item.address,
+        newDistance,
+      })
+    }
   }
 
   useEffect(() => {
-    if (expDestination) {
-      const longitude = expDestination.coordinates[0]
-      const latitude = expDestination.coordinates[1]
-      mapboxgl.accessToken = process.env.NEXT_PUBLIC_TOKEN_MAPBOX
-      let map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11',
-        center: [longitude, latitude],
-        zoom: 15,
-      })
+    distanceRef.current = []
 
-      // add marker for distance
-      const addDestinationMarker = () => {
-        const marker = new mapboxgl.Marker({ color: '#ff0000' })
+    const longitude = destination.coordinates[0]
+    const latitude = destination.coordinates[1]
+    mapboxgl.accessToken = process.env.NEXT_PUBLIC_TOKEN_MAPBOX
+    let map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [longitude, latitude],
+      zoom: 15,
+    })
+
+    // add marker for distance
+    const addDestinationMarker = () => {
+      const marker = new mapboxgl.Marker({ color: '#ff0000' })
+      const markerPopup = new mapboxgl.Popup()
+      markerPopup.setText(`${destination.name} - (${destination.address})`)
+      marker.setPopup(markerPopup)
+      marker.setLngLat([destination.coordinates[0], destination.coordinates[1]])
+      marker.addTo(map)
+    }
+    map.on('load', addDestinationMarker)
+
+    listUserLocation.map((item, index) => {
+      const addMarker = () => {
+        const marker = new mapboxgl.Marker()
         const markerPopup = new mapboxgl.Popup()
-        markerPopup.setText(`${expDestination.name} - (${expDestination.address})`)
+
+        markerPopup.setText(`${item.name} - (${item.address})`)
         marker.setPopup(markerPopup)
-        marker.setLngLat([expDestination.coordinates[0], expDestination.coordinates[1]])
+
+        marker.setLngLat([item.coordinates[0], item.coordinates[1]])
         marker.addTo(map)
       }
-      map.on('load', addDestinationMarker)
+      map.on('load', addMarker)
 
-      listUserLocation.map((item, index) => {
-        const addMarker = () => {
-          const marker = new mapboxgl.Marker()
-          const markerPopup = new mapboxgl.Popup()
+      let start = [item.coordinates[0], item.coordinates[1]]
+      const coordsDestination = [destination.coordinates[0], destination.coordinates[1]]
 
-          markerPopup.setText(`${item.name} - (${item.address})`)
-          marker.setPopup(markerPopup)
+      const getRoute = async (item, start, end) => {
+        // start: user location; end: destination
+        const response = await axios.get(
+          `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
+        )
+        const data = response.data.routes[0]
+        const coordinates = data.geometry.coordinates
+        // distanceRef.current.push({
+        //   userId: item.userId,
+        //   distance: data.distance,
+        // })
 
-          marker.setLngLat([item.coordinates[0], item.coordinates[1]])
-          marker.addTo(map)
+        // setDistance([...distance, distanceRef.current])
+        saveDistance(item, data.distance)
+        setDistance([...distanceRef.current])
+
+        const geojson = {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: coordinates,
+          },
         }
-        map.on('load', addMarker)
-
-        let start = [listUserLocation[index].coordinates[0], listUserLocation[index].coordinates[1]]
-        const getRoute = async (end) => {
-          const response = await axios.get(
-            `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
-          )
-          const data = response.data.routes[0]
-          const coordinates = data.geometry.coordinates
-          distanceRef.current.push(data.distance)
-          setDistance([...distance, distanceRef.current])
-          const geojson = {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'LineString',
-              coordinates: coordinates,
+        if (map.getSource(`route${index}`)) {
+          map.getSource(`route${index}`).setData(geojson)
+        } else {
+          let colorMarker
+          if (item.userId === currentLocation.userId) {
+            colorMarker = '#166f00'
+          } else colorMarker = '#3887be'
+          map.addLayer({
+            id: `route${index}`,
+            type: 'line',
+            source: {
+              type: 'geojson',
+              data: {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'LineString',
+                  coordinates: geojson,
+                },
+              },
             },
-          }
-          if (map.getSource(`route${index}`)) {
-            map.getSource(`route${index}`).setData(geojson)
-          } else {
-            map.addLayer({
-              id: `route${index}`,
-              type: 'line',
-              source: {
-                type: 'geojson',
-                data: {
+            layout: {
+              'line-join': 'round',
+              'line-cap': 'round',
+            },
+            paint: {
+              'line-color': `${colorMarker}`,
+              'line-width': 5,
+              'line-opacity': 0.75,
+            },
+          })
+        }
+      }
+      //add start point
+      map.on('load', async () => {
+        let colorMarker
+        if (item.userId === currentLocation.userId) {
+          colorMarker = '#166f00'
+        } else colorMarker = '#3887be'
+        await getRoute(item, start, coordsDestination)
+        map.addLayer({
+          id: `point${index}`,
+          type: 'circle',
+          source: {
+            type: 'geojson',
+            data: {
+              type: 'FeatureCollection',
+              features: [
+                {
                   type: 'Feature',
                   properties: {},
                   geometry: {
-                    type: 'LineString',
-                    coordinates: geojson,
+                    type: 'Point',
+                    coordinates: start,
                   },
                 },
+              ],
+            },
+          },
+          paint: {
+            'circle-radius': 10,
+            'circle-color': `${colorMarker}`,
+          },
+        })
+      })
+      // add end point
+      map.on('load', async () => {
+        await getRoute(item, start, coordsDestination)
+        let end = {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Point',
+                coordinates: coordsDestination,
               },
-              layout: {
-                'line-join': 'round',
-                'line-cap': 'round',
-              },
-              paint: {
-                'line-color': '#3887be',
-                'line-width': 5,
-                'line-opacity': 0.75,
-              },
-            })
-          }
+            },
+          ],
         }
-        //add start point
-        map.on('load', () => {
-          getRoute(start)
+        if (map.getLayer('end')) {
+          map.getSource('end').setData(end)
+        } else {
           map.addLayer({
-            id: `point${index}`,
+            id: 'end',
             type: 'circle',
             source: {
               type: 'geojson',
@@ -117,7 +186,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
                     properties: {},
                     geometry: {
                       type: 'Point',
-                      coordinates: start,
+                      coordinates: coordsDestination,
                     },
                   },
                 ],
@@ -125,108 +194,58 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             },
             paint: {
               'circle-radius': 10,
-              'circle-color': '#3887be',
+              'circle-color': '#f30',
             },
           })
+        }
+      })
+    })
+    //xử lý mảng điểm kinh độ vĩ độ có a[0]=a[n-1]
+    const arrayPoint = []
+    const getCenterPoint = () => {
+      listUserLocation.forEach((item) => {
+        arrayPoint.push(item.coordinates)
+      })
+      arrayPoint.push(arrayPoint[0])
+    }
+
+    if (listUserLocation.length >= 2) {
+      getCenterPoint()
+      let polygon = turf.polygon([arrayPoint])
+      let centerCoordinates = turf.centerOfMass(polygon)
+      console.log(centerCoordinates)
+
+      map.on('load', function () {
+        let center = turf.point([centerCoordinates.geometry.coordinates[0], centerCoordinates.geometry.coordinates[1]])
+        let radius = 1
+        let options = {
+          steps: 90,
+          units: 'kilometers',
+        }
+
+        let circle = turf.circle(center, radius, options)
+
+        map.addSource('circleData', {
+          type: 'geojson',
+          data: circle,
         })
-        // add end point
-        map.on('load', () => {
-          const coords = [expDestination.coordinates[0], expDestination.coordinates[1]]
-          let end = {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                properties: {},
-                geometry: {
-                  type: 'Point',
-                  coordinates: coords,
-                },
-              },
-            ],
-          }
-          if (map.getLayer('end')) {
-            map.getSource('end').setData(end)
-          } else {
-            map.addLayer({
-              id: 'end',
-              type: 'circle',
-              source: {
-                type: 'geojson',
-                data: {
-                  type: 'FeatureCollection',
-                  features: [
-                    {
-                      type: 'Feature',
-                      properties: {},
-                      geometry: {
-                        type: 'Point',
-                        coordinates: coords,
-                      },
-                    },
-                  ],
-                },
-              },
-              paint: {
-                'circle-radius': 10,
-                'circle-color': '#f30',
-              },
-            })
-          }
-          getRoute(coords)
+        map.addLayer({
+          id: 'circle-fill',
+          type: 'fill',
+          source: 'circleData',
+          paint: {
+            'fill-color': '#00FFFF',
+            'fill-opacity': 0.2,
+          },
         })
       })
-      //xử lý mảng điểm kinh độ vĩ độ có a[0]=a[n-1]
-      const arrayPoint = []
-      const getCenterPoint = () => {
-        listUserLocation.forEach((item) => {
-          arrayPoint.push(item.coordinates)
-        })
-        arrayPoint.push(arrayPoint[0])
-      }
-
-      if (listUserLocation.length > 2) {
-        getCenterPoint()
-        let polygon = turf.polygon([arrayPoint])
-        let centerCoordinates = turf.centerOfMass(polygon)
-
-        map.on('load', function () {
-          let center = turf.point([
-            centerCoordinates.geometry.coordinates[0],
-            centerCoordinates.geometry.coordinates[1],
-          ])
-          let radius = 1
-          let options = {
-            steps: 90,
-            units: 'kilometers',
-          }
-
-          let circle = turf.circle(center, radius, options)
-
-          map.addSource('circleData', {
-            type: 'geojson',
-            data: circle,
-          })
-          map.addLayer({
-            id: 'circle-fill',
-            type: 'fill',
-            source: 'circleData',
-            paint: {
-              'fill-color': '#00FFFF',
-              'fill-opacity': 0.2,
-            },
-          })
-        })
-      }
     }
-  }, [destination])
+  }, [destination.id])
 
-  const getDistance = () => {
-    if (distance[0] !== undefined) {
-      const total = distance[0].reduce((accumlator, value) => {
-        return accumlator + value
-      }, 0)
-      return total / distance[0].length / 500
+  const getAverageDistance = () => {
+    if (distance.length !== 0) {
+      const total = distance.reduce((acc, element) => acc + element.newDistance, 0)
+      return total / distance.length
     }
   }
 
@@ -239,7 +258,8 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
       <div className="w-9/12 mx-auto relative">
-        <div className="absolute right-0">
+        <div className="flex justify-between items-center">
+          <p className="text-blue-600 text-xl font-semibold">Thong tin duong di</p>
           <Button
             type="submit"
             variant="primary"
@@ -251,52 +271,27 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           </Button>
         </div>
         <p>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 inline mr-2"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Từ: {currentLocation.address}
+          <Marker />
+          Đến: {destination.address}
         </p>
-        <p>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 inline mr-2"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Đến: {expDestination.address}
-        </p>
-        <p>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 inline mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-            />
-          </svg>
-          {/* Chiều dài quãng đường: {(distance / 1000).toFixed(2)} KM */}
-          Chiều dài quãng đường trung bình: {distance[0] && getDistance().toFixed(2)} KM
+        <div className="my-2 p-2 h-32 overflow-y-scroll border border-gray-400">
+          {distance.length !== 0 &&
+            distance.map((item) => (
+              <div key={item.userId} className="mb-2">
+                <p>
+                  <Marker />
+                  Từ: {item.address}
+                </p>
+                <p>
+                  <ThreeDots />
+                  Chiều dài quãng đường: {(item.newDistance / 1000).toFixed(2)} KM
+                </p>
+              </div>
+            ))}
+        </div>
+        <p className="mb-3">
+          <ThreeDots />
+          Chiều dài quãng đường trung bình: {(getAverageDistance() / 1000).toFixed(2)} KM
         </p>
         <div id="map" style={{ width: '100%', height: '60vh' }} />
       </div>
