@@ -21,7 +21,7 @@ export const updateSessionAddresses = (data) => {
 }
 
 export const getAllAddresses = (data) => {
-  const url = `sessions/addresses/get-all?sid=${data.sid}`
+  const url = `sessions/addresses/get-all?sID=${data.sID}`
   return axiosClient.get(url)
 }
 

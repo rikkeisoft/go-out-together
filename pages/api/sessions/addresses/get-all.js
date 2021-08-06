@@ -9,7 +9,7 @@ const schema = yup.object().shape({
 
 export default async function handler(req, res) {
   try {
-    if (req.method !== 'DELETE') {
+    if (req.method !== 'GET') {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
