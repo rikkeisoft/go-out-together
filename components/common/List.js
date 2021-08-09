@@ -1,6 +1,7 @@
 import React, { memo } from 'react'
 import PropTypes from 'prop-types'
 import { Controller, useFormContext } from 'react-hook-form'
+import { toast } from 'react-toastify'
 import TrashIcon from 'components/icons/TrashIcon'
 
 const List = memo(({ name }) => {
@@ -24,6 +25,7 @@ const List = memo(({ name }) => {
                       onClick={() => {
                         const newValue = watch(name).slice()
                         newValue.splice(index, 1)
+                        toast.success('Xóa thành công', { position: 'top-right' })
                         onChange(newValue)
                       }}
                     >

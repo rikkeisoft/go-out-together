@@ -10,6 +10,7 @@ import { ErrorMessage } from '@hookform/error-message'
 import messageCodes from 'consts/messageCodes'
 import { useMutation } from 'react-query'
 import { createSession } from 'api/sessions'
+import { ToastContainer } from 'react-toastify'
 import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
@@ -131,7 +132,6 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
         <title>Bước 2</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <SmallTitle>Nhanh tay điền thông tin và bắt đầu thôi!</SmallTitle>
       {showMap && (
         <MapBox
@@ -237,6 +237,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
         </FormCard>
       )}
       <LoadingOverlay isOpen={createSessionMutation.isLoading} message="Đang xử lí..." />
+      <ToastContainer />
     </>
   )
 })
