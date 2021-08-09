@@ -210,13 +210,14 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
       arrayPoint.push(arrayPoint[0])
     }
 
-    if (listUserLocation.length > 2) {
-      getCenterPoint()
+    let coords, bounds
+    getCenterPoint()
+    if (listUserLocation.length >= 2) {
       let polygon = turf.polygon([arrayPoint])
       let centerCoordinates = turf.center(polygon)
 
       map.on('load', function () {
-        const coords = arrayPoint.slice(0, arrayPoint.length - 1)
+        coords = arrayPoint.slice(0, arrayPoint.length - 1)
         const from = turf.point(centerCoordinates.geometry.coordinates)
         const to = turf.point(arrayPoint[0])
         const distanceOption = { unit: 'radian' }
@@ -240,12 +241,17 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             'fill-opacity': 0.2,
           },
         })
-        const bounds = coords.reduce(
+        bounds = coords.reduce(
           (bounds, coord) => bounds.extend(coord),
           new mapboxgl.LngLatBounds(coords[0], coords[coords.length - 1]),
         )
         map.fitBounds(bounds, { padding: 50 })
       })
+    } else {
+      coords = arrayPoint.slice(0, 2)
+      console.log(coords)
+      bounds = new mapboxgl.LngLatBounds(coords[0], coords[1])
+      map.fitBounds(bounds, { padding: 50 })
     }
   }, [destination.id])
 

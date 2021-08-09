@@ -16,11 +16,13 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
   const selectedLocationRef = useRef([])
 
   useEffect(() => {
-    if (selectedLocationRef.current) {
-      selectedLocationRef.current = listAddress.map((address) => ({
-        name: address.name,
-        coordinates: [address.longitude, address.latitude],
-      }))
+    if (selectedLocationRef.current && !isOneLocaion) {
+      if (listAddress) {
+        selectedLocationRef.current = listAddress.map((address) => ({
+          name: address.name,
+          coordinates: [address.longitude, address.latitude],
+        }))
+      } else selectedLocationRef.current = []
     }
   }, [listAddress])
 
@@ -66,9 +68,9 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
         name: location.place_name,
         coordinates: location.center,
       }))
-      let arrayCoodinates = [...selectedLocationRef.current, ...newLocations]
+      let arrayCoordinates = [...selectedLocationRef.current, ...newLocations]
       // console.log(arrayCoodinates)
-      arrayCoodinates.map((item) => {
+      arrayCoordinates.map((item) => {
         map.on('load', () => {
           const marker = new mapboxgl.Marker()
           const markerPopup = new mapboxgl.Popup()
@@ -79,14 +81,22 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
           marker.setLngLat([item.coordinates[0], item.coordinates[1]])
           marker.addTo(map)
 
-          let arrayCoodinateMarkers = arrayCoodinates.map((address) => address.coordinates)
-          // console.log(arrayCoodinateMarkers)
-          const bounds = arrayCoodinateMarkers.reduce(
-            (bounds, coord) => bounds.extend(coord),
-            new mapboxgl.LngLatBounds(arrayCoodinateMarkers[0], arrayCoodinateMarkers[arrayCoodinates.length - 1]),
-          )
-          map.fitBounds(bounds, { padding: 50 })
-          // console.log(arrayCoodinates)
+          let bounds = []
+          const addedCoor = 0.0025
+          let arrayCoordinateMarkers = arrayCoordinates.map((address) => address.coordinates)
+          if (isOneLocaion || arrayCoordinates.length === 1) {
+            bounds = new mapboxgl.LngLatBounds(
+              [arrayCoordinateMarkers[0][0] + addedCoor, arrayCoordinateMarkers[0][1] - addedCoor],
+              [arrayCoordinateMarkers[0][0] - addedCoor, arrayCoordinateMarkers[0][1] + addedCoor],
+            )
+            map.fitBounds(bounds, { padding: 50 })
+          } else {
+            bounds = arrayCoordinateMarkers.reduce(
+              (bounds, coord) => bounds.extend(coord),
+              new mapboxgl.LngLatBounds(arrayCoordinateMarkers[0], arrayCoordinateMarkers[arrayCoordinates.length - 1]),
+            )
+            map.fitBounds(bounds, { padding: 50 })
+          }
         })
       })
     }
@@ -241,7 +251,7 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
                     }
                     show()
                   }}
-                  disabled={isOneLocaion ? listAddress.length + 1 > 5 : listAddress.length + listLocation.length > 5}
+                  // disabled={isOneLocaion ? listAddress.length + 1 > 5 : listAddress.length + listLocation.length > 5}
                 >
                   Thêm địa điểm
                 </Button>

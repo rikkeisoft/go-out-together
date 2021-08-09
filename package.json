@@ -3,6 +3,7 @@
   "scripts": {
     "lint": "eslint -c .eslintrc.js --ext .js,.jsx . --quiet",
     "format": "prettier --config .prettierrc '**/*.{jsx,js}' --write",
+    "updateFormat": "prettier --config .prettierrc **/*.{jsx,js} --write",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
