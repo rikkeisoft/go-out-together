@@ -64,6 +64,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   useEffect(() => {
     if (addressData && addressData?.data.length !== 0) {
       const newListUserLocations = addressData?.data.map((location) => ({
+        userId: location.userId,
         name: location.username,
         address: location.name,
         coordinates: [location.longitude, location.latitude],
@@ -71,6 +72,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
       const userLocation = addressData?.data.find((location) => location.userId === cookies.uid)
       const newUserLocation = {
+        userId: userLocation.userId,
         name: userLocation.username,
         address: userLocation.name,
         coordinates: [userLocation.longitude, userLocation.latitude],
@@ -145,22 +147,12 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
       {showMap && (
         <MapBox
-          addressCount={data.data.addresses.length}
+          listAddress={data.data.addresses}
           data={(data) => {
             handleOnAddLocation(data)
           }}
           show={() => {
             setShowMap(false)
-          }}
-        />
-      )}
-      {showDirectionRoutes && (
-        <DirectionRoutes
-          currentLocation={locations.userLocation}
-          listUserLocation={locations.listUserLocation}
-          destination={voteAddress}
-          showMap={() => {
-            setShowDirectionRoutes(false)
           }}
         />
       )}
@@ -183,6 +175,21 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
           <MessageText>
             Các thành viên đang tham gia: <MemberList members={data.data.members} />
           </MessageText>
+          {showDirectionRoutes && (
+            <DirectionRoutes
+              currentLocation={locations.userLocation}
+              listUserLocation={locations.listUserLocation}
+              destination={{
+                id: voteAddress.id,
+                name: 'Destination',
+                address: voteAddress.name,
+                coordinates: [voteAddress.longitude, voteAddress.latitude],
+              }}
+              showMap={() => {
+                setShowDirectionRoutes(false)
+              }}
+            />
+          )}
           <FormCard>
             <FormProvider {...methods}>
               <form onSubmit={methods.handleSubmit(onSubmit)}>

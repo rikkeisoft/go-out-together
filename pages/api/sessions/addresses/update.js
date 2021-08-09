@@ -15,6 +15,54 @@ const schema = yup.object().shape({
   ),
 })
 
+const findAddressID = async (queryString, values, address) => {
+  queryString = `SELECT id FROM addresses WHERE aid = ?`
+  values = [address.aid]
+  try {
+    const result = await mysql.query(queryString, values)
+    return result
+  } catch (err) {
+    cleanUp(mysql)
+    throw new ApiException(500, 'Không lấy được id từ bảng addresses', err)
+  }
+}
+
+const insertAddress = async (queryString, values, address) => {
+  queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
+  values = [address.aid, address.name, address.latitude, address.longitude]
+  try {
+    const result = await mysql.query(queryString, values)
+    return result
+  } catch (err) {
+    cleanUp(mysql)
+    throw new ApiException(500, 'Không thêm được thông tin địa chỉ', err)
+  }
+}
+
+const getCurrentSessionID = async (queryString, values, addressId) => {
+  queryString = `SELECT DISTINCT session_id FROM session_address WHERE address_id = ?`
+  values = [addressId]
+  try {
+    const result = await mysql.query(queryString, values)
+    return result
+  } catch (err) {
+    cleanUp(mysql)
+    throw new ApiException(500, 'Không lấy được session_id từ session_address', err)
+  }
+}
+
+const insertToSessionAddress = async (queryString, values, sessionId, addressId) => {
+  queryString = `INSERT INTO session_address (session_id, address_id) VALUES (?, ?)`
+  values = [sessionId, addressId]
+  try {
+    const result = await mysql.query(queryString, values)
+    return result
+  } catch (err) {
+    cleanUp(mysql)
+    throw new ApiException(500, 'Không thêm được thông tin', err)
+  }
+}
+
 export default async function handler(req, res) {
   try {
     if (req.method !== 'POST') {
@@ -41,53 +89,26 @@ export default async function handler(req, res) {
     }
     const sessionId = result[0].id
 
-    for (let address of addresses) {
-      queryString = `SELECT id FROM addresses WHERE aid = ?`
-      values = [address.aid]
-      try {
-        result = await mysql.query(queryString, values)
-      } catch (err) {
-        cleanUp(mysql)
-        throw new ApiException(500, 'Không lấy được id từ bảng addresses', err)
-      }
+    const addressPromises = addresses.map(async (address) => {
+      result = await findAddressID(queryString, values, address)
 
       let addressId
       if (result.length === 0) {
-        queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
-        values = [address.aid, address.name, address.latitude, address.longitude]
-        try {
-          result = await mysql.query(queryString, values)
-        } catch (err) {
-          cleanUp(mysql)
-          throw new ApiException(500, 'Không thêm được thông tin địa chỉ', err)
-        }
+        result = await insertAddress(queryString, values, address)
         addressId = result.insertId
-        console.log(result)
       } else {
         addressId = result[0].id
       }
-
-      queryString = `SELECT DISTINCT session_id FROM session_address WHERE address_id = ?`
-      values = [addressId]
-      try {
-        result = await mysql.query(queryString, values)
-      } catch (err) {
-        cleanUp(mysql)
-        throw new ApiException(500, 'Không lấy được session_id từ session_address', err)
-      }
+      result = await getCurrentSessionID(queryString, values, addressId)
 
       if (result.findIndex((ele) => ele.session_id === sessionId) === -1) {
-        // not in table
-        queryString = `INSERT INTO session_address (session_id, address_id) VALUES (?, ?)`
-        values = [sessionId, addressId]
-        try {
-          result = await mysql.query(queryString, values)
-        } catch (err) {
-          cleanUp(mysql)
-          throw new ApiException(500, 'Không thêm được thông tin', err)
-        }
+        result = await insertToSessionAddress(queryString, values, sessionId, addressId)
       }
-    }
+
+      return result
+    })
+
+    await Promise.all(addressPromises)
 
     cleanUp(mysql)
     res.status(200).json({

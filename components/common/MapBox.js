@@ -1,18 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import mapboxgl from 'mapbox-gl'
 import Head from 'next/head'
 import axios from 'axios'
 import Button from './Button'
-import * as turf from '@turf/turf'
+// import * as turf from '@turf/turf'
 
-const MapBox = ({ addressCount, show, isOneLocaion, data }) => {
+const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
   const [location, setLocation] = useState(null)
   const [dataLocation, setDataLocation] = useState(null)
   const [selectedLocation, setSelectedLocation] = useState('')
   const [listLocation, setListLocation] = useState([])
   const [showListLocation, setShowListLocation] = useState(true)
-  const [arrayCoodinates, setArrayCoodinates] = useState([])
+  // const [arrayCoodinates, setArrayCoodinates] = useState([])
+  const selectedLocationRef = useRef([])
+
+  useEffect(() => {
+    if (selectedLocationRef.current && !isOneLocaion) {
+      if (listAddress) {
+        selectedLocationRef.current = listAddress.map((address) => ({
+          name: address.name,
+          coordinates: [address.longitude, address.latitude],
+        }))
+      } else selectedLocationRef.current = []
+    }
+  }, [listAddress])
 
   // console.log(listLocation)
 
@@ -52,52 +64,78 @@ const MapBox = ({ addressCount, show, isOneLocaion, data }) => {
         center: [longitude, latitude],
         zoom: 12,
       })
-      listLocation.map((item) => {
-        const addMarker = () => {
+      const newLocations = listLocation.map((location) => ({
+        name: location.place_name,
+        coordinates: location.center,
+      }))
+      let arrayCoordinates = [...selectedLocationRef.current, ...newLocations]
+      // console.log(arrayCoodinates)
+      arrayCoordinates.map((item) => {
+        map.on('load', () => {
           const marker = new mapboxgl.Marker()
           const markerPopup = new mapboxgl.Popup()
 
-          markerPopup.setText(`${item.place_name}`)
+          markerPopup.setText(`${item.name}`)
           marker.setPopup(markerPopup)
 
-          marker.setLngLat([item.center[0], item.center[1]])
+          marker.setLngLat([item.coordinates[0], item.coordinates[1]])
           marker.addTo(map)
 
-          setArrayCoodinates([...arrayCoodinates, item.geometry.coordinates])
-        }
-        map.on('load', addMarker)
+          let bounds = []
+          const addedCoor = 0.0025
+          let arrayCoordinateMarkers = arrayCoordinates.map((address) => address.coordinates)
+          if (isOneLocaion || arrayCoordinates.length === 1) {
+            bounds = new mapboxgl.LngLatBounds(
+              [arrayCoordinateMarkers[0][0] + addedCoor, arrayCoordinateMarkers[0][1] - addedCoor],
+              [arrayCoordinateMarkers[0][0] - addedCoor, arrayCoordinateMarkers[0][1] + addedCoor],
+            )
+            map.fitBounds(bounds, { padding: 50 })
+          } else {
+            bounds = arrayCoordinateMarkers.reduce(
+              (bounds, coord) => bounds.extend(coord),
+              new mapboxgl.LngLatBounds(arrayCoordinateMarkers[0], arrayCoordinateMarkers[arrayCoordinates.length - 1]),
+            )
+            map.fitBounds(bounds, { padding: 50 })
+          }
+        })
       })
     }
-  }, [selectedLocation])
+  }, [selectedLocation, listLocation])
 
-  const getBound = () => {
-    var line = turf.lineString([
-      [-74, 40],
-      [-78, 42],
-      [-82, 35],
-    ])
-    var bbox = turf.bbox(line)
-    var bboxPolygon = turf.bboxPolygon(bbox)
-    console.log(bboxPolygon)
+  // const getBound = () => {
+  //   var line = turf.lineString([
+  //     [-74, 40],
+  //     [-78, 42],
+  //     [-82, 35],
+  //   ])
+  //   var bbox = turf.bbox(line)
+  //   var bboxPolygon = turf.bboxPolygon(bbox)
+  // console.log(bboxPolygon)
 
-    // if (arrayCoodinates.length > 2) {
-    //   let map = new mapboxgl.Map({
-    //     container: 'map',
-    //     style: 'mapbox://styles/mapbox/streets-v11',
-    //     center: [105.8, 21.0333],
-    //     zoom: 12,
-    //   })
+  // if (arrayCoodinates.length > 2) {
+  //   let map = new mapboxgl.Map({
+  //     container: 'map',
+  //     style: 'mapbox://styles/mapbox/streets-v11',
+  //     center: [105.8, 21.0333],
+  //     zoom: 12,
+  //   })
 
-    //   const line = turf.lineString(arrayCoodinates)
-    //   const bbox = turf.bbox(line)
-    //   const bboxPolygon = turf.bboxPolygon(bbox)
-    //   const bounds = bboxPolygon.geometry.coordinates
-    //   console.log(bounds)
+  //   const line = turf.lineString(arrayCoodinates)
+  //   const bbox = turf.bbox(line)
+  //   const bboxPolygon = turf.bboxPolygon(bbox)
+  //   const bounds = bboxPolygon.geometry.coordinates
+  //   console.log(bounds)
 
-    //   map.fitBounds(bounds[0], { padding: 10 })
-    // }
+  //   map.fitBounds(bounds[0], { padding: 10 })
+  // }
+  // }
+  // getBound()
+  const checkDisabledButton = () => {
+    if (listAddress !== undefined)
+      return isOneLocaion ? listAddress.length + 1 > 5 : listAddress.length + listLocation.length > 5
+
+    return false
   }
-  getBound()
 
   return (
     <>
@@ -128,14 +166,14 @@ const MapBox = ({ addressCount, show, isOneLocaion, data }) => {
           </div>
         ) : (
           <>
-            {addressCount && (
+            {listAddress && (
               <>
                 {isOneLocaion
-                  ? addressCount + 1 >= 5 && <p className="text-red-500">There are only 5 addresses total!</p>
-                  : addressCount + listLocation.length >= 5 && (
+                  ? listAddress.length + 1 >= 5 && <p className="text-red-500">There are only 5 addresses total!</p>
+                  : listAddress.length + listLocation.length >= 5 && (
                       <p className="text-red-500">There are only 5 addresses total!</p>
                     )}
-                <p>You can add {5 - addressCount} address</p>
+                <p>You can add {5 - listAddress.length} address</p>
                 <ul className="my-3">
                   {listLocation.length !== 0 && <span>List added address: </span>}
                   {listLocation.map((location) => (
@@ -219,7 +257,7 @@ const MapBox = ({ addressCount, show, isOneLocaion, data }) => {
                     }
                     show()
                   }}
-                  disabled={isOneLocaion ? addressCount + 1 > 5 : addressCount + listLocation.length > 5}
+                  disabled={checkDisabledButton()}
                 >
                   Thêm địa điểm
                 </Button>
@@ -237,6 +275,7 @@ const MapBox = ({ addressCount, show, isOneLocaion, data }) => {
                   key={index}
                   className="cursor-pointer p-2"
                   onClick={() => {
+                    window.scrollTo({ top: 100, behavior: 'smooth' })
                     setSelectedLocation(item)
                     if (isOneLocaion) {
                       setListLocation([item])
