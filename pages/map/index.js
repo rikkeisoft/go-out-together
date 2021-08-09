@@ -72,6 +72,7 @@ const Map = () => {
         <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
+
       <div className="w-80 m-5 relative">
         {listLocation.length >= 5 ? (
           <span className="text-red-500">Chỉ được tạo tối đa 5 địa điểm !</span>
