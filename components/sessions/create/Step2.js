@@ -52,17 +52,6 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
     defaultValues: formData,
   })
 
-  // const expListLocation = [
-  //   {
-  //     id: 'country.10278600750587150',
-  //     place_name: 'Canada',
-  //   },
-  //   {
-  //     id: 'place.9026059994661180',
-  //     place_name: 'Cau Giay, Hanoi, Vietnam',
-  //   },
-  // ]
-
   const onSubmit = (data) => {
     setFormData(Object.assign({}, formData, data))
     createSessionMutation.mutate({
@@ -146,7 +135,6 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
       <SmallTitle>Nhanh tay điền thông tin và bắt đầu thôi!</SmallTitle>
       {showMap && (
         <MapBox
-          // listSelectedLocation={expListLocation}
           data={(data) => {
             setListDataLocation(data)
           }}

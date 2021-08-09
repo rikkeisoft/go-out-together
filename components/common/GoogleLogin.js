@@ -8,7 +8,7 @@ function GoogleLogin() {
     signInFlow: 'popup',
     signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
     callbacks: {
-      signInSuccessWithAuthRedirect: () => false,
+      signInSuccessWithAuthResult: () => false,
     },
   }
 
