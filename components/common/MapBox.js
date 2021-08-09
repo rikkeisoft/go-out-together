@@ -130,6 +130,12 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
   // }
   // }
   // getBound()
+  const checkDisabledButton = () => {
+    if (listAddress !== undefined)
+      return isOneLocaion ? listAddress.length + 1 > 5 : listAddress.length + listLocation.length > 5
+
+    return false
+  }
 
   return (
     <>
@@ -251,7 +257,7 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
                     }
                     show()
                   }}
-                  // disabled={isOneLocaion ? listAddress.length + 1 > 5 : listAddress.length + listLocation.length > 5}
+                  disabled={checkDisabledButton()}
                 >
                   Thêm địa điểm
                 </Button>
@@ -269,6 +275,7 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
                   key={index}
                   className="cursor-pointer p-2"
                   onClick={() => {
+                    window.scrollTo({ top: 100, behavior: 'smooth' })
                     setSelectedLocation(item)
                     if (isOneLocaion) {
                       setListLocation([item])

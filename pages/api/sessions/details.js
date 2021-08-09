@@ -24,7 +24,12 @@ export default async function handler(req, res) {
     let queryString, values, result
     let data = {}
 
-    queryString = `SELECT id, title, content, expire_time FROM sessions WHERE sid = ?`
+    queryString = `
+    SELECT sessions.id, sessions.title, sessions.content, sessions.expire_time, session_user.user_id 
+    FROM sessions
+    INNER JOIN session_user
+    ON sessions.id = session_user.session_id
+    WHERE sid = ?`
     values = [sid]
     try {
       result = await mysql.query(queryString, values)
@@ -41,23 +46,13 @@ export default async function handler(req, res) {
     data.title = result[0].title
     data.content = result[0].content
     data.expireTime = result[0].expire_time
-
-    let members = []
-    queryString = `SELECT user_id FROM session_user WHERE session_id = ?`
-    values = [sessionId]
-    try {
-      result = await mysql.query(queryString, values)
-    } catch (err) {
-      cleanUp(mysql)
-      throw new ApiException(500, 'Không lấy được các thành viên trong session', err)
-    }
-
     let userIds = result.map((row) => row.user_id)
-    for (let userId of userIds) {
-      queryString = `SELECT name, username, avatar_url FROM users WHERE id = ?`
+
+    const userPromises = userIds.map((userId) => {
+      queryString = `SELECT id, name, username, avatar_url FROM users WHERE id = ?`
       values = [userId]
       try {
-        result = await mysql.query(queryString, values)
+        result = mysql.query(queryString, values)
       } catch (err) {
         cleanUp(mysql)
         throw new ApiException(500, 'Không lấy được thông tin thành viên trong session', err)
@@ -66,17 +61,9 @@ export default async function handler(req, res) {
         cleanUp(mysql)
         throw new ApiException(500, 'Không tìm thấy thành viên')
       }
+      return result
+    })
 
-      members.push({
-        id: userId,
-        username: result[0].username,
-        name: result[0].name,
-        avatarUrl: result[0].avatar_url,
-      })
-    }
-    data.members = members
-
-    let addresses = []
     queryString = `SELECT address_id FROM session_address WHERE session_id = ?`
     values = [sessionId]
     try {
@@ -87,11 +74,11 @@ export default async function handler(req, res) {
     }
 
     let addressIds = result.map((row) => row.address_id)
-    for (let addressId of addressIds) {
-      queryString = `SELECT aid, name, latitude, longitude FROM addresses WHERE id = ?`
+    const addressPromises = addressIds.map((addressId) => {
+      queryString = `SELECT id, aid, name, latitude, longitude FROM addresses WHERE id = ?`
       values = [addressId]
       try {
-        result = await mysql.query(queryString, values)
+        result = mysql.query(queryString, values)
       } catch (err) {
         cleanUp(mysql)
         throw new ApiException(500, 'Không lấy được thông tin địa điểm vui chơi', err)
@@ -100,14 +87,26 @@ export default async function handler(req, res) {
         cleanUp(mysql)
         throw new ApiException(500, 'Không tìm thấy địa điểm vui chơi')
       }
-      addresses.push({
-        id: addressId,
-        aid: result[0].aid,
-        name: result[0].name,
-        latitude: result[0].latitude,
-        longitude: result[0].longitude,
-      })
-    }
+
+      return result
+    })
+    const userResult = await Promise.all(userPromises)
+    const members = userResult.map((user) => ({
+      id: user[0].id,
+      username: user[0].username,
+      name: user[0].name,
+      avatarUrl: user[0].avatar_url,
+    }))
+    const addressResult = await Promise.all(addressPromises)
+    const addresses = addressResult.map((address) => ({
+      id: address[0].id,
+      aid: address[0].aid,
+      name: address[0].name,
+      latitude: address[0].latitude,
+      longitude: address[0].longitude,
+    }))
+
+    data.members = members
     data.addresses = addresses
 
     cleanUp(mysql)
