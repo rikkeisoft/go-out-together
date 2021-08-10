@@ -33,7 +33,7 @@ import LoadingOverlay from 'components/common/LoadingOverlay'
 import DirectionRoutes from 'components/common/DirectionRoutes'
 import socketIOClient from 'socket.io-client'
 
-const socket = socketIOClient(process.env.NEXT_PUBLIC_BASE_URL)
+const socket = socketIOClient(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
 
 const schema = yup.object().shape({
   votedAddress: yup.object({
