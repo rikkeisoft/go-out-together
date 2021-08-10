@@ -5,8 +5,18 @@ import { useFormContext, Controller } from 'react-hook-form'
 import TrashIcon from 'components/icons/TrashIcon'
 import Popup from './Popup'
 import Button from './Button'
+// import LoadingOverlay from 'components/common/LoadingOverlay'
+// import { useMutation, useQuery, useQueryClient } from 'react-query'
+// import {
+//   // getAllAddresses,
+//   // getSessionDetails,
+//   // updateSessionAddresses,
+//   deleteSessionAddress,
+//   // voteSession,
+// } from 'api/sessions'
 
 const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
+  
   const { control, watch, setValue } = useFormContext()
   const [openPopup, setOpenPopup] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState(null)
@@ -18,7 +28,7 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
   const onSelect = (item) => {
     setValue(name, item, { shouldValidate: true })
   }
-
+ 
   return (
     <Controller
       control={control}
@@ -35,14 +45,13 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
                       <input
                         type="radio"
                         className="mr-4"
-                        onClick={() => {
-                          // window.scrollTo({ top: 300, behavior: 'smooth' })
+                        onChange={() => {
                           onClick(item)
                           onSelect(item)
                         }}
                         checked={item.aid === value?.aid}
                       />
-                      {item.name}
+                      {item.name} ({item.voteCount} người vote)
                     </label>
                   </td>
                   <td className="p-2 w-10 cursor-pointer">
@@ -67,6 +76,7 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
                           variant="danger"
                           onClick={() => {
                             setOpenPopup(false), onDelete(selectedItemId)
+                        
                           }}
                         >
                           Yes
@@ -75,6 +85,7 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
                     </>
                   </Popup>
                 </tr>
+                
               )
             })}
           </tbody>

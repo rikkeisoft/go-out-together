@@ -43,8 +43,21 @@ export default async function handler(req, res) {
     // check vote time is expired or not
     if (expireTimeDate.getTime() < now.getTime()) {
       // not expire
-      queryString = `SELECT address_id, MAX(vote) AS vote_count FROM ( SELECT address_id, COUNT(address_id) AS vote FROM session_address_user WHERE session_id = ? GROUP BY address_id) AS vote_table GROUP BY address_id ORDER BY vote_count DESC LIMIT 1`
-      values = [sessionId]
+      queryString = `
+      SELECT address_id, vote as vote_count FROM
+      (
+        (SELECT address_id, COUNT(address_id) AS vote
+        FROM session_address_user 
+        WHERE session_id = ? GROUP BY address_id) as count_table
+        INNER JOIN (
+          SELECT MAX(vote) AS voter
+          FROM (SELECT COUNT(address_id) AS vote
+          FROM session_address_user 
+          WHERE session_id = ? GROUP BY address_id) as test_table
+        ) as max_table
+        ON max_table.voter = count_table.vote
+      )`
+      values = [sessionId, sessionId]
       try {
         result = await mysql.query(queryString, values)
       } catch (err) {
@@ -64,24 +77,29 @@ export default async function handler(req, res) {
         return
       }
       const voters = result[0].vote_count
-      const addressId = result[0].address_id
+      const addressIds = result.map((row) => row.address_id)
 
-      // get this address
-      queryString = `SELECT * FROM addresses WHERE id = ?`
-      values = [addressId]
-      try {
-        result = await mysql.query(queryString, values)
-      } catch (err) {
-        cleanUp(mysql)
-        throw new ApiException(500, 'Không lấy được id từ bảng users', err)
-      }
-      if (result.length === 0) {
-        cleanUp(mysql)
-        throw new ApiException(500, 'Không tìm thấy address')
-      }
+      const addressPromises = addressIds.map((id) => {
+        queryString = `SELECT * FROM addresses WHERE id = ?`
+        values = [id]
+        try {
+          result = mysql.query(queryString, values)
+        } catch (err) {
+          cleanUp(mysql)
+          throw new ApiException(500, 'Không lấy được id từ bảng users', err)
+        }
+        if (result.length === 0) {
+          cleanUp(mysql)
+          throw new ApiException(500, 'Không tìm thấy address')
+        }
+
+        return result
+      })
+
+      const addresses = await Promise.all(addressPromises)
       data = {
         voters,
-        address: result[0],
+        addresses,
       }
     } else {
       // time is not expired
@@ -91,7 +109,7 @@ export default async function handler(req, res) {
     cleanUp(mysql)
     res.status(200).json({
       messageCode: messageCodes.SUCCESS,
-      message: 'Vote successfully',
+      message: 'Lấy kết quả vote thành công',
       data,
     })
   } catch (exception) {

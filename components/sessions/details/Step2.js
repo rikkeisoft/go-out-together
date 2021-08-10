@@ -31,6 +31,9 @@ import MemberList from 'components/common/MemberList'
 import MapBox from 'components/common/MapBox'
 import LoadingOverlay from 'components/common/LoadingOverlay'
 import DirectionRoutes from 'components/common/DirectionRoutes'
+import socketIOClient from 'socket.io-client'
+
+const socket = socketIOClient(process.env.NEXT_PUBLIC_BASE_URL)
 
 const schema = yup.object().shape({
   votedAddress: yup.object({
@@ -42,7 +45,6 @@ const schema = yup.object().shape({
 })
 
 const Step2 = memo(({ sid, prevStep, nextStep }) => {
-  const voteSessionMutation = useMutation(voteSession)
   const [cookies] = useCookies(['uid'])
   const [showMap, setShowMap] = useState(false)
   const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
@@ -54,10 +56,10 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
   const queryClient = useQueryClient()
   const { mutateAsync } = useMutation((address) => updateSessionAddresses(address), {
-    onSuccess: () => queryClient.invalidateQueries(queryKeys.SESSION_DETAIL),
+    onSuccess: () => socket.emit('add_location'),
   })
-  const { mutateAsync: deleteAsync } = useMutation((info) => deleteSessionAddress(info), {
-    onSuccess: () => queryClient.invalidateQueries(queryKeys.SESSION_DETAIL),
+  const { isLoading: isLoadingAdress, mutateAsync: deleteAsync } = useMutation((info) => deleteSessionAddress(info), {
+    onSuccess: () => socket.emit('delete_location'),
   })
   const { data: addressData } = useQuery([queryKeys.GET_ADDRESS, { sid }], () => getAllAddresses({ sid }), { retry: 1 })
 
@@ -84,11 +86,46 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
     }
   }, [addressData])
 
+  const voteSessionMutation = useMutation(voteSession, {
+    onSuccess: () => {
+      socket.emit('vote')
+      nextStep()
+    },
+    onError: (error) => alert(error.message),
+  })
+
   const methods = useForm({
     resolver: yupResolver(schema),
   })
 
   const { isLoading, isSuccess, data } = useQuery([queryKeys.CHECK_SESSION, { sid }], () => getSessionDetails({ sid }))
+
+  // socketio
+  useEffect(() => {
+    // new user come
+    socket.emit('new_user_coming')
+
+    return socket.off('new_user_coming')
+  }, [])
+
+  useEffect(() => {
+    // get noti user come
+    socket.on('refetch_sesion_detail', () => {
+      queryClient.invalidateQueries(queryKeys.GET_ADDRESS)
+      queryClient.invalidateQueries(queryKeys.CHECK_SESSION)
+    })
+
+    // get noti add new locations
+    socket.on('refetch_add_location', () => queryClient.invalidateQueries(queryKeys.CHECK_SESSION))
+
+    // get noti delete location
+    socket.on('refetch_delete_location', () => queryClient.invalidateQueries(queryKeys.CHECK_SESSION))
+
+    // get noti voted location
+    socket.on('refetch_vote', () => queryClient.invalidateQueries(queryKeys.CHECK_SESSION))
+
+    return socket.offAny()
+  })
 
   const onSubmit = (data) => {
     console.log(data)
@@ -98,16 +135,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
       address: data.votedAddress,
     })
   }
-
-  useEffect(() => {
-    if (voteSessionMutation.isSuccess) {
-      if (voteSessionMutation.data.messageCode === messageCodes.SUCCESS) {
-        nextStep()
-      } else {
-        alert(voteSessionMutation.data.message)
-      }
-    }
-  }, [voteSessionMutation.isSuccess])
 
   const handleOnAddLocation = async (newLocations) => {
     const newData = newLocations.map((location) => ({
@@ -140,6 +167,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
   return (
     <>
+    
       <Head>
         <title>Bước 2</title>
         <link rel="icon" href="/favicon.ico" />
@@ -160,8 +188,10 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
       {!showMap && isSuccess && data.messageCode === messageCodes.SUCCESS && (
         <>
+        <div className="italic ml-16">
           <MessageText>
-            Vote sẽ kết thúc sau:
+            Vote sẽ kết thúc sau: 
+            <span className="text-red-500 ">
             <Countdown
               date={new Date(data.data.expireTime)}
               onComplete={() => {
@@ -169,14 +199,16 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                 nextStep()
               }}
             />
+            </span>
           </MessageText>
           <MessageText>Tiêu đề: {data.data.title}</MessageText>
           <MessageText>Nội dung: {data.data.content}</MessageText>
           <MessageText>
-            Các thành viên đang tham gia: <MemberList members={data.data.members} />
+            <p>Các thành viên đang tham gia:</p> <MemberList members={data.data.members} />
           </MessageText>
           {showDirectionRoutes && (
-            <DirectionRoutes
+            
+            <DirectionRoutes 
               currentLocation={locations.userLocation}
               listUserLocation={locations.listUserLocation}
               destination={{
@@ -189,7 +221,9 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                 setShowDirectionRoutes(false)
               }}
             />
+         
           )}
+          </div>
           <FormCard>
             <FormProvider {...methods}>
               <form onSubmit={methods.handleSubmit(onSubmit)}>
@@ -210,7 +244,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                 </Field>
 
                 <Field>
-                  <Label htmlFor="votedAddress">Chọn địa điểm ăn chơi:</Label>
+                  <Label htmlFor="votedAddress ">Chọn địa điểm ăn chơi:</Label>
                   <AddressVoter
                     name="votedAddress"
                     data={data.data.addresses}
@@ -220,6 +254,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     }}
                     onDelete={deleteAddress}
                   />
+                    <LoadingOverlay isOpen={isLoadingAdress} message="Đang Xóa địa điểm vote" />
                   {!_.isNil(methods.formState.errors.votedAddress) && <ErrorText>Chọn địa chỉ để vote</ErrorText>}
                 </Field>
 
@@ -237,12 +272,14 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                   <Button type="submit" variant="primary">
                     Tiếp theo
                   </Button>
+                  <LoadingOverlay isOpen={voteSessionMutation.isLoading} message="Đang xử lí..." />
                 </ButtonGroup>
               </form>
             </FormProvider>
           </FormCard>
         </>
       )}
+
     </>
   )
 })

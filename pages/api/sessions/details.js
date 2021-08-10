@@ -75,8 +75,15 @@ export default async function handler(req, res) {
 
     let addressIds = result.map((row) => row.address_id)
     const addressPromises = addressIds.map((addressId) => {
-      queryString = `SELECT id, aid, name, latitude, longitude FROM addresses WHERE id = ?`
-      values = [addressId]
+      queryString = `
+      SELECT id, aid, name, latitude, longitude,
+      (
+      SELECT COUNT(address_id) FROM session_address_user 
+      WHERE session_id = ? AND address_id = ?
+      ) AS vote_count
+      FROM addresses
+      WHERE id = ?`
+      values = [sessionId, addressId, addressId]
       try {
         result = mysql.query(queryString, values)
       } catch (err) {
@@ -104,6 +111,7 @@ export default async function handler(req, res) {
       name: address[0].name,
       latitude: address[0].latitude,
       longitude: address[0].longitude,
+      voteCount: address[0].vote_count,
     }))
 
     data.members = members

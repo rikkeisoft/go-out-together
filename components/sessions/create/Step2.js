@@ -10,6 +10,7 @@ import { ErrorMessage } from '@hookform/error-message'
 import messageCodes from 'consts/messageCodes'
 import { useMutation } from 'react-query'
 import { createSession } from 'api/sessions'
+import { ToastContainer } from 'react-toastify'
 import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
@@ -131,7 +132,6 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
         <title>Bước 2</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <SmallTitle>Nhanh tay điền thông tin và bắt đầu thôi!</SmallTitle>
       {showMap && (
         <MapBox
@@ -149,7 +149,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
           <FormProvider {...methods}>
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <Field>
-                <Label htmlFor="title">Tiêu đề:</Label>
+                <Label htmlFor="title"><p>Tiêu đề:</p></Label>
                 <TextField id="title" name="title" />
                 <ErrorMessage
                   errors={methods.formState.errors}
@@ -159,7 +159,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
               </Field>
 
               <Field>
-                <Label htmlFor="content">Nội dung:</Label>
+                <Label htmlFor="content"> <p >Nội Dung:</p></Label>
                 <TextArea id="content" name="content" />
                 <ErrorMessage
                   errors={methods.formState.errors}
@@ -169,7 +169,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
               </Field>
 
               <Field>
-                <Label htmlFor="timeLimit">Giới hạn thời gian vote:</Label>
+                <Label htmlFor="timeLimit"> <p >Giới hạn thời gian vote:</p></Label>
                 <SelectBox
                   id="timeLimit"
                   name="timeLimit"
@@ -208,7 +208,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
               </Field>
 
               <Field>
-                <Label htmlFor="addresses">Danh sách địa điểm ăn chơi:</Label>
+                <Label htmlFor="addresses"><p>Danh sách địa điểm ăn chơi:</p></Label>
 
                 {renderListLocation()}
 
@@ -237,6 +237,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
         </FormCard>
       )}
       <LoadingOverlay isOpen={createSessionMutation.isLoading} message="Đang xử lí..." />
+      <ToastContainer />
     </>
   )
 })
