@@ -56,7 +56,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const { mutateAsync } = useMutation((address) => updateSessionAddresses(address), {
     onSuccess: () => queryClient.invalidateQueries(queryKeys.SESSION_DETAIL),
   })
-  const { mutateAsync: deleteAsync } = useMutation((info) => deleteSessionAddress(info), {
+  const { isLoading: isLoadingAdress, mutateAsync: deleteAsync } = useMutation((info) => deleteSessionAddress(info), {
     onSuccess: () => queryClient.invalidateQueries(queryKeys.SESSION_DETAIL),
   })
   const { data: addressData } = useQuery([queryKeys.GET_ADDRESS, { sid }], () => getAllAddresses({ sid }), { retry: 1 })
@@ -140,6 +140,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
   return (
     <>
+    
       <Head>
         <title>Bước 2</title>
         <link rel="icon" href="/favicon.ico" />
@@ -160,8 +161,10 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
       {!showMap && isSuccess && data.messageCode === messageCodes.SUCCESS && (
         <>
+        <div className="italic ml-16">
           <MessageText>
-            Vote sẽ kết thúc sau:
+            Vote sẽ kết thúc sau: 
+            <span className="text-red-500 ">
             <Countdown
               date={new Date(data.data.expireTime)}
               onComplete={() => {
@@ -169,14 +172,16 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                 nextStep()
               }}
             />
+            </span>
           </MessageText>
           <MessageText>Tiêu đề: {data.data.title}</MessageText>
           <MessageText>Nội dung: {data.data.content}</MessageText>
           <MessageText>
-            Các thành viên đang tham gia: <MemberList members={data.data.members} />
+            <p>Các thành viên đang tham gia:</p> <MemberList members={data.data.members} />
           </MessageText>
           {showDirectionRoutes && (
-            <DirectionRoutes
+            
+            <DirectionRoutes 
               currentLocation={locations.userLocation}
               listUserLocation={locations.listUserLocation}
               destination={{
@@ -189,7 +194,9 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                 setShowDirectionRoutes(false)
               }}
             />
+         
           )}
+          </div>
           <FormCard>
             <FormProvider {...methods}>
               <form onSubmit={methods.handleSubmit(onSubmit)}>
@@ -210,7 +217,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                 </Field>
 
                 <Field>
-                  <Label htmlFor="votedAddress">Chọn địa điểm ăn chơi:</Label>
+                  <Label htmlFor="votedAddress ">Chọn địa điểm ăn chơi:</Label>
                   <AddressVoter
                     name="votedAddress"
                     data={data.data.addresses}
@@ -220,6 +227,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     }}
                     onDelete={deleteAddress}
                   />
+                    <LoadingOverlay isOpen={isLoadingAdress} message="Đang Xóa địa điểm vote" />
                   {!_.isNil(methods.formState.errors.votedAddress) && <ErrorText>Chọn địa chỉ để vote</ErrorText>}
                 </Field>
 
@@ -237,12 +245,14 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                   <Button type="submit" variant="primary">
                     Tiếp theo
                   </Button>
+                  <LoadingOverlay isOpen={voteSessionMutation.isLoading} message="Đang xử lí..." />
                 </ButtonGroup>
               </form>
             </FormProvider>
           </FormCard>
         </>
       )}
+
     </>
   )
 })
