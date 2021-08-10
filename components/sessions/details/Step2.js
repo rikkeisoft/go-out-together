@@ -31,6 +31,10 @@ import MemberList from 'components/common/MemberList'
 import MapBox from 'components/common/MapBox'
 import LoadingOverlay from 'components/common/LoadingOverlay'
 import DirectionRoutes from 'components/common/DirectionRoutes'
+import socketIOClient from 'socket.io-client'
+
+// const socket = socketIOClient(process.env.NODE_ENV !== 'production' ? 'http://localhost:8080' : process.env.NEXT_PUBLIC_SOCKET_IO_URL)
+const socket = socketIOClient('http://localhost:8080')
 
 const schema = yup.object().shape({
   votedAddress: yup.object({
@@ -42,7 +46,6 @@ const schema = yup.object().shape({
 })
 
 const Step2 = memo(({ sid, prevStep, nextStep }) => {
-  const voteSessionMutation = useMutation(voteSession)
   const [cookies] = useCookies(['uid'])
   const [showMap, setShowMap] = useState(false)
   const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
@@ -54,10 +57,10 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
   const queryClient = useQueryClient()
   const { mutateAsync } = useMutation((address) => updateSessionAddresses(address), {
-    onSuccess: () => queryClient.invalidateQueries(queryKeys.SESSION_DETAIL),
+    onSuccess: () => socket.emit('add_location'),
   })
-  const { isLoading: isLoadingAdress, mutateAsync: deleteAsync } = useMutation((info) => deleteSessionAddress(info), {
-    onSuccess: () => queryClient.invalidateQueries(queryKeys.SESSION_DETAIL),
+  const { mutateAsync: deleteAsync } = useMutation((info) => deleteSessionAddress(info), {
+    onSuccess: () => socket.emit('delete_location'),
   })
   const { data: addressData } = useQuery([queryKeys.GET_ADDRESS, { sid }], () => getAllAddresses({ sid }), { retry: 1 })
 
@@ -84,11 +87,46 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
     }
   }, [addressData])
 
+  const voteSessionMutation = useMutation(voteSession, {
+    onSuccess: () => {
+      socket.emit('vote')
+      nextStep()
+    },
+    onError: (error) => alert(error.message),
+  })
+
   const methods = useForm({
     resolver: yupResolver(schema),
   })
 
   const { isLoading, isSuccess, data } = useQuery([queryKeys.CHECK_SESSION, { sid }], () => getSessionDetails({ sid }))
+
+  // socketio
+  useEffect(() => {
+    // new user come
+    socket.emit('new_user_coming')
+
+    return socket.off('new_user_coming')
+  }, [])
+
+  useEffect(() => {
+    // get noti user come
+    socket.on('refetch_sesion_detail', () => {
+      queryClient.invalidateQueries(queryKeys.GET_ADDRESS)
+      queryClient.invalidateQueries(queryKeys.CHECK_SESSION)
+    })
+
+    // get noti add new locations
+    socket.on('refetch_add_location', () => queryClient.invalidateQueries(queryKeys.CHECK_SESSION))
+
+    // get noti delete location
+    socket.on('refetch_delete_location', () => queryClient.invalidateQueries(queryKeys.CHECK_SESSION))
+
+    // get noti voted location
+    socket.on('refetch_vote', () => queryClient.invalidateQueries(queryKeys.CHECK_SESSION))
+
+    return socket.offAny()
+  })
 
   const onSubmit = (data) => {
     console.log(data)
@@ -98,16 +136,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
       address: data.votedAddress,
     })
   }
-
-  useEffect(() => {
-    if (voteSessionMutation.isSuccess) {
-      if (voteSessionMutation.data.messageCode === messageCodes.SUCCESS) {
-        nextStep()
-      } else {
-        alert(voteSessionMutation.data.message)
-      }
-    }
-  }, [voteSessionMutation.isSuccess])
 
   const handleOnAddLocation = async (newLocations) => {
     const newData = newLocations.map((location) => ({

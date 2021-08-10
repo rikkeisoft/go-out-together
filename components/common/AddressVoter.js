@@ -45,14 +45,13 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
                       <input
                         type="radio"
                         className="mr-4"
-                        onClick={() => {
-                          // window.scrollTo({ top: 300, behavior: 'smooth' })
+                        onChange={() => {
                           onClick(item)
                           onSelect(item)
                         }}
                         checked={item.aid === value?.aid}
                       />
-                      {item.name}
+                      {item.name} ({item.voteCount} người vote)
                     </label>
                   </td>
                   <td className="p-2 w-10 cursor-pointer">

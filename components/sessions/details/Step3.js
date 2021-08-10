@@ -27,14 +27,14 @@ const Step3 = memo(({ sid }) => {
               onComplete={() => {
                 setTimeout(() => {
                   refetch()
-                }, 2000)
+                }, 800)
               }}
             />
           </MessageText>
         </Center>
       )
     } else {
-      if (_.isNil(data.data.address)) {
+      if (_.isNil(data.data.addresses)) {
         resultElement = (
           <Center>
             <MessageText>Không có địa điểm nào được vote</MessageText>
@@ -44,7 +44,12 @@ const Step3 = memo(({ sid }) => {
         resultElement = (
           <Center>
             <MessageText>
-              Địa điểm được vote nhiều nhất là {data.data.address.name} ({data.data.voters} người vote)
+              Địa điểm được vote nhiều nhất là
+              {data.data.addresses.map((address) => (
+                <p key={address[0].aid}>
+                  {address[0].name} ({data.data.voters} người vote)
+                </p>
+              ))}
             </MessageText>
           </Center>
         )
@@ -64,7 +69,7 @@ const Step3 = memo(({ sid }) => {
 })
 
 Step3.propTypes = {
-  sid: PropTypes.any,
+  sid: PropTypes.string,
 }
 
 Step3.defaultProps = {}
