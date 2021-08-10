@@ -33,8 +33,7 @@ import LoadingOverlay from 'components/common/LoadingOverlay'
 import DirectionRoutes from 'components/common/DirectionRoutes'
 import socketIOClient from 'socket.io-client'
 
-// const socket = socketIOClient(process.env.NODE_ENV !== 'production' ? 'http://localhost:8080' : process.env.NEXT_PUBLIC_SOCKET_IO_URL)
-const socket = socketIOClient('http://localhost:8080')
+const socket = socketIOClient(process.env.NEXT_PUBLIC_BASE_URL)
 
 const schema = yup.object().shape({
   votedAddress: yup.object({
@@ -59,7 +58,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const { mutateAsync } = useMutation((address) => updateSessionAddresses(address), {
     onSuccess: () => socket.emit('add_location'),
   })
-  const { mutateAsync: deleteAsync } = useMutation((info) => deleteSessionAddress(info), {
+  const { isLoading: isLoadingAdress, mutateAsync: deleteAsync } = useMutation((info) => deleteSessionAddress(info), {
     onSuccess: () => socket.emit('delete_location'),
   })
   const { data: addressData } = useQuery([queryKeys.GET_ADDRESS, { sid }], () => getAllAddresses({ sid }), { retry: 1 })
