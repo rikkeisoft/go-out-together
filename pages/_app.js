@@ -1,6 +1,7 @@
 import ProtectedComponent from 'components/ProtectedComponent/ProtectedComponent'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import 'tailwindcss/tailwind.css'
+import '../style/home.css'
 
 const queryClient = new QueryClient({
   defaultOptions: {

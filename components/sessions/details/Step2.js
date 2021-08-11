@@ -33,7 +33,7 @@ import LoadingOverlay from 'components/common/LoadingOverlay'
 import DirectionRoutes from 'components/common/DirectionRoutes'
 import socketIOClient from 'socket.io-client'
 
-const socket = socketIOClient(process.env.NEXT_PUBLIC_BASE_URL)
+const socket = socketIOClient(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
 
 const schema = yup.object().shape({
   votedAddress: yup.object({
@@ -55,7 +55,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   })
 
   const queryClient = useQueryClient()
-  const { mutateAsync } = useMutation((address) => updateSessionAddresses(address), {
+  const { isLoading: isLoadingList, mutateAsync } = useMutation((address) => updateSessionAddresses(address), {
     onSuccess: () => socket.emit('add_location'),
   })
   const { isLoading: isLoadingAdress, mutateAsync: deleteAsync } = useMutation((info) => deleteSessionAddress(info), {
@@ -167,7 +167,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
   return (
     <>
-    
       <Head>
         <title>Bước 2</title>
         <link rel="icon" href="/favicon.ico" />
@@ -188,48 +187,46 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
       {!showMap && isSuccess && data.messageCode === messageCodes.SUCCESS && (
         <>
-        <div className="italic ml-16">
-          <MessageText>
-            Vote sẽ kết thúc sau: 
-            <span className="text-red-500 ">
-            <Countdown
-              date={new Date(data.data.expireTime)}
-              onComplete={() => {
-                alert('Rất tiếc , đã hết thời gian vote')
-                nextStep()
-              }}
-            />
-            </span>
-          </MessageText>
-          <MessageText>Tiêu đề: {data.data.title}</MessageText>
-          <MessageText>Nội dung: {data.data.content}</MessageText>
-          <MessageText>
-            <p>Các thành viên đang tham gia:</p> <MemberList members={data.data.members} />
-          </MessageText>
-          {showDirectionRoutes && (
-            
-            <DirectionRoutes 
-              currentLocation={locations.userLocation}
-              listUserLocation={locations.listUserLocation}
-              destination={{
-                id: voteAddress.id,
-                name: 'Destination',
-                address: voteAddress.name,
-                coordinates: [voteAddress.longitude, voteAddress.latitude],
-              }}
-              showMap={() => {
-                setShowDirectionRoutes(false)
-              }}
-            />
-         
-          )}
+          <div className="italic ml-16">
+            <MessageText>
+              Vote sẽ kết thúc sau:
+              <span className="text-red-500 ">
+                <Countdown
+                  date={new Date(data.data.expireTime)}
+                  onComplete={() => {
+                    alert('Rất tiếc , đã hết thời gian vote')
+                    nextStep()
+                  }}
+                />
+              </span>
+            </MessageText>
+            <MessageText>Tiêu đề: {data.data.title}</MessageText>
+            <MessageText>Nội dung: {data.data.content}</MessageText>
+            <MessageText>
+              <p>Các thành viên đang tham gia:</p> <MemberList members={data.data.members} />
+            </MessageText>
+            {showDirectionRoutes && (
+              <DirectionRoutes
+                currentLocation={locations.userLocation}
+                listUserLocation={locations.listUserLocation}
+                destination={{
+                  id: voteAddress.id,
+                  name: 'Destination',
+                  address: voteAddress.name,
+                  coordinates: [voteAddress.longitude, voteAddress.latitude],
+                }}
+                showMap={() => {
+                  setShowDirectionRoutes(false)
+                }}
+              />
+            )}
           </div>
           <FormCard>
             <FormProvider {...methods}>
               <form onSubmit={methods.handleSubmit(onSubmit)}>
                 <Field>
                   {data.data.addresses.length >= 5 ? (
-                    <p className="text-red-500">Chỉ giới hạn tối đa 5 địa điểm!</p>
+                    <p className="text-white text-xl">Chỉ giới hạn tối đa 5 địa điểm!</p>
                   ) : (
                     <Button
                       type="button"
@@ -242,9 +239,11 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     </Button>
                   )}
                 </Field>
-
+                <LoadingOverlay isOpen={isLoadingList} message="Đang thêm địa điểm..." />
                 <Field>
-                  <Label htmlFor="votedAddress ">Chọn địa điểm ăn chơi:</Label>
+                  <Label htmlFor="votedAddress ">
+                    <p className="text-white text-xl">Chọn địa điểm ăn chơi:</p>
+                  </Label>
                   <AddressVoter
                     name="votedAddress"
                     data={data.data.addresses}
@@ -254,7 +253,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     }}
                     onDelete={deleteAddress}
                   />
-                    <LoadingOverlay isOpen={isLoadingAdress} message="Đang Xóa địa điểm vote" />
+                  <LoadingOverlay isOpen={isLoadingAdress} message="Đang Xóa địa điểm vote" />
                   {!_.isNil(methods.formState.errors.votedAddress) && <ErrorText>Chọn địa chỉ để vote</ErrorText>}
                 </Field>
 
@@ -279,7 +278,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
           </FormCard>
         </>
       )}
-
     </>
   )
 })
