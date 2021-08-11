@@ -39,7 +39,7 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
                           onClick(item)
                           onSelect(item)
                         }}
-                        onClick={window.scrollTo({ top: 500, behavior: 'smooth' })}
+                        onClick={window.scrollTo({ top: 600, behavior: 'smooth' })}
                         checked={item.aid === value?.aid}
                       />
                       {item.name} ({item.voteCount} người vote)
