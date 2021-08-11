@@ -48,18 +48,18 @@ export default function Home({ error }) {
       </Head>
 
       {/* <BackgroundImage src={homeBgSrc}> */}
-        <Popup isOpen={isError} onRequestClose={() => setIsError(false)}>
-          <h1>{error}</h1>
-        </Popup>
-        <Container>
-          <Center>
-            <TitleText>Làm thế nào để tìm địa điểm vui chơi một cách dễ dàng</TitleText>
-            <Button type="button" variant="primary" onClick={handleButtonClick}>
-              Thử ngay
-            </Button>
-            <GoogleLoginModal isOpen={isModalOpen} onRequestClose={() => setIsModalOpen(false)} />
-          </Center>
-        </Container>
+      <Popup isOpen={isError} onRequestClose={() => setIsError(false)}>
+        <h1>{error}</h1>
+      </Popup>
+      <Container>
+        <Center>
+          <TitleText>Làm thế nào để tìm địa điểm vui chơi một cách dễ dàng</TitleText>
+          <Button type="button" variant="primary" onClick={handleButtonClick}>
+            Thử ngay
+          </Button>
+          <GoogleLoginModal isOpen={isModalOpen} onRequestClose={() => setIsModalOpen(false)} />
+        </Center>
+      </Container>
       {/* </BackgroundImage> */}
     </MainLayout>
   )

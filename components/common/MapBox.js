@@ -173,9 +173,9 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
                   : listAddress.length + listLocation.length >= 5 && (
                       <p className="text-red-500">There are only 5 addresses total!</p>
                     )}
-                <p>You can add {5 - listAddress.length} address</p>
+                <p>Bạn cần nhập {5 - listAddress.length} địa chỉ</p>
                 <ul className="my-3">
-                  {listLocation.length !== 0 && <span>List added address: </span>}
+                  {listLocation.length !== 0 && <span>Danh sách địa điểm được thêm vào: </span>}
                   {listLocation.map((location) => (
                     <>
                       <li key={location.id} className="px-3 py-2 mb-2 border border-gray-400">

@@ -1,29 +1,23 @@
-# Next.js + Tailwind CSS Example
-
-This example shows how to use [Tailwind CSS](https://tailwindcss.com/) [(v2.2)](https://blog.tailwindcss.com/tailwindcss-2-2) with Next.js. It follows the steps outlined in the official [Tailwind docs](https://tailwindcss.com/docs/guides/nextjs).
-
-It uses the new [`Just-in-Time Mode`](https://tailwindcss.com/docs/just-in-time-mode) for Tailwind CSS.
-
 ## Preview
-
-Preview the example live on [StackBlitz](http://stackblitz.com/):
-
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/with-tailwindcss)
-
+  Việc hôm nay ăn gì, uống gì, đi đâu là một câu trả lời khó còn hơn cả thi đại học. Một người đã khó quyết định, khi có nhiều người còn khó quyết định gấp mấy lần. Chính vì thế, ứng dụng Cùng Đi Chơi sinh ra để giải quyết được nhu cầu đi đâu, ăn gì một cách dễ dàng bằng cách bình chọn.
+ # Cách sử dụng app 
+  - Người dùng sẽ truy cập vào app(sử dụng tài khoản đăng nhập là account google ) sau đó nhập địa điểm hiện tại, mở một group mới để bắt đầu session.
+  - Khi session bắt đầu, người dùng sẽ hiện ra 1 form để nhập tiêu đề, nội dung, và list địa điểm chọn lựa (chọn từ popup bản đồ với autocomplete).
+  - Sau khi nhập xong và submit, hệ thống sẽ sinh ra một đường dẫn để người dùng chia sẻ với những người bạn của mình.
+  - Với những người truy cập vào đường dẫn ở trên: 1 popup sẽ hiện ra để người dùng nhập tên, địa điểm hiện tại.
+  - Sau khi nhập tên, người dùng đó sẽ nhìn thấy được nội dung của session bao gồm: tiêu đề, nội dung, những ai đã tham gia session, danh sách lựa chọn cùng số lượng và những người vote. Người dùng có thể thêm vào một lựa chọn khác.
+  - Sau khi tất cả kết thúc phần vote của mình hoặc người mở session click vào nút kết thúc, địa điểm được nhiều người chọn nhất sẽ hiện ra và thông báo kết quả địa điểm được vote nhiều nhất  
 ## Deploy your own
-
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/next.js/tree/canary/examples/with-tailwindcss&project-name=with-tailwindcss&repository-name=with-tailwindcss)
-
+   https://go-out-together.vercel.app
+## Công nghệ 
+  - Next.js 
+  - TailwindCSS v2.
+  - React-query 
+  - Mapbox 
+  - Socket.io
 ## How to use
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example:
-
-```bash
 npx create-next-app --example with-tailwindcss with-tailwindcss-app
 # or
 yarn create next-app --example with-tailwindcss with-tailwindcss-app
-```
 
 Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).

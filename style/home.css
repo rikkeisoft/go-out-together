@@ -1,8 +1,10 @@
 .bg-image {
     /* The image used */
-    background: url(/assets/images/homeBg.svg);
+    background: url(/assets/images/bg20.png) no-repeat;
     width: 100%;
     height: 100vh;
     background-size: cover;
     overflow-y: scroll;
+    background-position: center;
+    background-repeat: no-repeat;
 }
