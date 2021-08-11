@@ -1,6 +1,5 @@
 import { login } from 'api/users'
 import GoogleLogin from 'components/common/GoogleLogin'
-import Popup from 'components/common/Popup'
 import queryKeys from 'consts/queryKeys'
 import urls from 'consts/urls'
 import { auth } from 'lib/firebase'
@@ -10,7 +9,7 @@ import { useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import { useMutation, useQueryClient } from 'react-query'
 
-function GoogleLoginModal({ isOpen, onRequestClose }) {
+function GoogleLoginModal() {
   const queryClient = useQueryClient()
   const router = useRouter()
   const [cookies, setCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
@@ -38,14 +37,9 @@ function GoogleLoginModal({ isOpen, onRequestClose }) {
       }
     })
     return () => unregisterAuthObserver()
-  }, [isOpen])
+  }, [])
 
-  return (
-    <Popup isOpen={isOpen} onRequestClose={onRequestClose}>
-      <h1 className="text-center font-medium w-64">Đăng nhập</h1>
-      <GoogleLogin />
-    </Popup>
-  )
+  return <GoogleLogin />
 }
 
 GoogleLoginModal.propTypes = {

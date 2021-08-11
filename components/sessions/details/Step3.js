@@ -22,14 +22,7 @@ const Step3 = memo(({ sid }) => {
         <Center>
           <MessageText>
             Vui lòng đợi kết quả sau:
-            <Countdown
-              date={new Date(data.data.expireTime)}
-              onComplete={() => {
-                setTimeout(() => {
-                  refetch()
-                }, 800)
-              }}
-            />
+            <Countdown date={new Date(data.data.expireTime)} onComplete={refetch} />
           </MessageText>
         </Center>
       )

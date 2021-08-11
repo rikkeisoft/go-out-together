@@ -128,7 +128,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   })
 
   const onSubmit = (data) => {
-    console.log(data)
     voteSessionMutation.mutate({
       sid: sid,
       uid: cookies.uid,
@@ -190,7 +189,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
           <div className="italic ml-16">
             <MessageText>
               Vote sẽ kết thúc sau:
-              <span className="text-red-500 ">
+              <span className="text-red-500 ml-1">
                 <Countdown
                   date={new Date(data.data.expireTime)}
                   onComplete={() => {
