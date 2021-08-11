@@ -1,10 +1,8 @@
-.bg {
+.bg-image {
     /* The image used */
-    background-image: url("../public//assest/image/bun-bo.jpg");
-    /* Full height */
-    height: 100%;
-    width: 100vw;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: url(/assets/images/homeBg.svg);
+    width: 100%;
+    height: 100vh;
     background-size: cover;
+    overflow-y: scroll;
 }
