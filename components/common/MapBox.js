@@ -12,7 +12,6 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
   const [selectedLocation, setSelectedLocation] = useState('')
   const [listLocation, setListLocation] = useState([])
   const [showListLocation, setShowListLocation] = useState(true)
-  // const [arrayCoodinates, setArrayCoodinates] = useState([])
   const selectedLocationRef = useRef([])
 
   useEffect(() => {
@@ -26,11 +25,9 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
     }
   }, [listAddress])
 
-  // console.log(listLocation)
-
   const handleDeleteAddressListLocation = (locationId) => {
     const locationIndex = listLocation.findIndex((location) => location.id === locationId)
-
+    setLocation('')
     setListLocation([...listLocation.slice(0, locationIndex), ...listLocation.slice(locationIndex + 1)])
   }
 
@@ -44,7 +41,7 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
           const dataList = response.data.features
           setDataLocation(dataList)
         } catch (error) {
-          console.log('error:: ', error)
+          console.log('error: ', error)
         }
       }
       getLocation()
@@ -52,8 +49,6 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
   }, [location])
 
   useEffect(() => {
-    setLocation(selectedLocation.place_name)
-
     if (selectedLocation) {
       const longitude = selectedLocation.center[0]
       const latitude = selectedLocation.center[1]
@@ -72,7 +67,9 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
       // console.log(arrayCoodinates)
       arrayCoordinates.map((item) => {
         map.on('load', () => {
-          const marker = new mapboxgl.Marker()
+          const marker = new mapboxgl.Marker({
+            color: '#3887be',
+          })
           const markerPopup = new mapboxgl.Popup()
 
           markerPopup.setText(`${item.name}`)
@@ -173,32 +170,30 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
                   : listAddress.length + listLocation.length >= 5 && (
                       <p className="text-red-500">There are only 5 addresses total!</p>
                     )}
-                <p>You can add {5 - listAddress.length} address</p>
+                <p>Bạn cần nhập {5 - listAddress.length} địa chỉ</p>
                 <ul className="my-3">
-                  {listLocation.length !== 0 && <span>List added address: </span>}
+                  {listLocation.length !== 0 && <span>Danh sách địa điểm được thêm vào: </span>}
                   {listLocation.map((location) => (
-                    <>
-                      <li key={location.id} className="px-3 py-2 mb-2 border border-gray-400">
-                        {location.place_name}
-                        <span
-                          className="ml-2 cursor-pointer"
-                          onClick={() => handleDeleteAddressListLocation(location.id)}
+                    <li key={location.id} className="px-3 py-2 mb-2 border border-gray-400">
+                      {location.place_name}
+                      <span
+                        className="ml-2 cursor-pointer"
+                        onClick={() => handleDeleteAddressListLocation(location.id)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 inline"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5 inline"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </span>
-                      </li>
-                    </>
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </span>
+                    </li>
                   ))}
                 </ul>
               </>
@@ -207,7 +202,7 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
               <input
                 type="text"
                 value={location || ''}
-                className="w-80 p-2 pr-10 inline outline-none border border-black whitespace-nowrap overflow-hidden overflow-ellipsis"
+                className="w-80 p-2 pr-10 inline outline-none border border-gray-400 whitespace-nowrap overflow-hidden overflow-ellipsis"
                 placeholder="Nhập địa chỉ của bạn"
                 onChange={(event) => {
                   setLocation(event.target.value)
@@ -234,18 +229,6 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
                 </svg>
               </span>
               <div className="absolute inline-block right-0">
-                {/* {
-                  isOneLocaion === true ? null :
-                    (<div className="mr-2 inline-block">
-                      <Button
-                        type="button"
-                        variant="primary"
-                        onClick={getBound}
-                      >
-                        Xem toàn bộ các điểm
-                      </Button>
-                    </div>)
-                } */}
                 <Button
                   type="submit"
                   variant="primary"
@@ -265,18 +248,17 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
             </form>
           </>
         )}
-
-        <ul>
-          {dataLocation &&
-            showListLocation &&
-            dataLocation.map((item, index) => {
+        {dataLocation && dataLocation.length !== 0 && showListLocation && (
+          <ul className="border border-gray-400 bg-gray-100">
+            {dataLocation.map((item, index) => {
               return (
                 <li
                   key={index}
                   className="cursor-pointer p-2"
                   onClick={() => {
-                    window.scrollTo({ top: 100, behavior: 'smooth' })
+                    window.scrollTo({ top: 300, behavior: 'smooth' })
                     setSelectedLocation(item)
+                    setLocation(item.place_name)
                     if (isOneLocaion) {
                       setListLocation([item])
                     } else {
@@ -307,8 +289,9 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
                 </li>
               )
             })}
-        </ul>
-        <div id="map" className="absolute" style={{ width: '100%', height: '70vh' }}></div>
+          </ul>
+        )}
+        <div id="map" className="w-full mb-8" style={{ height: '70vh' }}></div>
       </div>
     </>
   )

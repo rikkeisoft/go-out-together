@@ -50,11 +50,22 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
     map.on('load', addDestinationMarker)
 
     listUserLocation.map((item, index) => {
+      let colorSetting, info
+      if (item.userId === currentLocation.userId) {
+        colorSetting = '#166f00'
+        info = `Bạn - (${item.address})`
+      } else {
+        colorSetting = '#3887be'
+        info = `${item.name} - (${item.address})`
+      }
+
       const addMarker = () => {
-        const marker = new mapboxgl.Marker()
+        const marker = new mapboxgl.Marker({
+          color: colorSetting,
+        })
         const markerPopup = new mapboxgl.Popup()
 
-        markerPopup.setText(`${item.name} - (${item.address})`)
+        markerPopup.setText(info)
         marker.setPopup(markerPopup)
 
         marker.setLngLat([item.coordinates[0], item.coordinates[1]])
@@ -68,16 +79,10 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
       const getRoute = async (item, start, end) => {
         // start: user location; end: destination
         const response = await axios.get(
-          `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
+          `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&overview=full&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
         )
         const data = response.data.routes[0]
         const coordinates = data.geometry.coordinates
-        // distanceRef.current.push({
-        //   userId: item.userId,
-        //   distance: data.distance,
-        // })
-
-        // setDistance([...distance, distanceRef.current])
         saveDistance(item, data.distance)
         setDistance([...distanceRef.current])
 
@@ -92,10 +97,6 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
         if (map.getSource(`route${index}`)) {
           map.getSource(`route${index}`).setData(geojson)
         } else {
-          let colorMarker
-          if (item.userId === currentLocation.userId) {
-            colorMarker = '#166f00'
-          } else colorMarker = '#3887be'
           map.addLayer({
             id: `route${index}`,
             type: 'line',
@@ -115,7 +116,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
               'line-cap': 'round',
             },
             paint: {
-              'line-color': `${colorMarker}`,
+              'line-color': `${colorSetting}`,
               'line-width': 5,
               'line-opacity': 0.75,
             },
@@ -124,10 +125,6 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
       }
       //add start point
       map.on('load', async () => {
-        let colorMarker
-        if (item.userId === currentLocation.userId) {
-          colorMarker = '#166f00'
-        } else colorMarker = '#3887be'
         await getRoute(item, start, coordsDestination)
         map.addLayer({
           id: `point${index}`,
@@ -150,7 +147,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           },
           paint: {
             'circle-radius': 10,
-            'circle-color': `${colorMarker}`,
+            'circle-color': `${colorSetting}`,
           },
         })
       })
@@ -272,7 +269,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
       </Head>
       <div className="w-9/12 mx-auto relative">
         <div className="flex justify-between items-center">
-          <p className="text-blue-600 text-xl font-semibold">Thong tin duong di</p>
+          <p className="text-blue-600 text-xl font-semibold">Thông tin đường đi</p>
           <Button
             type="submit"
             variant="primary"
@@ -302,10 +299,12 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
               </div>
             ))}
         </div>
-        <p className="mb-3">
-          <ThreeDots />
-          Chiều dài quãng đường trung bình: {(getAverageDistance() / 1000).toFixed(2)} KM
-        </p>
+        {distance.length !== 0 && (
+          <p className="mb-3">
+            <ThreeDots />
+            Chiều dài quãng đường trung bình: {(getAverageDistance() / 1000).toFixed(2)} KM
+          </p>
+        )}
         <div id="map" style={{ width: '100%', height: '60vh' }} />
       </div>
     </>

@@ -15,7 +15,7 @@ const AddressField = memo(({ name }) => {
           type="text"
           className="w-full px-2 py-1 border border-gray-500 focus-visible:outline-none"
           readOnly={true}
-          value={value.name}
+          defaultValue={value.name}
         />
       )}
     />

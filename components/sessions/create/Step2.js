@@ -149,7 +149,9 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
           <FormProvider {...methods}>
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <Field>
-                <Label htmlFor="title"><p>Tiêu đề:</p></Label>
+                <Label htmlFor="title">
+                  <p>Tiêu đề:</p>
+                </Label>
                 <TextField id="title" name="title" />
                 <ErrorMessage
                   errors={methods.formState.errors}
@@ -159,7 +161,10 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
               </Field>
 
               <Field>
-                <Label htmlFor="content"> <p >Nội Dung:</p></Label>
+                <Label htmlFor="content">
+                  {' '}
+                  <p>Nội Dung:</p>
+                </Label>
                 <TextArea id="content" name="content" />
                 <ErrorMessage
                   errors={methods.formState.errors}
@@ -169,7 +174,10 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
               </Field>
 
               <Field>
-                <Label htmlFor="timeLimit"> <p >Giới hạn thời gian vote:</p></Label>
+                <Label htmlFor="timeLimit">
+                  {' '}
+                  <p className="text-white">Giới hạn thời gian vote:</p>
+                </Label>
                 <SelectBox
                   id="timeLimit"
                   name="timeLimit"
@@ -208,7 +216,9 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
               </Field>
 
               <Field>
-                <Label htmlFor="addresses"><p>Danh sách địa điểm ăn chơi:</p></Label>
+                <Label htmlFor="addresses">
+                  <p className="text-white text-xl">Danh sách địa điểm ăn chơi:</p>
+                </Label>
 
                 {renderListLocation()}
 

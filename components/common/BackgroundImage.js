@@ -1,11 +1,11 @@
 import React, { memo } from 'react'
 import PropTypes from 'prop-types'
-import Image from 'next/image'
+// import Image from 'next/image'
 
-const BackgroundImage = memo(({ src, children }) => {
+const BackgroundImage = memo(({ children }) => {
   return (
-    <div className="relative w-screen h-screen">
-      <Image src={src} layout="fill" className="object-cover"  alt="" />
+    <div className="relative w-screen h-screen bg-image">
+      {/* <Image src={src} layout="fill" className="object-cover bg-image"  alt="" /> */}
       <div className="absolute top-0 left-0 w-full h-full">{children}</div>
     </div>
   )
