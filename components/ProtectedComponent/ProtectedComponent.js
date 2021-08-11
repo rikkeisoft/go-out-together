@@ -1,5 +1,5 @@
 import { checkUser } from 'api/users'
-import Loading from 'components/common/Loading'
+import LoadingOverlay from 'components/common/LoadingOverlay'
 import queryKeys from 'consts/queryKeys'
 import { useRouter } from 'next/router'
 import Home from 'pages'
@@ -21,9 +21,11 @@ export default function ProtectedComponent({ children }) {
         }
         return new Promise((rs) => rs())
       }
+
       try {
         await checkUser()
         queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedIn: true })
+        return
       } catch (error) {
         removeCookie('username', { path: '/' })
         removeCookie('uid', { path: '/' })
@@ -32,13 +34,9 @@ export default function ProtectedComponent({ children }) {
         throw new Error(error.response.data.message)
       }
     },
-    { retry: false, staleTime: 5 * 60 * 1000 },
+    { retry: false },
   )
   const router = useRouter()
-
-  useEffect(() => {
-    queryClient.invalidateQueries(queryKeys.CHECK_USER)
-  }, [router.isReady, router.pathname])
 
   useEffect(() => {
     if (!router.isReady) return
@@ -53,12 +51,12 @@ export default function ProtectedComponent({ children }) {
   }, [router.isReady])
 
   if (isLoading) {
-    return <Loading />
+    return <LoadingOverlay isOpen={isLoading} message="Vui lòng chờ..." />
   }
 
   if (error) {
     if (router.pathname === '/sessions/[sid]') return <Details error={error.message} />
-    return <Home error={error.message} />
+    return <Home />
   }
 
   return <>{children}</>

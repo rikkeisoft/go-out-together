@@ -5,15 +5,6 @@ import { useFormContext, Controller } from 'react-hook-form'
 import TrashIcon from 'components/icons/TrashIcon'
 import Popup from './Popup'
 import Button from './Button'
-// import LoadingOverlay from 'components/common/LoadingOverlay'
-// import { useMutation, useQuery, useQueryClient } from 'react-query'
-// import {
-//   // getAllAddresses,
-//   // getSessionDetails,
-//   // updateSessionAddresses,
-//   deleteSessionAddress,
-//   // voteSession,
-// } from 'api/sessions'
 
 const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
   const { control, watch, setValue } = useFormContext()
@@ -48,6 +39,7 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
                           onClick(item)
                           onSelect(item)
                         }}
+                        onClick={window.scrollTo({ top: 600, behavior: 'smooth' })}
                         checked={item.aid === value?.aid}
                       />
                       {item.name} ({item.voteCount} người vote)
@@ -66,10 +58,10 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
                   </td>
                   <Popup isOpen={openPopup} onRequestClose={() => setOpenPopup(false)}>
                     <>
-                      <h1 className="mb-4">Are you sure to delete this address?</h1>
+                      <h1 className="mb-4">Bạn có chắc chắn muốn xóa địa chỉ này?</h1>
                       <div className="w-full flex items-center justify-around">
                         <Button variant="primary" onClick={() => setOpenPopup(false)}>
-                          No
+                          Không
                         </Button>
                         <Button
                           variant="danger"
@@ -77,7 +69,7 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
                             setOpenPopup(false), onDelete(selectedItemId)
                           }}
                         >
-                          Yes
+                          Có
                         </Button>
                       </div>
                     </>

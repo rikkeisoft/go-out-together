@@ -3,7 +3,7 @@ import React from 'react'
 function Loading() {
   return (
     <div className="flex flex-col justify-center items-center">
-      <h1 className="font-bold">Please wait..</h1>
+      <h1 className="font-bold">Vui lòng chờ...</h1>
       <div className="my-4 flex justify-center items-center">
         <svg
           className="animate-spin -ml-1 mr-3 h-8 w-8 text-black"
