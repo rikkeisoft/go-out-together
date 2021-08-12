@@ -33,7 +33,7 @@ export default function ProtectedComponent({ children }) {
         throw new Error(error.response.data.message)
       }
     },
-    { retry: false, staleTime: Infinity, retryOnMount: false, enabled: false },
+    { retryOnMount: false, enabled: false },
   )
   const router = useRouter()
 
