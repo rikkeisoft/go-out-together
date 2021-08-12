@@ -20,7 +20,10 @@ const Step3 = memo(({ sid, setFormData, backwardStep }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Center>
-        <MessageText>Chia sẻ link với bạn bè để họ tham gia vote</MessageText>
+        <MessageText>
+          {' '}
+          <p className="mt-10">Chia sẻ link với bạn bè để họ tham gia vote</p>
+        </MessageText>
         <CopyableLink
           text={sharedLink}
           onClick={() => {

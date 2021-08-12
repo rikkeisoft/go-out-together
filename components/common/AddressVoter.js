@@ -29,7 +29,7 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
           <tbody>
             {data.map((item) => {
               return (
-                <tr key={`item-` + item.aid} className="hover:bg-gray-100">
+                <tr key={`item-` + item.aid} className="hover:bg-gray-100 font-bold">
                   <td className="p-2 cursor-pointer">
                     <label className="cursor-pointer">
                       <input
@@ -39,7 +39,6 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
                           onClick(item)
                           onSelect(item)
                         }}
-                        onClick={window.scrollTo({ top: 600, behavior: 'smooth' })}
                         checked={item.aid === value?.aid}
                       />
                       {item.name} ({item.voteCount} người vote)
