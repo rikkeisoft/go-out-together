@@ -163,7 +163,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
               <Field>
                 <Label htmlFor="content">
                   {' '}
-                  <p  className="text-black-600 font-bold">Nội Dung:</p>
+                  <p className="text-black-600 font-bold">Nội Dung:</p>
                 </Label>
                 <TextArea id="content" name="content" />
                 <ErrorMessage
