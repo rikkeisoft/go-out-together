@@ -229,7 +229,6 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
                   key={index}
                   className="cursor-pointer p-2"
                   onClick={() => {
-                    window.scrollTo({ top: 300, behavior: 'smooth' })
                     setSelectedLocation(item)
                     setLocation(item.place_name)
                     if (isOneLocaion) {

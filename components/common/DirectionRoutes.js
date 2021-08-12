@@ -316,7 +316,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
         <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
-      <div className="w-full mx-auto relative">
+      <div className="mx-auto relative" style={{ width: '800px' }}>
         <div className="flex justify-between items-center">
           <p className="text-blue-600 text-xl font-semibold">Thông tin đường đi</p>
           <Button
@@ -354,7 +354,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             Chiều dài quãng đường trung bình: {(getAverageDistance() / 1000).toFixed(2)} KM
           </p>
         )}
-        <div id="map" style={{ width: '100%', height: '60vh' }} />
+        <div id="map" className="w-full" style={{ height: '60vh' }} />
       </div>
     </>
   )
