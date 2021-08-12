@@ -7,7 +7,7 @@ const TextField = memo(({ type, id, readOnly, name, placeholder }) => {
   return (
     <input
       type={type}
-      className="w-full px-2 py-1 border border-gray-500 focus-visible:outline-none"
+      className="w-full px-2 py-1 border border-gray-500 focus-visible:outline-none shadow-md"
       id={id}
       readOnly={readOnly}
       {...register(name)}

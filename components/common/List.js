@@ -13,7 +13,7 @@ const List = memo(({ name }) => {
       name={name}
       defaultValue={[]}
       render={({ field: { onChange, value, name } }) => (
-        <table className="w-full">
+        <table className="w-full font-bold">
           <tbody>
             {value.map((item, index) => {
               return (

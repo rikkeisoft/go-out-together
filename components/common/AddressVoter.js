@@ -29,7 +29,7 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
           <tbody>
             {data.map((item) => {
               return (
-                <tr key={`item-` + item.aid} className="hover:bg-gray-100">
+                <tr key={`item-` + item.aid} className="hover:bg-gray-100 font-bold">
                   <td className="p-2 cursor-pointer">
                     <label className="cursor-pointer">
                       <input

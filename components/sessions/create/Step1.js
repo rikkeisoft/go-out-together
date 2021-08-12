@@ -10,7 +10,6 @@ import { ErrorMessage } from '@hookform/error-message'
 import { useMutation } from 'react-query'
 import messageCodes from 'consts/messageCodes'
 import { updateSessionCreator } from 'api/users'
-import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
 import TextField from 'components/common/TextField'
@@ -125,11 +124,13 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
           }}
         />
       ) : (
-        <FormCard>
+        <div className=" mt-14 w-6/12 mt-2/5 mx-auto px-10 py-10 font-bold">
           <FormProvider {...methods}>
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <Field>
-                <Label htmlFor="name">Tên:</Label>
+                <Label htmlFor="name">
+                  <p className="mb-2">Tên:</p>
+                </Label>
                 <TextField id="name" name="name" />
                 <ErrorMessage
                   errors={methods.formState.errors}
@@ -140,7 +141,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
 
               <Field>
                 <Label htmlFor="address">Địa điểm hiện tại của bạn:</Label>
-                <div className="py-2">
+                <div className="py-2 mb-6">
                   <Button
                     type="button"
                     variant="primary"
@@ -148,7 +149,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
                       setShowMap(true)
                     }}
                   >
-                    Chọn địa điểm trên bản đồ
+                    <p>Chọn địa điểm trên bản đồ</p>
                   </Button>
                 </div>
                 <AddressField name="address" />
@@ -162,7 +163,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
               </ButtonGroup>
             </form>
           </FormProvider>
-        </FormCard>
+        </div>
       )}
       <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
     </>
