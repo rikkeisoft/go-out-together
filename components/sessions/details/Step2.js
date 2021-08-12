@@ -10,7 +10,7 @@ import Countdown from 'react-countdown'
 import queryKeys from 'consts/queryKeys'
 import messageCodes from 'consts/messageCodes'
 import AddressVoter from 'components/common/AddressVoter'
-// import { ErrorMessage } from '@hookform/error-message'
+
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import {
   getAllAddresses,
@@ -19,8 +19,6 @@ import {
   deleteSessionAddress,
   voteSession,
 } from 'api/sessions'
-
-import FormCard from 'components/common/FormCard'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
 import ErrorText from 'components/common/ErrorText'
@@ -32,6 +30,7 @@ import MapBox from 'components/common/MapBox'
 import LoadingOverlay from 'components/common/LoadingOverlay'
 import DirectionRoutes from 'components/common/DirectionRoutes'
 import socketIOClient from 'socket.io-client'
+import Popup from 'components/common/Popup'
 
 const socket = socketIOClient(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
 
@@ -47,6 +46,7 @@ const schema = yup.object().shape({
 const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const [cookies] = useCookies(['uid'])
   const [showMap, setShowMap] = useState(false)
+  // const [isOpen, setIsOpen] = useState(false)
   const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
   const [voteAddress, setVoteAddress] = useState(null)
   const [locations, setLocations] = useState({
@@ -185,8 +185,13 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
       <LoadingOverlay isOpen={isLoading} message="Đang lấy thông tin session..." />
 
       {!showMap && isSuccess && data.messageCode === messageCodes.SUCCESS && (
-        <>
-          <div className="italic ml-16">
+      <div className=" ml-32 w-5/6 mt-10   transition duration-500">
+          <div className="flex justify-between border-b-2 border-fuchsia-600  px-10 pt-6">
+            <div>
+                <MessageText>Tiêu đề: {data.data.title}</MessageText>
+                <MessageText>Nội dung: {data.data.content}</MessageText>
+            </div>
+            <div>
             <MessageText>
               Vote sẽ kết thúc sau:
               <span className="text-red-500 ml-1">
@@ -199,11 +204,13 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                 />
               </span>
             </MessageText>
-            <MessageText>Tiêu đề: {data.data.title}</MessageText>
-            <MessageText>Nội dung: {data.data.content}</MessageText>
+            </div>
+            <div>
             <MessageText>
               <p>Các thành viên đang tham gia:</p> <MemberList members={data.data.members} />
             </MessageText>
+            </div>
+          <Popup isOpen={showDirectionRoutes} onRequestClose={()=> setShowDirectionRoutes(false)}>
             {showDirectionRoutes && (
               <DirectionRoutes
                 currentLocation={locations.userLocation}
@@ -216,14 +223,17 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                 }}
                 showMap={() => {
                   setShowDirectionRoutes(false)
+                  
                 }}
               />
             )}
-          </div>
-          <FormCard>
+          </Popup>
+             </div>
+          <div className="px-20 pt-4">
+         
             <FormProvider {...methods}>
               <form onSubmit={methods.handleSubmit(onSubmit)}>
-                <Field>
+            
                   {data.data.addresses.length >= 5 ? (
                     <p className="text-white text-xl">Chỉ giới hạn tối đa 5 địa điểm!</p>
                   ) : (
@@ -237,11 +247,10 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                       Thêm địa điểm
                     </Button>
                   )}
-                </Field>
                 <LoadingOverlay isOpen={isLoadingList} message="Đang thêm địa điểm..." />
                 <Field>
                   <Label htmlFor="votedAddress ">
-                    <p className="text-white text-xl">Chọn địa điểm ăn chơi:</p>
+                    <p className="text-xl text-black-600 font-bold my-4">Chọn địa điểm ăn chơi:</p>
                   </Label>
                   <AddressVoter
                     name="votedAddress"
@@ -253,9 +262,8 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     onDelete={deleteAddress}
                   />
                   <LoadingOverlay isOpen={isLoadingAdress} message="Đang Xóa địa điểm vote" />
-                  {!_.isNil(methods.formState.errors.votedAddress) && <ErrorText>Chọn địa chỉ để vote</ErrorText>}
+                  {!_.isNil(methods.formState.errors.votedAddress) && <ErrorText> <p className="font-bold">Chọn địa chỉ để vote</p></ErrorText>}
                 </Field>
-
                 <ButtonGroup>
                   <Button
                     type="button"
@@ -274,8 +282,9 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                 </ButtonGroup>
               </form>
             </FormProvider>
-          </FormCard>
-        </>
+         
+          </div>
+        </div>
       )}
     </>
   )
