@@ -2,8 +2,8 @@ import { checkUser } from 'api/users'
 import LoadingOverlay from 'components/common/LoadingOverlay'
 import queryKeys from 'consts/queryKeys'
 import { useRouter } from 'next/router'
-// import Home from 'pages'
-// import Details from 'pages/sessions/[sid]'
+import Home from 'pages'
+import Details from 'pages/sessions/[sid]'
 import { useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import { useQuery, useQueryClient } from 'react-query'
@@ -33,7 +33,7 @@ export default function ProtectedComponent({ children }) {
         throw new Error(error.response.data.message)
       }
     },
-    { retry: false, staleTime: Infinity },
+    { retry: false, staleTime: Infinity, retryOnMount: false, enabled: false },
   )
   const router = useRouter()
 
@@ -54,9 +54,8 @@ export default function ProtectedComponent({ children }) {
   }
 
   if (error) {
-    // if (router.pathname === '/sessions/[sid]') return <Details error={error.message} />
-    // return <Home />
-    return <h1>Alo</h1>
+    if (router.pathname === '/sessions/[sid]') return <Details error={error.message} />
+    return <Home />
   }
 
   return <>{children}</>
