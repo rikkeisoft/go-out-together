@@ -34,7 +34,7 @@ export default function ProtectedComponent({ children }) {
         throw new Error(error.response.data.message)
       }
     },
-    { retry: false },
+    { retryOnMount: false },
   )
   const router = useRouter()
 
