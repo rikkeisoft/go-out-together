@@ -33,16 +33,18 @@ export default function ProtectedComponent({ children }) {
         throw new Error(error.response.data.message)
       }
     },
-    { retryOnMount: false },
+    { retry: false },
   )
   const router = useRouter()
 
   useEffect(() => {
     if (!router.isReady) return
-    const pageAccessedByReload = window.performance.getEntriesByType('navigation')
-    if (pageAccessedByReload[0].type === 'reload') {
+    const isReloaded = sessionStorage.getItem('pageReloaded')
+    if (isReloaded) {
       sessionStorage.getItem('redirectURL') && sessionStorage.removeItem('redirectURL')
-    } else if (router.query.id === undefined && router.asPath !== '/') {
+    }
+    sessionStorage.setItem('pageReloaded', 'true')
+    if (router.query.id === undefined && router.asPath !== '/') {
       sessionStorage.setItem('redirectURL', router.asPath)
     } else if (router.query.id !== undefined && router.pathname === '/sessions/[sid]') {
       sessionStorage.setItem('redirectURL', `/sessions/${router.query.sid}`)
