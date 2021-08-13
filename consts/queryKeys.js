@@ -5,4 +5,5 @@ export default {
   CHECK_SESSION: 'checkSession',
   GET_SESSION_RESULT: 'getSessionResult',
   GET_ADDRESS: 'getAddress',
+  GET_OLD: 'getOldSessions',
 }
