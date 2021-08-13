@@ -131,7 +131,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
     voteSessionMutation.mutate({
       sid: sid,
       uid: cookies.uid,
-      address: data.votedAddress,
+      aid: data.votedAddress.aid,
     })
   }
 

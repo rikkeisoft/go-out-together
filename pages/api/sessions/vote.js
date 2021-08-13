@@ -6,12 +6,7 @@ import ApiException from 'exceptions/ApiException'
 const schema = yup.object().shape({
   sid: yup.string().required(),
   uid: yup.string().required(),
-  address: yup.object({
-    aid: yup.string().required(),
-    name: yup.string().required(),
-    latitude: yup.number().required(),
-    longitude: yup.number().required(),
-  }),
+  aid: yup.string().required(),
 })
 
 export default async function handler(req, res) {
@@ -20,10 +15,10 @@ export default async function handler(req, res) {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { sid, uid, address } = req.body
+    const { sid, uid, aid } = req.body
 
     try {
-      await schema.validate({ uid, sid, address })
+      await schema.validate({ uid, sid, aid })
     } catch (err) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
@@ -59,7 +54,7 @@ export default async function handler(req, res) {
     const sessionId = result[0].id
 
     queryString = `SELECT id FROM addresses WHERE aid = ?`
-    values = [address.aid]
+    values = [aid]
     try {
       result = await mysql.query(queryString, values)
     } catch (err) {
@@ -70,10 +65,10 @@ export default async function handler(req, res) {
       cleanUp(mysql)
       throw new ApiException(500, 'Không tìm thấy address')
     }
-    let addressId = result[0].id
+    const addressId = result[0].id
 
-    queryString = `SELECT session_id, address_id, user_id FROM session_address_user WHERE session_id = ? AND address_id = ? AND user_id = ?`
-    values = [sessionId, addressId, userId]
+    queryString = `SELECT session_id, user_id FROM session_address_user WHERE session_id = ? AND user_id = ?`
+    values = [sessionId, userId]
     try {
       result = await mysql.query(queryString, values)
     } catch (err) {
@@ -88,6 +83,16 @@ export default async function handler(req, res) {
       } catch (err) {
         cleanUp(mysql)
         throw new ApiException(500, 'Không thêm được bản ghi mới vào bảng session_address_user', err)
+      }
+    } else {
+      // update vote
+      queryString = `UPDATE session_address_user SET address_id = ? WHERE session_id = ? AND user_id = ?`
+      values = [addressId, sessionId, userId]
+      try {
+        result = await mysql.query(queryString, values)
+      } catch (err) {
+        cleanUp(mysql)
+        throw new ApiException(500, 'Không update được thông tin từ bảng session_address_user', err)
       }
     }
 
