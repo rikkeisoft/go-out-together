@@ -11,7 +11,8 @@ import { useQuery, useQueryClient } from 'react-query'
 export default function ProtectedComponent({ children }) {
   const [, , removeCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
   const queryClient = useQueryClient()
-  const { error, isLoading } = useQuery(queryKeys.CHECK_USER,
+  const { error, isLoading } = useQuery(
+    queryKeys.CHECK_USER,
     async () => {
       const state = queryClient.getQueryState(queryKeys.CHECK_USER)
       if (state?.data && (state?.data.isSignedOut || state?.data.isSignedIn)) {
