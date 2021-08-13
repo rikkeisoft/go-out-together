@@ -15,6 +15,11 @@ export const getSessionDetails = (data) => {
   return axiosClient.get(url)
 }
 
+export const getOldSessions = (data) => {
+  const url = `/sessions/get-old?uid=${data.uid}`
+  return axiosClient.get(url)
+}
+
 export const updateSessionAddresses = (data) => {
   const url = `/sessions/addresses/update`
   return axiosClient.post(url, data)

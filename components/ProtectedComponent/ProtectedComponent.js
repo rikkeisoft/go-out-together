@@ -11,7 +11,8 @@ import { useQuery, useQueryClient } from 'react-query'
 export default function ProtectedComponent({ children }) {
   const [, , removeCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
   const queryClient = useQueryClient()
-  const { error, isLoading } = useQuery(queryKeys.CHECK_USER,
+  const { error, isLoading } = useQuery(
+    queryKeys.CHECK_USER,
     async () => {
       const state = queryClient.getQueryState(queryKeys.CHECK_USER)
       if (state?.data && (state?.data.isSignedOut || state?.data.isSignedIn)) {
@@ -49,7 +50,7 @@ export default function ProtectedComponent({ children }) {
     } else if (router.query.id !== undefined && router.pathname === '/sessions/[sid]') {
       sessionStorage.setItem('redirectURL', `/sessions/${router.query.sid}`)
     } else return
-  }, [router.isReady])
+  }, [router.isReady, router.pathname])
 
   if (isLoading) {
     return <LoadingOverlay isOpen={isLoading} message="Vui lòng chờ..." />

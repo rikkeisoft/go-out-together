@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { useFormContext, Controller } from 'react-hook-form'
@@ -10,6 +10,14 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
   const { control, watch, setValue } = useFormContext()
   const [openPopup, setOpenPopup] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState(null)
+
+  useEffect(() => {
+    const votedAddress = localStorage.getItem('votedAddress')
+    if (votedAddress) {
+      setValue(name, JSON.parse(votedAddress), { shouldValidate: true })
+      setSelectedItemId(JSON.parse(votedAddress).id)
+    }
+  }, [])
 
   if (!_.isNil(watch(name)) && _.isNil(data.find((item) => item.aid === watch(name)?.aid))) {
     setValue(name, null, { shouldValidate: true })
@@ -40,6 +48,7 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
                           onSelect(item)
                         }}
                         checked={item.aid === value?.aid}
+                        disabled={item.id === selectedItemId}
                       />
                       {item.name} ({item.voteCount} người vote)
                     </label>
