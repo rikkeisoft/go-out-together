@@ -36,7 +36,7 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
       const getLocation = async () => {
         try {
           const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_API_MAPBOX}/${location}.json?proximity=105.75077611516895,20.999219111687964&bbox=105.28661775459875,20.561809950646023,106.01138933743641,21.386576932112078&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
+            `${process.env.NEXT_PUBLIC_API_MAPBOX}/${location}.json?proximity=105.75077611516895,20.999219111687964&bbox=105.57999631946717,20.86290687846366,105.91278669275977,21.162623422597193&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
           )
           const dataList = response.data.features
           setDataLocation(dataList)
@@ -114,7 +114,7 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
         <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
-      <h1 className="text-center font-semibold text-xl">Hãy chọn lựa chọn địa điểm ở Hà Nội</h1>
+      <h1 className="text-center font-semibold text-xl">Hãy chọn địa điểm ở Hà Nội</h1>
       <div className="w-80 mb-2 relative mx-auto w-4/5">
         {listLocation.length > 4 ? (
           <div className="flex justify-between">

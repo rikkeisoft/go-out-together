@@ -38,7 +38,7 @@ export default function Details({ error }) {
       stepElement = <Step2 sid={sid} prevStep={prevStep} nextStep={nextStep} />
       break
     case 3:
-      stepElement = <Step3 sid={sid} />
+      stepElement = <Step3 sid={sid} prevStep={prevStep} />
       break
     default:
       break

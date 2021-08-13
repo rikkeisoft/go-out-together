@@ -50,7 +50,7 @@ export default function ProtectedComponent({ children }) {
     } else if (router.query.id !== undefined && router.pathname === '/sessions/[sid]') {
       sessionStorage.setItem('redirectURL', `/sessions/${router.query.sid}`)
     } else return
-  }, [router.isReady])
+  }, [router.isReady, router.pathname])
 
   if (isLoading) {
     return <LoadingOverlay isOpen={isLoading} message="Vui lòng chờ..." />

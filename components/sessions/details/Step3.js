@@ -10,27 +10,48 @@ import { getSessionResult } from 'api/sessions'
 import Center from 'components/common/Center'
 import MessageText from 'components/common/MessageText'
 import LoadingOverlay from 'components/common/LoadingOverlay'
+import Button from 'components/common/Button'
 
-const Step3 = memo(({ sid }) => {
+const Step3 = memo(({ sid, prevStep }) => {
   const { isLoading, isSuccess, data, refetch } = useQuery([queryKeys.GET_SESSION_RESULT, { sid }], () =>
     getSessionResult({ sid }),
   )
+  const votedAddress = JSON.parse(localStorage.getItem('votedAddress'))
+
   let resultElement = <></>
   if (isSuccess && data.messageCode === messageCodes.SUCCESS) {
     if (data.data?.expireTime) {
       resultElement = (
         <Center>
+          {votedAddress && (
+            <h4 className="text-xl my-3 font-semibold">
+              Bạn đã vote cho địa điểm: <span className="text-2xl font-bold text-red-500">{votedAddress.name}</span>
+            </h4>
+          )}
           <MessageText>
-            Vui lòng đợi kết quả sau:
-            <Countdown date={new Date(data.data.expireTime)} onComplete={refetch} />
+            Đợi kết quả sau:{' '}
+            <span className="text-red-500 text-2xl">
+              <Countdown
+                date={new Date(data.data.expireTime)}
+                onComplete={() => {
+                  refetch()
+                  localStorage.removeItem('votedAddress')
+                }}
+              />
+            </span>
           </MessageText>
+          <Button type="button" variant="danger" onClick={prevStep}>
+            Chọn lại
+          </Button>
         </Center>
       )
     } else {
       if (_.isNil(data.data.addresses)) {
         resultElement = (
           <Center>
-            <MessageText>Không có địa điểm nào được vote</MessageText>
+            <MessageText>
+              <span className="text-red-500">Không có địa điểm nào được vote</span>
+            </MessageText>
           </Center>
         )
       } else {
@@ -39,7 +60,7 @@ const Step3 = memo(({ sid }) => {
             <MessageText>
               Địa điểm được vote nhiều nhất là
               {data.data.addresses.map((address) => (
-                <p key={address[0].aid}>
+                <p key={address[0].aid} className="text-red-500">
                   {address[0].name} ({data.data.voters} người vote)
                 </p>
               ))}
