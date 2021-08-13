@@ -128,11 +128,17 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   })
 
   const onSubmit = (data) => {
-    voteSessionMutation.mutate({
-      sid: sid,
-      uid: cookies.uid,
-      aid: data.votedAddress.aid,
-    })
+    const prevVotedAddress = JSON.parse(localStorage.getItem('votedAddress'))
+    if (prevVotedAddress && prevVotedAddress.id === data.votedAddress.id) {
+      nextStep()
+    } else {
+      localStorage.setItem('votedAddress', JSON.stringify(data.votedAddress))
+      voteSessionMutation.mutate({
+        sid: sid,
+        uid: cookies.uid,
+        aid: data.votedAddress.aid,
+      })
+    }
   }
 
   const handleOnAddLocation = async (newLocations) => {
