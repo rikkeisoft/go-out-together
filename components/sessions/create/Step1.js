@@ -18,7 +18,7 @@ import ErrorText from 'components/common/ErrorText'
 import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MapBox from 'components/common/MapBox'
-// import LoadingOverlay from 'components/common/LoadingOverlay'
+import LoadingOverlay from 'components/common/LoadingOverlay'
 import SmallTitle from 'components/common/SmallTitle'
 
 const schema = yup.object().shape({
@@ -123,7 +123,9 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
                   </Button> */}
                   
       {isToggleView ? (
+          <div className=" ml-32 w-5/6 mt-10   transition duration-500">
         <SmallTitle>Session cũ</SmallTitle>
+        </div>
       ) : (
 
       showMap ? (
@@ -180,10 +182,11 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
         </div>
         //  <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
       )
-      // <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
       )}
       { isToggleView ? (
-                  <ButtonGroup>
+
+                <div className=" ml-32 w-5/6 mt-10   transition duration-500">
+                 <div className=" mr-24 flex justify-end">
                   <Button
                                 type="button"
                                 variant="primary"
@@ -191,7 +194,8 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
                               >
                                 <p>Tạo session mới</p>
                               </Button>
-                          </ButtonGroup>
+                  </div>
+                </div>
       ) : null }
       {/* <ButtonGroup>
       <Button
@@ -202,6 +206,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
                     <p>Tạo session mới</p>
                   </Button>
               </ButtonGroup> */}
+    <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
     </>
   )
 })
