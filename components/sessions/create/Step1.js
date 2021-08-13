@@ -18,7 +18,8 @@ import ErrorText from 'components/common/ErrorText'
 import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MapBox from 'components/common/MapBox'
-import LoadingOverlay from 'components/common/LoadingOverlay'
+// import LoadingOverlay from 'components/common/LoadingOverlay'
+import SmallTitle from 'components/common/SmallTitle'
 
 const schema = yup.object().shape({
   name: yup.string().required('Nhập vào tên'),
@@ -34,6 +35,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   const [cookies] = useCookies()
   const [showMap, setShowMap] = useState(false)
   const [userLocation, setUserLocation] = useState(null)
+  const [isToggleView, setIsToggleView] = useState(true)
 
   const updateSessionCreatorMutation = useMutation(updateSessionCreator)
 
@@ -108,11 +110,23 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
 
   return (
     <>
-      <Head>
+     <Head>
         <title>Bước 1</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {showMap ? (
+      {/* <Button
+                    type="button"
+                    variant="primary"
+                    onClick={() => setIsToggleView(!isToggleView)}
+                  >
+                    <p>Tạo session mới</p>
+                  </Button> */}
+                  
+      {isToggleView ? (
+        <SmallTitle>Session cũ</SmallTitle>
+      ) : (
+
+      showMap ? (
         <MapBox
           isOneLocaion={true}
           data={(data) => {
@@ -164,8 +178,30 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
             </form>
           </FormProvider>
         </div>
+        //  <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
+      )
+      // <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
       )}
-      <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
+      { isToggleView ? (
+                  <ButtonGroup>
+                  <Button
+                                type="button"
+                                variant="primary"
+                                onClick={() => setIsToggleView(!isToggleView)}
+                              >
+                                <p>Tạo session mới</p>
+                              </Button>
+                          </ButtonGroup>
+      ) : null }
+      {/* <ButtonGroup>
+      <Button
+                    type="button"
+                    variant="primary"
+                    onClick={() => setIsToggleView(!isToggleView)}
+                  >
+                    <p>Tạo session mới</p>
+                  </Button>
+              </ButtonGroup> */}
     </>
   )
 })
