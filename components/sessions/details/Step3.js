@@ -11,12 +11,14 @@ import Center from 'components/common/Center'
 import MessageText from 'components/common/MessageText'
 import LoadingOverlay from 'components/common/LoadingOverlay'
 import Button from 'components/common/Button'
+import { useRouter } from 'next/router'
 
-const Step3 = memo(({ sid, prevStep }) => {
+const Step3 = memo(({ sid, prevStep, setFormData }) => {
   const { isLoading, isSuccess, data, refetch } = useQuery([queryKeys.GET_SESSION_RESULT, { sid }], () =>
     getSessionResult({ sid }),
   )
   const votedAddress = JSON.parse(localStorage.getItem('votedAddress'))
+  const router = useRouter()
 
   let resultElement = <></>
   if (isSuccess && data.messageCode === messageCodes.SUCCESS) {
@@ -65,6 +67,16 @@ const Step3 = memo(({ sid, prevStep }) => {
                 </p>
               ))}
             </MessageText>
+            <Button
+              type="button"
+              variant="primary"
+              onClick={() => {
+                setFormData()
+                router.replace('/sessions/create')
+              }}
+            >
+              Tạo nhóm mới
+            </Button>
           </Center>
         )
       }
