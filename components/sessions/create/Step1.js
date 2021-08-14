@@ -22,6 +22,8 @@ import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MapBox from 'components/common/MapBox'
 import LoadingOverlay from 'components/common/LoadingOverlay'
+import DetailIcon from 'components/icons/DetailIcon'
+import Popup from 'components/common/Popup'
 
 const schema = yup.object().shape({
   name: yup.string().required('Nhập vào tên'),
@@ -38,7 +40,10 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   const [showMap, setShowMap] = useState(false)
   const [userLocation, setUserLocation] = useState(null)
   const [isToggleView, setIsToggleView] = useState(true)
-  const [isModalView, setIsModalView] = useState(true)
+  const [openPopup, setOpenPopup] = useState(false)
+  const [idDetail, setIdDetail] = useState('')
+  // const [isModalView, setIsModalView] = useState(true)
+  console.log(idDetail)
 
   const updateSessionCreatorMutation = useMutation(updateSessionCreator)
 
@@ -46,9 +51,10 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
     name: cookies.username,
   })
   const uid = cookies.uid
-  const { data: oldSessions } = useQuery([queryKeys.GET_OLD, { uid }], () => getOldSessions({ uid }), { retry: 1 })
+  const { data: oldSessions, isLoading } = useQuery([queryKeys.GET_OLD, { uid }], () => getOldSessions({ uid }), {
+    retry: 1,
+  })
   console.log(oldSessions)
-
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: defaultValues,
@@ -84,111 +90,156 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
     }
   }, [updateSessionCreatorMutation.isSuccess])
 
+  let itemDetail = {}
+  if (idDetail) {
+    const findIdex = oldSessions?.data.findIndex((item) => item.id === idDetail)
+    if (findIdex > -1) {
+      itemDetail = oldSessions?.data[findIdex]
+    }
+  }
+
   return (
     <>
       <Head>
         <title>Bước 1</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {isModalView ? (
-        isToggleView ? (
-          <div className=" mt-14 w-4/6 bg-white mt-2/5 mx-auto px-10 py-10 rounded-xl font-bold">
-            {oldSessions?.data.length !== 0 &&
-              oldSessions?.data.map((item) => (
-                <tr key={item.uid}>
-                  <td> Link group tham gia:{item.sid}</td>
-                  <td> Tiêu đề:{item.title}</td>
-                  <td> Nội dung:{item.content}</td>
-                  <td> Kết quả vote: {item.result}</td>
+      {isToggleView ? (
+        <>
+          <div className="flex justify-center text-xl font-bold">Thông tin các nhóm đã tham gia</div>
+          <div className="w-8/12 mt-8 mx-auto border-gray-200">
+            <table className="min-w-full bg-white border-r text-center">
+              <thead className="bg-gray-800 text-white ">
+                <tr className=" sm:table-row  ">
+                  <th className="w-2/6   py-3 px-4 uppercase font-semibold text-sm border-r">ID Nhóm</th>
+                  <th className="w-3/5  py-3 px-4 uppercase font-semibold text-sm border-r">Tiêu đề</th>
+                  <th className="w-1/6  py-3 px-4 uppercase font-semibold text-sm border-r"></th>
                 </tr>
-              ))}
+              </thead>
+              <tbody className="text-gray-700">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={3}>
+                      <div className="flex justify-center items-center py-3">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  oldSessions?.data.length !== 0 &&
+                  oldSessions?.data.map((item, index) => (
+                    <tr className=" sm:table-row border" key={index}>
+                      <td className="p-3 border-r"> {item.sid}</td>
+                      <td className="p-3 border-r"> {item.title}</td>
+                      <td className="p-3 border-r">
+                        <span
+                          title="Chi tiết"
+                          className="cursor-pointer"
+                          onClick={() => {
+                            setIdDetail(item.id)
+                            setOpenPopup(true)
+                          }}
+                        >
+                          <DetailIcon />
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+            <ButtonGroup>
+              <Button type="submit" variant="primary" onClick={() => setIsToggleView(!isToggleView)}>
+                Tạo nhóm
+              </Button>
+            </ButtonGroup>
           </div>
-        ) : showMap ? (
-          <MapBox
-            isOneLocaion={true}
-            data={(data) => {
-              console.log(data)
-              setUserLocation(data)
-            }}
-            show={() => {
-              setShowMap(false)
-            }}
-          />
-        ) : (
-          <div className="w-full px-3 py-6 md:mt-14 md:w-6/12 md:mt-2/5 md:mx-auto md:px-10 md:py-10 font-bold">
-            <FormProvider {...methods}>
-              <form onSubmit={methods.handleSubmit(onSubmit)}>
-                <Field>
-                  <Label htmlFor="name">
-                    <p className="mb-2">Tên:</p>
-                  </Label>
-                  <TextField id="name" name="name" />
-                  <ErrorMessage
-                    errors={methods.formState.errors}
-                    name="name"
-                    render={({ message }) => <ErrorText>{message}</ErrorText>}
-                  />
-                </Field>
+          {/* <div className="flex justify-center">
+          </div> */}
+        </>
+      ) : showMap ? (
+        <MapBox
+          isOneLocaion={true}
+          data={(data) => {
+            console.log(data)
+            setUserLocation(data)
+          }}
+          show={() => {
+            setShowMap(false)
+          }}
+        />
+      ) : (
+        <div className=" mt-14 w-6/12 mt-2/5 mx-auto px-10 py-15 font-bold">
+          <FormProvider {...methods}>
+            <form onSubmit={methods.handleSubmit(onSubmit)}>
+              <Field>
+                <Label htmlFor="name">
+                  <p className="mb-2">Tên:</p>
+                </Label>
+                <TextField id="name" name="name" />
+                <ErrorMessage
+                  errors={methods.formState.errors}
+                  name="name"
+                  render={({ message }) => <ErrorText>{message}</ErrorText>}
+                />
+              </Field>
 
-                <Field>
-                  <Label htmlFor="address">Địa điểm hiện tại của bạn:</Label>
-                  <div className="py-2 mb-6">
-                    <Button
-                      type="button"
-                      variant="primary"
-                      onClick={() => {
-                        setShowMap(true)
-                      }}
-                    >
-                      <p>Chọn địa điểm trên bản đồ</p>
-                    </Button>
-                  </div>
-                  <AddressField name="address" />
-                  {!_.isNil(methods.formState.errors.address) && <ErrorText>Nhập vào địa chỉ</ErrorText>}
-                </Field>
-
+              <Field>
+                <Label htmlFor="address">Địa điểm hiện tại của bạn:</Label>
+                <div className="py-2 mb-6">
+                  <Button type="button" variant="primary" onClick={() => setShowMap(true)}>
+                    <p>Chọn địa điểm trên bản đồ</p>
+                  </Button>
+                </div>
+                <AddressField name="address" />
+                {!_.isNil(methods.formState.errors.address) && <ErrorText>Nhập vào địa chỉ</ErrorText>}
+              </Field>
+              <div className="  mx-auto flex justify-between">
                 <ButtonGroup>
-                  <Button type="submit" variant="primary" onClick={() => {}}>
-                    Tiếp theo
+                  <Button type="button" variant="primary" onClick={() => setIsToggleView(!isToggleView)}>
+                    {isToggleView ? 'Tạo nhóm' : 'Quay lại'}
                   </Button>
                 </ButtonGroup>
-              </form>
-            </FormProvider>
-          </div>
-          //  <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
-        )
-      ) : (
-        <div className=" mt-14 w-4/6 bg-white rounded-xl mt-2/5 mx-auto px-10 py-10 ">
-          <p className="font-bold">Danh sách các session đã tham gia: </p>
-          <table className=" mx-auto border-collapse border border-black mt-4 ">
-            <thead>
-              <tr>
-                <th className="border border-black w-1/2">Group ID</th>
-                <th className="border border-black w-1/2 ">Title</th>
-              </tr>
-            </thead>
-            <tbody>
-              {oldSessions?.data.length !== 0 &&
-                oldSessions?.data.map((item) => (
-                  <tr key={item.uid}>
-                    <td className="border border-black w-10 text-center"> {item.sid}</td>
-                    <td className="border border-black w-10 text-center"> {item.title}</td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+                {!isToggleView ? (
+                  <ButtonGroup>
+                    <Button type="submit" variant="primary" onClick={() => {}}>
+                      Tiếp theo
+                    </Button>
+                  </ButtonGroup>
+                ) : null}
+              </div>
+            </form>
+          </FormProvider>
         </div>
       )}
-      <div className=" mt-4 mx-auto w-4/6 flex justify-between">
-        <Button type="button" variant="primary" onClick={() => setIsModalView(!isModalView)}>
-          {isModalView ? 'List' : 'Chi tiết'}
-        </Button>
-        {isToggleView ? (
-          <Button type="button" variant="primary" onClick={() => setIsToggleView(!isToggleView)}>
-            <p>Tạo session mới</p>
-          </Button>
-        ) : null}
-      </div>
+      {idDetail ? (
+        <Popup isOpen={openPopup} onRequestClose={() => setOpenPopup(false)}>
+          <div className="bg-black text-white  font-bold text-center py-2 mb-2">Thông tin của sessions</div>
+          <div>
+            <p>
+              <span className="font-bold mr-2">Tiêu đề:</span>
+              {itemDetail.title}
+            </p>
+            <p>
+              <span className="font-bold mr-2">Nội dung:</span>
+              {itemDetail.content}
+            </p>
+            <p>
+              <span className="font-bold mr-2">ID Nhóm:</span>
+              {itemDetail.sid}
+            </p>
+            <p>
+              <span className="font-bold mr-2">Kết quả vote:</span>
+              {itemDetail.result || '---'}
+            </p>
+          </div>
+          <div className="flex justify-end mt-2">
+            <Button variant="dark" type="button" onClick={() => setOpenPopup(false)}>
+              Đóng
+            </Button>
+          </div>
+        </Popup>
+      ) : null}
       <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
     </>
   )
@@ -199,7 +250,6 @@ Step1.propTypes = {
   setFormData: PropTypes.func,
   nextStep: PropTypes.func,
 }
-
 Step1.defaultProps = {}
 
 export default Step1

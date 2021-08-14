@@ -7,6 +7,8 @@ const Button = memo(({ type, variant, children, onClick, disabled }) => {
     className += ' bg-blue-500 hover:bg-blue-400'
   } else if (variant === 'danger') {
     className += ' bg-red-500 hover:bg-red-400'
+  } else if (variant === 'dark') {
+    className += ' bg-gray-900 hover:bg-gray-900'
   }
 
   return (
