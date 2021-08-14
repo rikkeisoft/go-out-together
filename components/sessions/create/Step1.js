@@ -83,6 +83,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
       }
     }
   }, [updateSessionCreatorMutation.isSuccess])
+
   return (
     <>
       <Head>
@@ -114,7 +115,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
             }}
           />
         ) : (
-          <div className=" mt-14 w-6/12 mt-2/5 mx-auto px-10 py-10 font-bold">
+          <div className="w-full px-3 py-6 md:mt-14 md:w-6/12 md:mt-2/5 md:mx-auto md:px-10 md:py-10 font-bold">
             <FormProvider {...methods}>
               <form onSubmit={methods.handleSubmit(onSubmit)}>
                 <Field>
@@ -158,7 +159,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
         )
       ) : (
         <div className=" mt-14 w-4/6 bg-white rounded-xl mt-2/5 mx-auto px-10 py-10 ">
-        <p className="font-bold">Danh sách các session đã tham gia: </p>
+          <p className="font-bold">Danh sách các session đã tham gia: </p>
           <table className=" mx-auto border-collapse border border-black mt-4 ">
             <thead>
               <tr>
@@ -180,14 +181,13 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
       )}
       <div className=" mt-4 mx-auto w-4/6 flex justify-between">
         <Button type="button" variant="primary" onClick={() => setIsModalView(!isModalView)}>
-        {isModalView ? 'List' : 'Chi tiết'}
+          {isModalView ? 'List' : 'Chi tiết'}
         </Button>
         {isToggleView ? (
           <Button type="button" variant="primary" onClick={() => setIsToggleView(!isToggleView)}>
             <p>Tạo session mới</p>
           </Button>
-        ) : 
-        null}
+        ) : null}
       </div>
       <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
     </>

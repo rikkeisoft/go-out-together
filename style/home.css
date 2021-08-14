@@ -8,3 +8,15 @@
   background-position: center;
   background-repeat: no-repeat;
 }
+
+.popup-direction {
+  width: 800px;
+}
+
+@media only screen and (max-width: 768px) {
+  .popup-direction {
+    width: 100%;
+    font-size: 0.875rem;
+    height: 85vh;
+  }
+}

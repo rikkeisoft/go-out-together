@@ -7,7 +7,7 @@ import homeBgSrc from 'public/assets/images/homeBg.svg'
 
 const Container = memo(({ children }) => {
   return (
-    <BackgroundImage src={ homeBgSrc}>
+    <BackgroundImage src={homeBgSrc}>
       <div className="container top-0  mx-auto p-2">{children}</div>
     </BackgroundImage>
   )
