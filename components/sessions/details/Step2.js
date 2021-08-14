@@ -191,9 +191,9 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
       <LoadingOverlay isOpen={isLoading} message="Đang lấy thông tin session..." />
 
       {!showMap && isSuccess && data.messageCode === messageCodes.SUCCESS && (
-        <div className=" ml-32 w-5/6 mt-10   transition duration-500">
-          <div className="flex justify-between border-b-2 border-fuchsia-600  px-10 pt-6">
-            <div>
+        <div className="p-1 md:mx-auto w-full md:w-5/6 md:mt-10 transition duration-500">
+          <div className="flex flex-col lg:flex-row lg:justify-between border-b-2 border-fuchsia-600 md:px-10 pt-6">
+            <div className="flex justify-between">
               <MessageText>Tiêu đề: {data.data.title}</MessageText>
               <MessageText>Nội dung: {data.data.content}</MessageText>
             </div>
@@ -234,11 +234,11 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
               )}
             </Popup>
           </div>
-          <div className="px-20 pt-4">
+          <div className="px-1 pt-4">
             <FormProvider {...methods}>
               <form onSubmit={methods.handleSubmit(onSubmit)}>
                 {data.data.addresses.length >= 5 ? (
-                  <p className="text-white text-xl">Chỉ giới hạn tối đa 5 địa điểm!</p>
+                  <p className="text-red-500 text-xl">Chỉ giới hạn tối đa 5 địa điểm!</p>
                 ) : (
                   <Button
                     type="button"

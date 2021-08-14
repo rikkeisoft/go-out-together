@@ -115,7 +115,7 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
       <h1 className="text-center font-semibold text-xl">Hãy chọn địa điểm ở Hà Nội</h1>
-      <div className="w-80 mb-2 relative mx-auto w-4/5">
+      <div className="w-full md:w-4/5 px-2 mb-2 relative mx-auto">
         {listLocation.length > 4 ? (
           <div className="flex justify-between">
             <p className="text-red-500">Chỉ được tạo tối đa 5 địa điểm !</p>
@@ -138,12 +138,12 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
           <>
             {listAddress && (
               <>
+                <p className="text-center">Bạn chỉ được nhập tối đa {5 - listAddress.length} địa chỉ</p>
                 {isOneLocaion
-                  ? listAddress.length + 1 >= 5 && <p className="text-red-500">There are only 5 addresses total!</p>
+                  ? listAddress.length + 1 >= 5 && <p className="text-red-500">Đã đủ 5 địa chỉ!!</p>
                   : listAddress.length + listLocation.length >= 5 && (
-                      <p className="text-red-500">There are only 5 addresses total!</p>
+                      <p className="my-1 text-red-500">Đã đủ 5 địa chỉ!!</p>
                     )}
-                <p>Bạn cần nhập {5 - listAddress.length} địa chỉ</p>
                 <ul className="my-3">
                   {listLocation.length !== 0 && <span>Danh sách địa điểm được thêm vào: </span>}
                   {listLocation.map((location) => (
@@ -171,37 +171,39 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
                 </ul>
               </>
             )}
-            <form className="mb-2 relative">
-              <input
-                type="text"
-                value={location || ''}
-                className="w-80 p-2 pr-10 inline outline-none border border-gray-400 whitespace-nowrap overflow-hidden overflow-ellipsis"
-                placeholder="Nhập địa chỉ của bạn"
-                onChange={(event) => {
-                  setLocation(event.target.value)
-                  setShowListLocation(true)
-                }}
-              />
-              <span
-                className="absolute top-1.5 left-72"
-                onClick={() => {
-                  setLocation('')
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 inline"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+            <form className="mb-4 flex flex-col-reverse items-center md:flex-row md:justify-between">
+              <div className="relative w-full md:w-80 bg-white border md:border-0 border-gray-400">
+                <input
+                  type="text"
+                  value={location || ''}
+                  className="w-11/12 md:w-80 p-2 pr-10 inline outline-none whitespace-nowrap overflow-hidden overflow-ellipsis"
+                  placeholder="Nhập địa chỉ của bạn"
+                  onChange={(event) => {
+                    setLocation(event.target.value)
+                    setShowListLocation(true)
+                  }}
+                />
+                <span
+                  className="absolute top-1.5 md:left-72"
+                  onClick={() => {
+                    setLocation('')
+                  }}
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </span>
-              <div className="absolute inline-block right-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 inline"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div className="mb-2 md:mb-0">
                 <Button
                   type="submit"
                   variant="primary"
