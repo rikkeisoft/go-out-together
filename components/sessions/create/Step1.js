@@ -42,8 +42,6 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   const [isToggleView, setIsToggleView] = useState(true)
   const [openPopup, setOpenPopup] = useState(false)
   const [idDetail, setIdDetail] = useState('')
-  // const [isModalView, setIsModalView] = useState(true)
-  console.log(idDetail)
 
   const updateSessionCreatorMutation = useMutation(updateSessionCreator)
 
@@ -54,7 +52,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   const { data: oldSessions, isLoading } = useQuery([queryKeys.GET_OLD, { uid }], () => getOldSessions({ uid }), {
     retry: 1,
   })
-  console.log(oldSessions)
+  
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: defaultValues,
@@ -129,7 +127,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
                   oldSessions?.data.length !== 0 &&
                   oldSessions?.data.map((item, index) => (
                     <tr className=" sm:table-row border" key={index}>
-                      <td className="p-3 border-r"> {item.sid}</td>
+                      <td className="p-3 border-r whitespace-nowrap overflow-hidden overflow-ellipsis"> {item.sid}</td>
                       <td className="p-3 border-r"> {item.title}</td>
                       <td className="p-3 border-r">
                         <span
@@ -154,8 +152,6 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
               </Button>
             </ButtonGroup>
           </div>
-          {/* <div className="flex justify-center">
-          </div> */}
         </>
       ) : showMap ? (
         <MapBox
@@ -169,7 +165,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
           }}
         />
       ) : (
-        <div className=" mt-14 w-6/12 mt-2/5 mx-auto px-10 py-15 font-bold">
+        <div className="w-full px-3 py-6 md:mt-14 md:w-6/12 md:mt-2/5 md:mx-auto md:px-10 md:py-10 font-bold">
           <FormProvider {...methods}>
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <Field>
