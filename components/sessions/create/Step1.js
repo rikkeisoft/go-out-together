@@ -52,7 +52,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   const { data: oldSessions, isLoading } = useQuery([queryKeys.GET_OLD, { uid }], () => getOldSessions({ uid }), {
     retry: 1,
   })
-  
+
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: defaultValues,
@@ -104,14 +104,14 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
       </Head>
       {isToggleView ? (
         <>
-          <div className="flex justify-center text-xl font-bold">Thông tin các nhóm đã tham gia</div>
-          <div className="w-8/12 mt-8 mx-auto border-gray-200">
-            <table className="min-w-full bg-white border-r text-center">
-              <thead className="bg-gray-800 text-white ">
-                <tr className=" sm:table-row  ">
-                  <th className="w-2/6   py-3 px-4 uppercase font-semibold text-sm border-r">ID Nhóm</th>
-                  <th className="w-3/5  py-3 px-4 uppercase font-semibold text-sm border-r">Tiêu đề</th>
-                  <th className="w-1/6  py-3 px-4 uppercase font-semibold text-sm border-r"></th>
+          <div className="text-center text-xl font-bold">Thông tin các nhóm đã tham gia</div>
+          <div className="md:w-8/12 mt-8 mx-auto border-gray-200">
+            <table className="min-w-full break-all bg-white border-r text-center table-auto">
+              <thead className="bg-gray-800 text-white">
+                <tr className="sm:table-row">
+                  <th className="w-2/6 py-3 px-4 uppercase font-semibold text-sm border-r">ID Nhóm</th>
+                  <th className="w-3/6 py-3 px-4 uppercase font-semibold text-sm border-r">Tiêu đề</th>
+                  <th className="w-1/6 py-3 px-4 uppercase font-semibold text-sm border-r"></th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
@@ -126,9 +126,9 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
                 ) : (
                   oldSessions?.data.length !== 0 &&
                   oldSessions?.data.map((item, index) => (
-                    <tr className=" sm:table-row border" key={index}>
-                      <td className="p-3 border-r whitespace-nowrap overflow-hidden overflow-ellipsis"> {item.sid}</td>
-                      <td className="p-3 border-r"> {item.title}</td>
+                    <tr className="sm:table-row border" key={index}>
+                      <td className="p-3 border-r">{item.sid}</td>
+                      <td className="p-3 border-r">{item.title}</td>
                       <td className="p-3 border-r">
                         <span
                           title="Chi tiết"
