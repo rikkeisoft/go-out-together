@@ -18,7 +18,9 @@ import {
   updateSessionAddresses,
   deleteSessionAddress,
   voteSession,
+  getSessionResult,
 } from 'api/sessions'
+import Center from 'components/common/Center'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
 import ErrorText from 'components/common/ErrorText'
@@ -31,6 +33,7 @@ import LoadingOverlay from 'components/common/LoadingOverlay'
 import DirectionRoutes from 'components/common/DirectionRoutes'
 import socketIOClient from 'socket.io-client'
 import Popup from 'components/common/Popup'
+import { useRouter } from 'next/router'
 
 const socket = socketIOClient(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
 
@@ -46,13 +49,16 @@ const schema = yup.object().shape({
 const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const [cookies] = useCookies(['uid'])
   const [showMap, setShowMap] = useState(false)
+  // const [idDetail, setIdDetail] = useState('')
   // const [isOpen, setIsOpen] = useState(false)
   const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
   const [voteAddress, setVoteAddress] = useState(null)
+  // const [timeVote,setTimeVote] = useState('')
   const [locations, setLocations] = useState({
     userLocation: {},
     listUserLocation: [],
   })
+  const { data: voteResult } = useQuery([queryKeys.GET_SESSION_RESULT, { sid }], () => getSessionResult({ sid }))
 
   const queryClient = useQueryClient()
   const { isLoading: isLoadingList, mutateAsync } = useMutation((address) => updateSessionAddresses(address), {
@@ -99,7 +105,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   })
 
   const { isLoading, isSuccess, data } = useQuery([queryKeys.CHECK_SESSION, { sid }], () => getSessionDetails({ sid }))
-
   // socketio
   useEffect(() => {
     // new user come
@@ -169,6 +174,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
       console.error(error)
     }
   }
+  const router = useRouter()
 
   return (
     <>
@@ -272,22 +278,45 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     </ErrorText>
                   )}
                 </Field>
-                <ButtonGroup>
-                  <Button
-                    type="button"
-                    variant="danger"
-                    onClick={() => {
-                      prevStep()
-                    }}
-                  >
-                    Trước đó
-                  </Button>
+                {new Date(data.data.expireTime).getTime() > new Date().getTime() ? (
+                  <ButtonGroup>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      onClick={() => {
+                        prevStep()
+                      }}
+                    >
+                      Trước đó
+                    </Button>
 
-                  <Button type="submit" variant="primary">
-                    Tiếp theo
-                  </Button>
-                  <LoadingOverlay isOpen={voteSessionMutation.isLoading} message="Đang xử lí..." />
-                </ButtonGroup>
+                    <Button type="submit" variant="primary">
+                      Tiếp theo
+                    </Button>
+                    <LoadingOverlay isOpen={voteSessionMutation.isLoading} message="Đang xử lí..." />
+                  </ButtonGroup>
+                ) : (
+                  <Center>
+                    <MessageText>
+                      Địa điểm được vote nhiều nhất 
+                      { voteResult?.data?.length !== 0 && voteResult?.data?.addresses?.map((address) => (
+                        <p key={address[0].aid} className="text-red-500">
+                          {address[0].name} ({voteResult.data.voters} người vote)
+                        </p>
+                      ))||'---'}
+
+                    </MessageText>
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={() => {
+                        router.replace('/sessions/create')
+                      }}
+                    >
+                      Back
+                    </Button>
+                  </Center>
+                )}
               </form>
             </FormProvider>
           </div>

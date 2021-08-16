@@ -23,7 +23,8 @@ import Button from 'components/common/Button'
 import MapBox from 'components/common/MapBox'
 import LoadingOverlay from 'components/common/LoadingOverlay'
 import DetailIcon from 'components/icons/DetailIcon'
-import Popup from 'components/common/Popup'
+// import Popup from 'components/common/Popup'
+import { useRouter } from 'next/router'
 
 const schema = yup.object().shape({
   name: yup.string().required('Nhập vào tên'),
@@ -40,8 +41,8 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   const [showMap, setShowMap] = useState(false)
   const [userLocation, setUserLocation] = useState(null)
   const [isToggleView, setIsToggleView] = useState(true)
-  const [openPopup, setOpenPopup] = useState(false)
-  const [idDetail, setIdDetail] = useState('')
+  // // const [openPopup, setOpenPopup] = useState(false)
+  // const [idDetail, setIdDetail] = useState('')
 
   const updateSessionCreatorMutation = useMutation(updateSessionCreator)
 
@@ -87,14 +88,15 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
       }
     }
   }, [updateSessionCreatorMutation.isSuccess])
+  const router = useRouter()
 
-  let itemDetail = {}
-  if (idDetail) {
-    const findIdex = oldSessions?.data.findIndex((item) => item.id === idDetail)
-    if (findIdex > -1) {
-      itemDetail = oldSessions?.data[findIdex]
-    }
-  }
+  // let itemDetail = {}
+  // if (idDetail) {
+  //   const findIdex = oldSessions?.data.findIndex((item) => item.id === idDetail)
+  //   if (findIdex > -1) {
+  //     itemDetail = oldSessions?.data[findIdex]
+  //   }
+  // }
 
   return (
     <>
@@ -134,8 +136,9 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
                           title="Chi tiết"
                           className="cursor-pointer"
                           onClick={() => {
-                            setIdDetail(item.id)
-                            setOpenPopup(true)
+                            router.replace(`/sessions/${item.sid}`)
+                            // setIdDetail(item.id)
+                            // setOpenPopup(true)
                           }}
                         >
                           <DetailIcon />
@@ -208,7 +211,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
           </FormProvider>
         </div>
       )}
-      {idDetail ? (
+      {/* {idDetail ? (
         <Popup isOpen={openPopup} onRequestClose={() => setOpenPopup(false)}>
           <div className="bg-black text-white  font-bold text-center py-2 mb-2">Thông tin của sessions</div>
           <div>
@@ -235,7 +238,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
             </Button>
           </div>
         </Popup>
-      ) : null}
+      ) : null} */}
       <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
     </>
   )
