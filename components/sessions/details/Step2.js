@@ -193,7 +193,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
       {!showMap && isSuccess && data.messageCode === messageCodes.SUCCESS && (
         <div className="p-1 md:mx-auto w-full md:w-5/6 md:mt-10 transition duration-500">
           <div className="flex flex-col lg:flex-row lg:justify-between border-b-2 border-fuchsia-600 md:px-10 pt-6">
-            <div className="flex justify-between">
+            <div>
               <MessageText>Tiêu đề: {data.data.title}</MessageText>
               <MessageText>Nội dung: {data.data.content}</MessageText>
             </div>
