@@ -195,16 +195,18 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
         />
       )}
       <LoadingOverlay isOpen={isLoading} message="Đang lấy thông tin session..." />
-      { !(new Date(data?.data?.expireTime).getTime() > new Date().getTime()) ? (
-         <Center>
+      {!(new Date(data?.data?.expireTime).getTime() > new Date().getTime()) ? (
+        <Center>
           <MessageText>
-          <p className="mt-3">Địa điểm được vote nhiều nhất</p>
-          { voteResult?.data?.length !== 0 && voteResult?.data?.addresses?.map((address) => (
-            <p key={address[0].aid} className="text-red-500 mt-2">
-              {address[0].name} ({voteResult.data.voters} người vote)
-            </p>
-          )) || '---'}
-        </MessageText>
+            <p className="mt-3">Địa điểm được vote nhiều nhất</p>
+            {(voteResult?.data?.length !== 0 &&
+              voteResult?.data?.addresses?.map((address) => (
+                <p key={address[0].aid} className="text-red-500 mt-2">
+                  {address[0].name} ({voteResult.data.voters} người vote)
+                </p>
+              ))) ||
+              '---'}
+          </MessageText>
         </Center>
       ) : null}
       {!showMap && isSuccess && data.messageCode === messageCodes.SUCCESS && (
@@ -215,18 +217,22 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
               <MessageText>Nội dung: {data.data.content}</MessageText>
             </div>
             <div>
-              <MessageText>
-                Vote sẽ kết thúc sau:
-                <span className="text-red-500 ml-1">
-                  <Countdown
-                    date={new Date(data.data.expireTime)}
-                    onComplete={() => {
-                      alert('Rất tiếc , đã hết thời gian vote')
-                      nextStep()
-                    }}
-                  />
-                </span>
-              </MessageText>
+              {new Date(data?.data?.expireTime).getTime() > new Date().getTime() ? (
+                <MessageText>
+                  Vote sẽ kết thúc sau:
+                  <span className="text-red-500 ml-1">
+                    <Countdown
+                      date={new Date(data.data.expireTime)}
+                      onComplete={() => {
+                        alert('Rất tiếc , đã hết thời gian vote')
+                        nextStep()
+                      }}
+                    />
+                  </span>
+                </MessageText>
+              ) : (
+                <MessageText>Session đã kết thúc</MessageText>
+              )}
             </div>
             <div>
               <MessageText>
@@ -257,20 +263,26 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                 {data.data.addresses.length >= 5 ? (
                   <p className="text-red-500 text-xl">Chỉ giới hạn tối đa 5 địa điểm!</p>
                 ) : (
-                  <Button
-                    type="button"
-                    variant="primary"
-                    onClick={() => {
-                      setShowMap(true)
-                    }}
-                  >
-                    Thêm địa điểm
-                  </Button>
+                  new Date(data?.data?.expireTime).getTime() > new Date().getTime() && (
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={() => {
+                        setShowMap(true)
+                      }}
+                    >
+                      Thêm địa điểm
+                    </Button>
+                  )
                 )}
                 <LoadingOverlay isOpen={isLoadingList} message="Đang thêm địa điểm..." />
                 <Field>
                   <Label htmlFor="votedAddress ">
-                    <p className="text-xl text-black-600 font-bold my-4">Chọn địa điểm ăn chơi:</p>
+                    {new Date(data?.data?.expireTime).getTime() > new Date().getTime() ? (
+                      <p className="text-xl text-black-600 font-bold my-4">Chọn địa điểm ăn chơi:</p>
+                    ) : (
+                      <p className="text-xl text-black-600 font-bold my-4">Các địa điểm ăn chơi:</p>
+                    )}
                   </Label>
                   <AddressVoter
                     name="votedAddress"
@@ -282,12 +294,13 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     onDelete={deleteAddress}
                   />
                   <LoadingOverlay isOpen={isLoadingAdress} message="Đang Xóa địa điểm vote" />
-                  {!_.isNil(methods.formState.errors.votedAddress) && (
-                    <ErrorText>
-                      {' '}
-                      <p className="font-bold">Chọn địa chỉ để vote</p>
-                    </ErrorText>
-                  )}
+                  {!_.isNil(methods.formState.errors.votedAddress) &&
+                    new Date(data?.data?.expireTime).getTime() > new Date().getTime() && (
+                      <ErrorText>
+                        {' '}
+                        <p className="font-bold">Chọn địa chỉ để vote</p>
+                      </ErrorText>
+                    )}
                 </Field>
                 {new Date(data.data.expireTime).getTime() > new Date().getTime() ? (
                   <ButtonGroup>
@@ -307,15 +320,15 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     <LoadingOverlay isOpen={voteSessionMutation.isLoading} message="Đang xử lí..." />
                   </ButtonGroup>
                 ) : (
-                    <Button
-                      type="button"
-                      variant="primary"
-                      onClick={() => {
-                        router.replace('/sessions/create')
-                      }}
-                    >
-                      Back
-                    </Button>
+                  <Button
+                    type="button"
+                    variant="primary"
+                    onClick={() => {
+                      router.replace('/sessions/create')
+                    }}
+                  >
+                    Back
+                  </Button>
                 )}
               </form>
             </FormProvider>

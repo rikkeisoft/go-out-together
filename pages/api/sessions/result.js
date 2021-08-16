@@ -95,20 +95,30 @@ export default async function handler(req, res) {
 
         return result
       })
-      const sessionResultPromises = addressIds.map((id) => {
-        queryString = `INSERT INTO session_result VALUES (?, ?)`
-        values = [sessionId, id]
-        try {
-          result = mysql.query(queryString, values)
-        } catch (err) {
-          cleanUp(mysql)
-          throw new ApiException(500, 'Không thêm được dữ liệu', err)
-        }
-        return result
-      })
+      queryString = `SELECT * FROM session_result WHERE session_id = ?`
+      values = [sessionId]
+      try {
+        result = await mysql.query(queryString, values)
+      } catch (err) {
+        cleanUp(mysql)
+        throw new ApiException(500, 'Không lấy được id từ bảng users', err)
+      }
+      if (result.length === 0) {
+        const sessionResultPromises = addressIds.map((id) => {
+          queryString = `INSERT INTO session_result VALUES (?, ?)`
+          values = [sessionId, id]
+          try {
+            result = mysql.query(queryString, values)
+          } catch (err) {
+            cleanUp(mysql)
+            throw new ApiException(500, 'Không thêm được dữ liệu', err)
+          }
+          return result
+        })
+        await Promise.all(sessionResultPromises)
+      }
 
       const addresses = await Promise.all(addressPromises)
-      await Promise.all(sessionResultPromises)
       data = {
         voters,
         addresses,
