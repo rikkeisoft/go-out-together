@@ -37,9 +37,12 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
           <tbody>
             {data.map((item) => {
               return (
-                <tr key={`item-` + item.aid} className="hover:bg-gray-100 font-bold">
-                  <td className="p-2 cursor-pointer">
-                    <label className="cursor-pointer">
+                <tr
+                  key={`item-` + item.aid}
+                  className="hover:bg-gray-100 font-bold border border-transparent rounded-md"
+                >
+                  <td className="p-2 cursor-pointer border border-transparent rounded-tl-md rounded-bl-md">
+                    <label className="cursor-pointer text-lg">
                       <input
                         type="radio"
                         className="mr-4"
@@ -53,7 +56,7 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
                       {item.name} ({item.voteCount} người vote)
                     </label>
                   </td>
-                  <td className="p-2 w-10 cursor-pointer">
+                  <td className="p-2 w-10 cursor-pointer rounded-tr-md rounded-br-md">
                     <button
                       type="button"
                       onClick={() => {

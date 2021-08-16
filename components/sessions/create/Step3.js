@@ -3,11 +3,9 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import PropTypes from 'prop-types'
 import Center from 'components/common/Center'
-import FormCard from 'components/common/FormCard'
 import Button from 'components/common/Button'
 import MessageText from 'components/common/MessageText'
 import urls from 'consts/urls'
-import ButtonGroup from 'components/common/ButtonGroup'
 import CopyableLink from 'components/common/CopyableLink'
 
 const Step3 = memo(({ sid, setFormData, backwardStep }) => {
@@ -22,7 +20,7 @@ const Step3 = memo(({ sid, setFormData, backwardStep }) => {
       <Center>
         <MessageText>
           {' '}
-          <p className="mt-10">Chia sẻ link với bạn bè để họ tham gia vote</p>
+          <p className="mt-10 text-2xl">Chia sẻ link với bạn bè để họ tham gia vote</p>
         </MessageText>
         <CopyableLink
           text={sharedLink}
@@ -33,29 +31,18 @@ const Step3 = memo(({ sid, setFormData, backwardStep }) => {
           {sharedLink}
         </CopyableLink>
       </Center>
-      <FormCard>
-        <ButtonGroup>
-          <Button
-            type="button"
-            variant="danger"
-            onClick={() => {
-              router.push(urls.HOME)
-            }}
-          >
-            Về trang chủ
-          </Button>
-          <Button
-            type="button"
-            variant="primary"
-            onClick={() => {
-              setFormData()
-              backwardStep()
-            }}
-          >
-            Tạo nhóm mới
-          </Button>
-        </ButtonGroup>
-      </FormCard>
+      <div className="mt-6 text-center">
+        <Button
+          type="button"
+          variant="primary"
+          onClick={() => {
+            setFormData()
+            backwardStep()
+          }}
+        >
+          Tạo nhóm mới
+        </Button>
+      </div>
     </>
   )
 })

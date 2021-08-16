@@ -13,13 +13,13 @@ const List = memo(({ name }) => {
       name={name}
       defaultValue={[]}
       render={({ field: { onChange, value, name } }) => (
-        <table className="w-full font-bold">
+        <table className="w-full font-bold mt-4">
           <tbody>
             {value.map((item, index) => {
               return (
-                <tr key={`item-` + index} className="hover:bg-gray-100">
-                  <td className="p-2">{item.name}</td>
-                  <td className="p-2 w-10">
+                <tr key={`item-` + index} className="hover:bg-gray-100 border border-transparent rounded-md text-lg">
+                  <td className="pl-4 py-2 rounded-tl-md rounded-bl-md">{item.name}</td>
+                  <td className="pr-4 py-2 w-10 rounded-tr-md rounded-br-md">
                     <button
                       type="button"
                       onClick={() => {

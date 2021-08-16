@@ -12,7 +12,7 @@ const CopyableLink = memo(({ text, children, onClick }) => {
     <>
       <div className="flex flex-row justify-center">
         <span
-          className="inline-block mb-5 text-blue-500 text-xl font-bold cursor-pointer whitespace-nowrap overflow-hidden overflow-ellipsis"
+          className="inline-block mb-5 text-blue-500 text-xl md:text-3xl font-bold cursor-pointer whitespace-nowrap overflow-hidden overflow-ellipsis"
           onClick={() => {
             onClick && onClick()
           }}
