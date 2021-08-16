@@ -15,10 +15,10 @@ const Step0 = memo(({ sid, uid, setStep }) => {
     if (isSuccess) {
       if (data.messageCode === messageCodes.SUCCESS) {
         if (!data.data.canVote) {
-          if (!data.data.voted) {
-            alert('Rất tiếc, đã hết thời gian vote')
-          }
-          setStep(3)
+          // if (!data.data.voted) {
+          //   alert('Rất tiếc, đã hết thời gian vote')
+          // }
+          setStep(2)
           return
         }
 
