@@ -195,10 +195,21 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
         />
       )}
       <LoadingOverlay isOpen={isLoading} message="Đang lấy thông tin session..." />
-
+      { !(new Date(data?.data?.expireTime).getTime() > new Date().getTime()) ? (
+         <Center>
+          <MessageText>
+          <p className="mt-3">Địa điểm được vote nhiều nhất</p>
+          { voteResult?.data?.length !== 0 && voteResult?.data?.addresses?.map((address) => (
+            <p key={address[0].aid} className="text-red-500 mt-2">
+              {address[0].name} ({voteResult.data.voters} người vote)
+            </p>
+          )) || '---'}
+        </MessageText>
+        </Center>
+      ) : null}
       {!showMap && isSuccess && data.messageCode === messageCodes.SUCCESS && (
         <div className="p-1 md:mx-auto w-full md:w-5/6 md:mt-10 transition duration-500">
-          <div className="flex flex-col lg:flex-row lg:justify-between border-b-2 border-fuchsia-600 md:px-10 pt-6">
+          <div className="flex flex-col lg:flex-row lg:justify-between border-b-2 border-fuchsia-600  pt-6">
             <div>
               <MessageText>Tiêu đề: {data.data.title}</MessageText>
               <MessageText>Nội dung: {data.data.content}</MessageText>
@@ -296,16 +307,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     <LoadingOverlay isOpen={voteSessionMutation.isLoading} message="Đang xử lí..." />
                   </ButtonGroup>
                 ) : (
-                  <Center>
-                    <MessageText>
-                      Địa điểm được vote nhiều nhất 
-                      { voteResult?.data?.length !== 0 && voteResult?.data?.addresses?.map((address) => (
-                        <p key={address[0].aid} className="text-red-500">
-                          {address[0].name} ({voteResult.data.voters} người vote)
-                        </p>
-                      ))||'---'}
-
-                    </MessageText>
                     <Button
                       type="button"
                       variant="primary"
@@ -315,7 +316,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     >
                       Back
                     </Button>
-                  </Center>
                 )}
               </form>
             </FormProvider>
