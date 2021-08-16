@@ -1,8 +1,6 @@
 import Head from 'next/head'
 import MainLayout from 'layouts/MainLayout'
 import Container from 'components/common/Container'
-import TitleText from 'components/common/TitleText'
-import Button from 'components/common/Button'
 import Center from 'components/common/Center'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
@@ -37,17 +35,29 @@ export default function Home() {
 
       <Container>
         <Center>
-          <TitleText>Làm thế nào để tìm địa điểm vui chơi một cách dễ dàng</TitleText>
-          {cookies?.accessToken ? (
-            <Button type="button" variant="primary" onClick={handleButtonClick}>
-              Thử ngay
-            </Button>
-          ) : (
-            <>
-              <p className="font-semibold text-xl">Đăng nhập ngay: </p>
-              <GoogleLoginModal />
-            </>
-          )}
+          <div className="py-36 md:py-80">
+            <h1 className="mb-3 text-gray-800 text-2xl md:text-5xl font-bold">GO OUT TOGETHER</h1>
+            <h1 className="mb-3 text-gray-800 text-2xl md:text-5xl font-bold">
+              Tạo nhóm và cùng bạn bè chọn địa điểm vui chơi
+            </h1>
+            <div className="mt-6 md:mt-12">
+              {cookies?.accessToken ? (
+                <div>
+                  <button
+                    className="inline-flex items-center md:px-12 md:py-3 px-8 py-2 text-white md:text-2xl text-base font-semibold rounded-md bg-blue-500 hover:bg-blue-400"
+                    onClick={handleButtonClick}
+                  >
+                    Thử ngay
+                  </button>
+                </div>
+              ) : (
+                <div className="md:flex md:justify-center md:items-center">
+                  <span className="font-semibold text-2xl font-semibold">Đăng nhập ngay: </span>
+                  <GoogleLoginModal />
+                </div>
+              )}
+            </div>
+          </div>
         </Center>
       </Container>
     </MainLayout>

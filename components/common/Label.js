@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 const Label = memo(({ htmlFor, children }) => {
   return (
-    <label htmlFor={htmlFor} className="mb-1">
+    <label htmlFor={htmlFor} className="mb-1 md:text-2xl">
       {children}
     </label>
   )
