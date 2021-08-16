@@ -18,7 +18,9 @@ import {
   updateSessionAddresses,
   deleteSessionAddress,
   voteSession,
+  getSessionResult,
 } from 'api/sessions'
+import Center from 'components/common/Center'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
 import ErrorText from 'components/common/ErrorText'
@@ -31,6 +33,7 @@ import LoadingOverlay from 'components/common/LoadingOverlay'
 import DirectionRoutes from 'components/common/DirectionRoutes'
 import socketIOClient from 'socket.io-client'
 import Popup from 'components/common/Popup'
+import { useRouter } from 'next/router'
 
 const socket = socketIOClient(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
 
@@ -46,13 +49,16 @@ const schema = yup.object().shape({
 const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const [cookies] = useCookies(['uid'])
   const [showMap, setShowMap] = useState(false)
+  // const [idDetail, setIdDetail] = useState('')
   // const [isOpen, setIsOpen] = useState(false)
   const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
   const [voteAddress, setVoteAddress] = useState(null)
+  // const [timeVote,setTimeVote] = useState('')
   const [locations, setLocations] = useState({
     userLocation: {},
     listUserLocation: [],
   })
+  const { data: voteResult } = useQuery([queryKeys.GET_SESSION_RESULT, { sid }], () => getSessionResult({ sid }))
 
   const queryClient = useQueryClient()
   const { isLoading: isLoadingList, mutateAsync } = useMutation((address) => updateSessionAddresses(address), {
@@ -99,7 +105,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   })
 
   const { isLoading, isSuccess, data } = useQuery([queryKeys.CHECK_SESSION, { sid }], () => getSessionDetails({ sid }))
-
   // socketio
   useEffect(() => {
     // new user come
@@ -169,6 +174,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
       console.error(error)
     }
   }
+  const router = useRouter()
 
   return (
     <>
@@ -189,27 +195,44 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
         />
       )}
       <LoadingOverlay isOpen={isLoading} message="Đang lấy thông tin session..." />
-
+      {!(new Date(data?.data?.expireTime).getTime() > new Date().getTime()) ? (
+        <Center>
+          <MessageText>
+            <p className="mt-3">Địa điểm được vote nhiều nhất</p>
+            {(voteResult?.data?.length !== 0 &&
+              voteResult?.data?.addresses?.map((address) => (
+                <p key={address[0].aid} className="text-red-500 mt-2">
+                  {address[0].name} ({voteResult.data.voters} người vote)
+                </p>
+              ))) ||
+              '---'}
+          </MessageText>
+        </Center>
+      ) : null}
       {!showMap && isSuccess && data.messageCode === messageCodes.SUCCESS && (
         <div className="p-1 md:mx-auto w-full md:w-5/6 md:mt-10 transition duration-500">
-          <div className="flex flex-col lg:flex-row lg:justify-between border-b-2 border-fuchsia-600 md:px-10 pt-6">
+          <div className="flex flex-col lg:flex-row lg:justify-between border-b-2 border-fuchsia-600  pt-6">
             <div>
               <MessageText>Tiêu đề: {data.data.title}</MessageText>
               <MessageText>Nội dung: {data.data.content}</MessageText>
             </div>
             <div>
-              <MessageText>
-                Vote sẽ kết thúc sau:
-                <span className="text-red-500 ml-1">
-                  <Countdown
-                    date={new Date(data.data.expireTime)}
-                    onComplete={() => {
-                      alert('Rất tiếc , đã hết thời gian vote')
-                      nextStep()
-                    }}
-                  />
-                </span>
-              </MessageText>
+              {new Date(data?.data?.expireTime).getTime() > new Date().getTime() ? (
+                <MessageText>
+                  Vote sẽ kết thúc sau:
+                  <span className="text-red-500 ml-1">
+                    <Countdown
+                      date={new Date(data.data.expireTime)}
+                      onComplete={() => {
+                        alert('Rất tiếc , đã hết thời gian vote')
+                        nextStep()
+                      }}
+                    />
+                  </span>
+                </MessageText>
+              ) : (
+                <MessageText>Session đã kết thúc</MessageText>
+              )}
             </div>
             <div>
               <MessageText>
@@ -240,20 +263,26 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                 {data.data.addresses.length >= 5 ? (
                   <p className="text-red-500 text-xl">Chỉ giới hạn tối đa 5 địa điểm!</p>
                 ) : (
-                  <Button
-                    type="button"
-                    variant="primary"
-                    onClick={() => {
-                      setShowMap(true)
-                    }}
-                  >
-                    Thêm địa điểm
-                  </Button>
+                  new Date(data?.data?.expireTime).getTime() > new Date().getTime() && (
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={() => {
+                        setShowMap(true)
+                      }}
+                    >
+                      Thêm địa điểm
+                    </Button>
+                  )
                 )}
                 <LoadingOverlay isOpen={isLoadingList} message="Đang thêm địa điểm..." />
                 <Field>
                   <Label htmlFor="votedAddress ">
-                    <p className="text-xl text-black-600 font-bold my-4">Chọn địa điểm ăn chơi:</p>
+                    {new Date(data?.data?.expireTime).getTime() > new Date().getTime() ? (
+                      <p className="text-xl text-black-600 font-bold my-4">Chọn địa điểm ăn chơi:</p>
+                    ) : (
+                      <p className="text-xl text-black-600 font-bold my-4">Các địa điểm ăn chơi:</p>
+                    )}
                   </Label>
                   <AddressVoter
                     name="votedAddress"
@@ -265,29 +294,42 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     onDelete={deleteAddress}
                   />
                   <LoadingOverlay isOpen={isLoadingAdress} message="Đang Xóa địa điểm vote" />
-                  {!_.isNil(methods.formState.errors.votedAddress) && (
-                    <ErrorText>
-                      {' '}
-                      <p className="font-bold">Chọn địa chỉ để vote</p>
-                    </ErrorText>
-                  )}
+                  {!_.isNil(methods.formState.errors.votedAddress) &&
+                    new Date(data?.data?.expireTime).getTime() > new Date().getTime() && (
+                      <ErrorText>
+                        {' '}
+                        <p className="font-bold">Chọn địa chỉ để vote</p>
+                      </ErrorText>
+                    )}
                 </Field>
-                <ButtonGroup>
+                {new Date(data.data.expireTime).getTime() > new Date().getTime() ? (
+                  <ButtonGroup>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      onClick={() => {
+                        prevStep()
+                      }}
+                    >
+                      Trước đó
+                    </Button>
+
+                    <Button type="submit" variant="primary">
+                      Tiếp theo
+                    </Button>
+                    <LoadingOverlay isOpen={voteSessionMutation.isLoading} message="Đang xử lí..." />
+                  </ButtonGroup>
+                ) : (
                   <Button
                     type="button"
-                    variant="danger"
+                    variant="primary"
                     onClick={() => {
-                      prevStep()
+                      router.replace('/sessions/create')
                     }}
                   >
-                    Trước đó
+                    Back
                   </Button>
-
-                  <Button type="submit" variant="primary">
-                    Tiếp theo
-                  </Button>
-                  <LoadingOverlay isOpen={voteSessionMutation.isLoading} message="Đang xử lí..." />
-                </ButtonGroup>
+                )}
               </form>
             </FormProvider>
           </div>
