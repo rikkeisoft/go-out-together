@@ -38,7 +38,7 @@ export default function Details({ error }) {
       stepElement = <Step2 sid={sid} prevStep={prevStep} nextStep={nextStep} />
       break
     case 3:
-      stepElement = <Step3 sid={sid} prevStep={prevStep} />
+      stepElement = <Step3 sid={sid} prevStep={prevStep} setFormData={setFormData} />
       break
     default:
       break
@@ -71,9 +71,10 @@ export default function Details({ error }) {
           <UserAvatar imgURL={cookies?.imgURL} username={cookies?.username} onSignOut={handleSignOut} />
         </div>
         <Center>
-          <TitleText>
-            Bạn đang tham gia nhóm: <span className="text-blue-500">{sid}</span>
-          </TitleText>
+          <TitleText>Bạn đang tham gia nhóm: </TitleText>
+          <span className="inline-block text-2xl font-bold text-blue-500 whitespace-nowrap overflow-hidden overflow-ellipsis">
+            {sid}
+          </span>
         </Center>
         {error ? (
           <div className="text-center">

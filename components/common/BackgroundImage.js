@@ -4,9 +4,9 @@ import PropTypes from 'prop-types'
 
 const BackgroundImage = memo(({ children }) => {
   return (
-    <div className="relative w-screen h-screen bg-image">
+    <div className="relative w-screen h-screen  bg-image">
       {/* <Image src={src} layout="fill" className="object-cover bg-image"  alt="" /> */}
-      <div className="absolute top-0 left-0 w-full h-full"> {children}</div>
+      <div className=" top-0 left-0 w-full h-full"> {children}</div>
     </div>
   )
 })

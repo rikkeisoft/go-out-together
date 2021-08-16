@@ -316,7 +316,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
         <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
-      <div className="mx-auto relative" style={{ width: '800px' }}>
+      <div className="mx-auto relative popup-direction">
         <div className="flex justify-between items-center">
           <p className="text-blue-600 text-xl font-semibold">Thông tin đường đi</p>
           <Button
