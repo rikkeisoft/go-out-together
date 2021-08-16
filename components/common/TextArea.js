@@ -7,7 +7,7 @@ const TextArea = memo(({ id, readOnly, name, placeholder }) => {
 
   return (
     <textarea
-      className="w-full h-32 px-2 py-1 border border-gray-500 focus-visible:outline-none resize-none"
+      className="w-full h-32 px-3 py-2 border rounded-md border-gray-500 focus-visible:outline-none resize-none text-lg"
       id={id}
       readOnly={readOnly}
       {...register(name)}

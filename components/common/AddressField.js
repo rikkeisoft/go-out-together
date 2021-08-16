@@ -13,7 +13,7 @@ const AddressField = memo(({ name }) => {
       render={({ field: { value } }) => (
         <input
           type="text"
-          className="w-full px-2 py-1 border border-gray-500 focus-visible:outline-none"
+          className="w-full px-3 py-2 border rounded-md border-gray-500 focus-visible:outline-none text-lg"
           readOnly={true}
           defaultValue={value.name}
         />

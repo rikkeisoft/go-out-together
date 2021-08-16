@@ -150,7 +150,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <Field>
                 <Label htmlFor="title">
-                  <p className="text-black-600 font-bold">Tiêu đề:</p>
+                  <p className="mb-2 text-black-600 font-bold">Tiêu đề:</p>
                 </Label>
                 <TextField id="title" name="title" />
                 <ErrorMessage
@@ -163,7 +163,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
               <Field>
                 <Label htmlFor="content">
                   {' '}
-                  <p className="text-black-600 font-bold">Nội Dung:</p>
+                  <p className="mb-2 text-black-600 font-bold">Nội Dung:</p>
                 </Label>
                 <TextArea id="content" name="content" />
                 <ErrorMessage
