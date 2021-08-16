@@ -67,7 +67,9 @@ export default async function handler(req, res) {
     }
     const addressId = result[0].id
 
-    queryString = `SELECT session_id, user_id FROM session_address_user WHERE session_id = ? AND user_id = ? AND address_id = ?`
+    queryString = `
+    SELECT session_id, user_id FROM session_address_user WHERE session_id = ? AND user_id = ? AND address_id = ?
+    `
     values = [sessionId, userId, addressId]
     try {
       result = await mysql.query(queryString, values)
