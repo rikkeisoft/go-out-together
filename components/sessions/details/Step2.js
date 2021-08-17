@@ -49,11 +49,8 @@ const schema = yup.object().shape({
 const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const [cookies] = useCookies(['uid'])
   const [showMap, setShowMap] = useState(false)
-  // const [idDetail, setIdDetail] = useState('')
-  // const [isOpen, setIsOpen] = useState(false)
   const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
   const [voteAddress, setVoteAddress] = useState(null)
-  // const [timeVote,setTimeVote] = useState('')
   const [locations, setLocations] = useState({
     userLocation: {},
     listUserLocation: [],
@@ -277,30 +274,31 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                 )}
                 <LoadingOverlay isOpen={isLoadingList} message="Đang thêm địa điểm..." />
                 <Field>
-                  <Label htmlFor="votedAddress ">
+                  <Label htmlFor="votedAddress">
                     {new Date(data?.data?.expireTime).getTime() > new Date().getTime() ? (
                       <p className="text-xl text-black-600 font-bold my-4">Chọn địa điểm ăn chơi:</p>
                     ) : (
                       <p className="text-xl text-black-600 font-bold my-4">Các địa điểm ăn chơi:</p>
                     )}
                   </Label>
-                  <AddressVoter
-                    name="votedAddress"
-                    data={data.data.addresses}
-                    onClick={(item) => {
-                      setVoteAddress(item)
-                      setShowDirectionRoutes(true)
-                    }}
-                    onDelete={deleteAddress}
-                  />
-                  <LoadingOverlay isOpen={isLoadingAdress} message="Đang Xóa địa điểm vote" />
-                  {!_.isNil(methods.formState.errors.votedAddress) &&
-                    new Date(data?.data?.expireTime).getTime() > new Date().getTime() && (
-                      <ErrorText>
-                        {' '}
-                        <p className="font-bold">Chọn địa chỉ để vote</p>
-                      </ErrorText>
-                    )}
+                    <AddressVoter
+                      name="votedAddress"
+                      showDelete={new Date(data?.data?.expireTime).getTime() > new Date().getTime()}
+                      data={data.data.addresses}
+                      onClick={(item) => {
+                        setVoteAddress(item)
+                        setShowDirectionRoutes(true)
+                      }}
+                      onDelete={deleteAddress}
+                    />
+                    <LoadingOverlay isOpen={isLoadingAdress} message="Đang Xóa địa điểm vote" />
+                {!_.isNil(methods.formState.errors.votedAddress) &&
+                  new Date(data?.data?.expireTime).getTime() > new Date().getTime() && (
+                    <ErrorText>
+                      {' '}
+                      <p className="font-bold">Chọn địa chỉ để vote</p>
+                    </ErrorText>
+                  )}
                 </Field>
                 {new Date(data.data.expireTime).getTime() > new Date().getTime() ? (
                   <ButtonGroup>
@@ -313,7 +311,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     >
                       Trước đó
                     </Button>
-
                     <Button type="submit" variant="primary">
                       Tiếp theo
                     </Button>
