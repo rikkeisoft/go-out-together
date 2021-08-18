@@ -33,7 +33,7 @@ const schema = yup.object().shape({
   }),
 })
 
-const Step1 = memo(({ sid, formData, setFormData, nextStep }) => {
+const Step1 = memo(({ sid, formData, setFormData }) => {
   const [cookies] = useCookies()
   const [showMap, setShowMap] = useState(false)
   const [userLocation, setUserLocation] = useState(null)
@@ -51,12 +51,17 @@ const Step1 = memo(({ sid, formData, setFormData, nextStep }) => {
 
   const onSubmit = (data) => {
     setFormData(Object.assign({}, formData, data))
-    joinSessionMutation.mutate({
-      sid: sid,
-      uid: cookies.uid,
-      name: data.name,
-      address: data.address,
-    })
+    const isSessionExpired = JSON.parse(sessionStorage.getItem('isSessionExpired'))
+    if (isSessionExpired) {
+      router.push(`${urls.SESSIONS}/${sid}/2`)
+    } else {
+      joinSessionMutation.mutate({
+        sid: sid,
+        uid: cookies.uid,
+        name: data.name,
+        address: data.address,
+      })
+    }
   }
 
   useEffect(() => {
@@ -78,7 +83,6 @@ const Step1 = memo(({ sid, formData, setFormData, nextStep }) => {
     if (joinSessionMutation.isSuccess) {
       if (joinSessionMutation.data.messageCode === messageCodes.SUCCESS) {
         router.push(`${urls.SESSIONS}/${sid}/2`)
-        nextStep()
       } else {
         alert(joinSessionMutation.data.message)
       }
@@ -151,7 +155,6 @@ Step1.propTypes = {
   sid: PropTypes.string,
   formData: PropTypes.object,
   setFormData: PropTypes.func,
-  nextStep: PropTypes.func,
 }
 
 Step1.defaultProps = {}

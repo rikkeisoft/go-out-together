@@ -22,7 +22,7 @@ export default function Create() {
   const router = useRouter()
   const [cookies, , removeCookie] = useCookies(['uid', 'username', 'imgURL'])
   const queryClient = useQueryClient()
-  const { formData, backwardStep, prevStep, nextStep, setFormData } = useStep()
+  const { formData, setFormData } = useStep()
   const [createStep, setCreateStep] = useState('0')
 
   useEffect(() => {
@@ -33,13 +33,13 @@ export default function Create() {
   let stepElement = <></>
   switch (createStep) {
     case '1':
-      stepElement = <Step1 formData={formData} setFormData={setFormData} nextStep={nextStep} />
+      stepElement = <Step1 formData={formData} setFormData={setFormData} />
       break
     case '2':
-      stepElement = <Step2 formData={formData} setFormData={setFormData} prevStep={prevStep} nextStep={nextStep} />
+      stepElement = <Step2 formData={formData} setFormData={setFormData} />
       break
     case '3':
-      stepElement = <Step3 setFormData={setFormData} backwardStep={backwardStep} />
+      stepElement = <Step3 setFormData={setFormData} />
       break
     default:
       break
@@ -55,6 +55,7 @@ export default function Create() {
     removeCookie('uid', { path: '/' })
     removeCookie('username', { path: '/' })
     removeCookie('imgURL', { path: '/' })
+    removeCookie('address', { path: '/' })
     auth.signOut()
   }
 

@@ -25,7 +25,7 @@ export default function Details({ error }) {
   const router = useRouter()
   const queryClient = useQueryClient()
   const sid = router.query.all[0]
-  const { formData, setStep, prevStep, nextStep, setFormData } = useStep(0)
+  const { formData, setFormData } = useStep()
   const [detailStep, setDetailStep] = useState('0')
 
   useEffect(() => {
@@ -36,16 +36,16 @@ export default function Details({ error }) {
   let stepElement = <></>
   switch (detailStep) {
     case '0':
-      stepElement = <Step0 sid={sid} uid={cookies.uid} setStep={setStep} />
+      stepElement = <Step0 sid={sid} uid={cookies.uid} />
       break
     case '1':
-      stepElement = <Step1 sid={sid} formData={formData} setFormData={setFormData} nextStep={nextStep} />
+      stepElement = <Step1 sid={sid} formData={formData} setFormData={setFormData} />
       break
     case '2':
-      stepElement = <Step2 sid={sid} prevStep={prevStep} nextStep={nextStep} />
+      stepElement = <Step2 sid={sid} />
       break
     case '3':
-      stepElement = <Step3 sid={sid} prevStep={prevStep} setFormData={setFormData} />
+      stepElement = <Step3 sid={sid} setFormData={setFormData} />
       break
     default:
       break
@@ -61,6 +61,7 @@ export default function Details({ error }) {
     removeCookie('uid', { path: '/' })
     removeCookie('username', { path: '/' })
     removeCookie('imgURL', { path: '/' })
+    removeCookie('address', { path: '/' })
     auth.signOut()
   }
 

@@ -21,7 +21,9 @@ export default function Home() {
   }, [])
 
   const handleButtonClick = () => {
-    router.push(redirectURL)
+    if (url) {
+      router.back()
+    } else router.push(redirectURL)
   }
 
   return (
@@ -47,7 +49,7 @@ export default function Home() {
                     className="inline-flex mr-6 items-center md:px-12 md:py-3 px-8 py-2 text-white md:text-2xl text-base font-semibold rounded-md bg-blue-500 hover:bg-blue-400"
                     onClick={handleButtonClick}
                   >
-                    Thử ngay
+                    {!url ? 'Thử ngay' : 'Xem chi tiết nhóm'}
                   </button>
                   {url && (
                     <button

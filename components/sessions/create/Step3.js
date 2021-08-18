@@ -11,8 +11,7 @@ import CopyableLink from 'components/common/CopyableLink'
 const Step3 = memo(({ setFormData }) => {
   const router = useRouter()
   const sid = sessionStorage.getItem('sid')
-  const isAdmin = sessionStorage.getItem('isAdmin')
-  if (isAdmin) sessionStorage.removeItem('isAdmin')
+
   const sharedLink = process.env.NEXT_PUBLIC_BASE_URL + urls.SESSIONS + '/' + sid + '/0'
   return (
     <>
@@ -40,7 +39,7 @@ const Step3 = memo(({ setFormData }) => {
           variant="primary"
           onClick={() => {
             setFormData()
-            router.replace(`${urls.SESSIONS_CREATE}/1`)
+            router.push(`${urls.SESSIONS_CREATE}/1`)
           }}
         >
           Tạo nhóm mới
@@ -53,7 +52,6 @@ const Step3 = memo(({ setFormData }) => {
 Step3.propTypes = {
   sid: PropTypes.string,
   setFormData: PropTypes.func,
-  backwardStep: PropTypes.func,
 }
 
 Step3.defaultProps = {}

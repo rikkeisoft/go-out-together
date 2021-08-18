@@ -47,7 +47,7 @@ const schema = yup.object().shape({
   }),
 })
 
-const Step2 = memo(({ sid, prevStep, nextStep }) => {
+const Step2 = memo(({ sid }) => {
   const [cookies] = useCookies(['uid'])
   const [showMap, setShowMap] = useState(false)
   const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
@@ -56,6 +56,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
     userLocation: {},
     listUserLocation: [],
   })
+
   const { data: voteResult } = useQuery([queryKeys.GET_SESSION_RESULT, { sid }], () => getSessionResult({ sid }))
 
   const queryClient = useQueryClient()
@@ -68,6 +69,9 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const { data: addressData } = useQuery([queryKeys.GET_ADDRESS, { sid }], () => getAllAddresses({ sid }), { retry: 1 })
 
   useEffect(() => {
+    const isSessionExpired = JSON.parse(sessionStorage.getItem('isSessionExpired'))
+    let newUserLocation = {}
+
     if (addressData && addressData?.data.length !== 0) {
       const newListUserLocations = addressData?.data.map((location) => ({
         userId: location.userId,
@@ -75,13 +79,14 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
         address: location.name,
         coordinates: [location.longitude, location.latitude],
       }))
-
-      const userLocation = addressData?.data.find((location) => location.userId === cookies.uid)
-      const newUserLocation = {
-        userId: userLocation.userId,
-        name: userLocation.username,
-        address: userLocation.name,
-        coordinates: [userLocation.longitude, userLocation.latitude],
+      if (!isSessionExpired) {
+        const userLocation = addressData?.data.find((location) => location.userId === cookies.uid)
+        newUserLocation = {
+          userId: userLocation.userId,
+          name: userLocation.username,
+          address: userLocation.name,
+          coordinates: [userLocation.longitude, userLocation.latitude],
+        }
       }
       setLocations({
         userLocation: newUserLocation,
@@ -94,7 +99,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
     onSuccess: () => {
       socket.emit('vote')
       router.push(`${urls.SESSIONS}/${sid}/3`)
-      nextStep()
     },
     onError: (error) => alert(error.message),
   })
@@ -135,9 +139,9 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
     const prevVotedAddress = JSON.parse(localStorage.getItem('votedAddress'))
     if (prevVotedAddress && prevVotedAddress.id === data.votedAddress.id) {
       router.push(`${urls.SESSIONS}/${sid}/3`)
-      nextStep()
     } else {
       localStorage.setItem('votedAddress', JSON.stringify(data.votedAddress))
+      sessionStorage.setItem('voted', 'true')
       voteSessionMutation.mutate({
         sid: sid,
         uid: cookies.uid,
@@ -226,7 +230,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                       onComplete={() => {
                         alert('Rất tiếc , đã hết thời gian vote')
                         router.push(`${urls.SESSIONS}/${sid}/3`)
-                        nextStep()
                       }}
                     />
                   </span>
@@ -311,7 +314,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                       variant="danger"
                       onClick={() => {
                         router.back()
-                        prevStep()
                       }}
                     >
                       Trước đó
@@ -326,10 +328,10 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     type="button"
                     variant="primary"
                     onClick={() => {
-                      router.replace('/sessions/create')
+                      router.back()
                     }}
                   >
-                    Back
+                    Quay lại
                   </Button>
                 )}
               </form>
@@ -343,8 +345,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
 Step2.propTypes = {
   sid: PropTypes.any,
-  prevStep: PropTypes.func,
-  nextStep: PropTypes.func,
 }
 
 Step2.defaultProps = {}

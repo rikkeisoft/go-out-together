@@ -44,13 +44,14 @@ const schema = yup.object().shape({
     .min(2),
 })
 
-const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
+const Step2 = memo(({ formData, setFormData }) => {
   const [cookies] = useCookies()
   const [showMap, setShowMap] = useState(false)
   const [listDataLocation, setListDataLocation] = useState(null)
   const createSessionMutation = useMutation(createSession)
 
   if (sessionStorage.getItem('checkOldSession')) sessionStorage.removeItem('checkOldSession')
+  if (sessionStorage.getItem('redirectToOldSession')) sessionStorage.removeItem('redirectToOldSession')
 
   const methods = useForm({
     resolver: yupResolver(schema),
@@ -59,13 +60,17 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
 
   const onSubmit = (data) => {
     setFormData(Object.assign({}, formData, data))
-    createSessionMutation.mutate({
-      uid: cookies.uid,
-      title: data.title,
-      content: data.content,
-      timeLimit: data.timeLimit,
-      addresses: data.addresses,
-    })
+    if (sessionStorage.getItem('sid')) {
+      router.push(`${urls.SESSIONS_CREATE}/3`)
+    } else {
+      createSessionMutation.mutate({
+        uid: cookies.uid,
+        title: data.title,
+        content: data.content,
+        timeLimit: data.timeLimit,
+        addresses: data.addresses,
+      })
+    }
   }
 
   useEffect(() => {
@@ -88,7 +93,6 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
       if (createSessionMutation.data.messageCode === messageCodes.SUCCESS) {
         sessionStorage.setItem('sid', createSessionMutation.data.data.sid)
         router.push(`${urls.SESSIONS_CREATE}/3`)
-        nextStep()
       } else {
         alert(createSessionMutation.data.message)
       }
@@ -238,7 +242,6 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
                   variant="danger"
                   onClick={() => {
                     router.back()
-                    prevStep()
                   }}
                 >
                   Trước đó
@@ -261,8 +264,6 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
 Step2.propTypes = {
   formData: PropTypes.object,
   setFormData: PropTypes.func,
-  prevStep: PropTypes.func,
-  nextStep: PropTypes.func,
   setSid: PropTypes.func,
 }
 

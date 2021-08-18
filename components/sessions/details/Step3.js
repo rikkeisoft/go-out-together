@@ -12,12 +12,14 @@ import MessageText from 'components/common/MessageText'
 import LoadingOverlay from 'components/common/LoadingOverlay'
 import Button from 'components/common/Button'
 import { useRouter } from 'next/router'
+import urls from 'consts/urls'
 
-const Step3 = memo(({ sid, prevStep, setFormData }) => {
+const Step3 = memo(({ sid, setFormData }) => {
   const { isLoading, isSuccess, data, refetch } = useQuery([queryKeys.GET_SESSION_RESULT, { sid }], () =>
     getSessionResult({ sid }),
   )
   const votedAddress = JSON.parse(localStorage.getItem('votedAddress'))
+  const voted = sessionStorage.getItem('voted')
   const router = useRouter()
 
   let resultElement = <></>
@@ -36,9 +38,8 @@ const Step3 = memo(({ sid, prevStep, setFormData }) => {
               <Countdown
                 date={new Date(data.data.expireTime)}
                 onComplete={() => {
-                  refetch()
                   localStorage.removeItem('votedAddress')
-                  sessionStorage.removeItem('redirectURL')
+                  refetch()
                 }}
               />
             </span>
@@ -47,8 +48,7 @@ const Step3 = memo(({ sid, prevStep, setFormData }) => {
             type="button"
             variant="danger"
             onClick={() => {
-              router.back()
-              prevStep()
+              voted ? router.back() : router.push(`${urls.SESSIONS}/${sid}/2`)
             }}
           >
             Chọn lại
@@ -80,7 +80,9 @@ const Step3 = memo(({ sid, prevStep, setFormData }) => {
               variant="primary"
               onClick={() => {
                 setFormData()
-                router.replace('/sessions/create')
+                sessionStorage.removeItem('voted')
+                sessionStorage.removeItem('redirectURL')
+                router.push(`${urls.SESSIONS_CREATE}/1`)
               }}
             >
               Tạo nhóm mới
