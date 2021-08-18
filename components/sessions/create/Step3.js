@@ -11,6 +11,8 @@ import CopyableLink from 'components/common/CopyableLink'
 const Step3 = memo(({ setFormData }) => {
   const router = useRouter()
   const sid = sessionStorage.getItem('sid')
+  sessionStorage.getItem('isAdmin') && sessionStorage.removeItem('isAdmin')
+  sessionStorage.getItem('redirectToOldSession') && sessionStorage.removeItem('redirectToOldSession')
 
   const sharedLink = process.env.NEXT_PUBLIC_BASE_URL + urls.SESSIONS + '/' + sid + '/0'
   return (

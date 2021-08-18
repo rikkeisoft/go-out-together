@@ -26,7 +26,7 @@ export default function Details({ error }) {
   const queryClient = useQueryClient()
   const sid = router.query.all[0]
   const { formData, setFormData } = useStep()
-  const [detailStep, setDetailStep] = useState('0')
+  const [detailStep, setDetailStep] = useState(null)
 
   useEffect(() => {
     if (!router.isReady) return

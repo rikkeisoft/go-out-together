@@ -49,7 +49,6 @@ const Step0 = memo(({ sid, uid }) => {
 Step0.propTypes = {
   sid: PropTypes.string,
   uid: PropTypes.string,
-  setStep: PropTypes.func,
 }
 
 Step0.defaultProps = {}
