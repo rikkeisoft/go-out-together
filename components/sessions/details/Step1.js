@@ -20,6 +20,8 @@ import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MapBox from 'components/common/MapBox'
 import LoadingOverlay from 'components/common/LoadingOverlay'
+import router from 'next/router'
+import urls from 'consts/urls'
 
 const schema = yup.object().shape({
   name: yup.string().required('Nhập vào tên'),
@@ -31,7 +33,7 @@ const schema = yup.object().shape({
   }),
 })
 
-const Step1 = memo(({ sid, formData, setFormData, nextStep }) => {
+const Step1 = memo(({ sid, formData, setFormData }) => {
   const [cookies] = useCookies()
   const [showMap, setShowMap] = useState(false)
   const [userLocation, setUserLocation] = useState(null)
@@ -49,12 +51,17 @@ const Step1 = memo(({ sid, formData, setFormData, nextStep }) => {
 
   const onSubmit = (data) => {
     setFormData(Object.assign({}, formData, data))
-    joinSessionMutation.mutate({
-      sid: sid,
-      uid: cookies.uid,
-      name: data.name,
-      address: data.address,
-    })
+    const isSessionExpired = JSON.parse(sessionStorage.getItem('isSessionExpired'))
+    if (isSessionExpired) {
+      router.push(`${urls.SESSIONS}/${sid}/2`)
+    } else {
+      joinSessionMutation.mutate({
+        sid: sid,
+        uid: cookies.uid,
+        name: data.name,
+        address: data.address,
+      })
+    }
   }
 
   useEffect(() => {
@@ -74,9 +81,8 @@ const Step1 = memo(({ sid, formData, setFormData, nextStep }) => {
 
   useEffect(() => {
     if (joinSessionMutation.isSuccess) {
-      console.log(joinSessionMutation.data.messageCode)
       if (joinSessionMutation.data.messageCode === messageCodes.SUCCESS) {
-        nextStep()
+        router.push(`${urls.SESSIONS}/${sid}/2`)
       } else {
         alert(joinSessionMutation.data.message)
       }
@@ -149,7 +155,6 @@ Step1.propTypes = {
   sid: PropTypes.string,
   formData: PropTypes.object,
   setFormData: PropTypes.func,
-  nextStep: PropTypes.func,
 }
 
 Step1.defaultProps = {}

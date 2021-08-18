@@ -8,9 +8,13 @@ import MessageText from 'components/common/MessageText'
 import urls from 'consts/urls'
 import CopyableLink from 'components/common/CopyableLink'
 
-const Step3 = memo(({ sid, setFormData, backwardStep }) => {
+const Step3 = memo(({ setFormData }) => {
   const router = useRouter()
-  const sharedLink = process.env.NEXT_PUBLIC_BASE_URL + urls.SESSIONS + '/' + sid
+  const sid = sessionStorage.getItem('sid')
+  sessionStorage.getItem('isAdmin') && sessionStorage.removeItem('isAdmin')
+  sessionStorage.getItem('redirectToOldSession') && sessionStorage.removeItem('redirectToOldSession')
+
+  const sharedLink = process.env.NEXT_PUBLIC_BASE_URL + urls.SESSIONS + '/' + sid + '/0'
   return (
     <>
       <Head>
@@ -25,7 +29,7 @@ const Step3 = memo(({ sid, setFormData, backwardStep }) => {
         <CopyableLink
           text={sharedLink}
           onClick={() => {
-            router.push(urls.SESSIONS + '/' + sid)
+            router.push(`${urls.SESSIONS}/${sid}/0`)
           }}
         >
           {sharedLink}
@@ -37,7 +41,7 @@ const Step3 = memo(({ sid, setFormData, backwardStep }) => {
           variant="primary"
           onClick={() => {
             setFormData()
-            backwardStep()
+            router.push(`${urls.SESSIONS_CREATE}/1`)
           }}
         >
           Tạo nhóm mới
@@ -50,7 +54,6 @@ const Step3 = memo(({ sid, setFormData, backwardStep }) => {
 Step3.propTypes = {
   sid: PropTypes.string,
   setFormData: PropTypes.func,
-  backwardStep: PropTypes.func,
 }
 
 Step3.defaultProps = {}

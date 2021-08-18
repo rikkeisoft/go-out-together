@@ -6,7 +6,7 @@ import TrashIcon from 'components/icons/TrashIcon'
 import Popup from './Popup'
 import Button from './Button'
 
-const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
+const AddressVoter = memo(({ name, showDelete, data, onClick, onDelete }) => {
   const { control, watch, setValue } = useFormContext()
   const [openPopup, setOpenPopup] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState(null)
@@ -26,7 +26,6 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
   const onSelect = (item) => {
     setValue(name, item, { shouldValidate: true })
   }
-
   return (
     <Controller
       control={control}
@@ -41,32 +40,50 @@ const AddressVoter = memo(({ name, data, onClick, onDelete }) => {
                   key={`item-` + item.aid}
                   className="hover:bg-gray-100 font-bold border border-transparent rounded-md"
                 >
-                  <td className="p-2 cursor-pointer border border-transparent rounded-tl-md rounded-bl-md">
-                    <label className="cursor-pointer text-lg">
-                      <input
-                        type="radio"
-                        className="mr-4"
-                        onChange={() => {
-                          onClick(item)
-                          onSelect(item)
+                  {showDelete ? (
+                    <td className="p-2 cursor-pointer border border-transparent rounded-tl-md rounded-bl-md">
+                      <label className="cursor-pointer text-lg">
+                        <input
+                          type="radio"
+                          className="mr-4"
+                          onChange={() => {
+                            onClick(item)
+                            onSelect(item)
+                          }}
+                          checked={item.aid === value?.aid}
+                          disabled={item.id === selectedItemId}
+                        />
+                        {item.name} ({item.voteCount} người vote)
+                      </label>
+                    </td>
+                  ) : (
+                    <td className="p-2 cursor-pointer border border-transparent rounded-tl-md rounded-bl-md">
+                      <label className="cursor-pointer text-lg">
+                        <input
+                          type="radio"
+                          className="mr-4"
+                          onChange={() => {
+                            onClick(item)
+                          }}
+                          checked={item.aid === value?.aid}
+                        />
+                        {item.name} ({item.voteCount} người vote)
+                      </label>
+                    </td>
+                  )}
+                  {showDelete ? (
+                    <td className="p-2 w-10 cursor-pointer rounded-tr-md rounded-br-md">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedItemId(() => item.id)
+                          setOpenPopup(true)
                         }}
-                        checked={item.aid === value?.aid}
-                        disabled={item.id === selectedItemId}
-                      />
-                      {item.name} ({item.voteCount} người vote)
-                    </label>
-                  </td>
-                  <td className="p-2 w-10 cursor-pointer rounded-tr-md rounded-br-md">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedItemId(() => item.id)
-                        setOpenPopup(true)
-                      }}
-                    >
-                      <TrashIcon className="w-6" />
-                    </button>
-                  </td>
+                      >
+                        <TrashIcon className="w-6" />
+                      </button>
+                    </td>
+                  ) : null}
                   <Popup isOpen={openPopup} onRequestClose={() => setOpenPopup(false)}>
                     <>
                       <h1 className="mb-4">Bạn có chắc chắn muốn xóa địa chỉ này?</h1>

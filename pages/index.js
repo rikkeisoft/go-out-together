@@ -9,19 +9,23 @@ import GoogleLoginModal from 'components/auth/GoogleLoginModal'
 import { useCookies } from 'react-cookie'
 
 export default function Home() {
-  const [redirectURL, setRedirectURL] = useState(urls.SESSIONS_CREATE)
+  const [redirectURL, setRedirectURL] = useState(`${urls.SESSIONS_CREATE}/1`)
   const [cookies] = useCookies(['accessToken'])
   const router = useRouter()
+  const url = sessionStorage.getItem('redirectURL')
+  // sessionStorage.getItem('isAdmin') && sessionStorage.removeItem('isAdmin')
+  // sessionStorage.getItem('redirectToOldSession') && sessionStorage.removeItem('redirectToOldSession')
 
   useEffect(() => {
-    const url = sessionStorage.getItem('redirectURL')
     if (url !== null) {
       setRedirectURL(url)
     }
   }, [])
 
   const handleButtonClick = () => {
-    router.push(redirectURL)
+    if (url) {
+      router.back()
+    } else router.push(redirectURL)
   }
 
   return (
@@ -42,13 +46,21 @@ export default function Home() {
             </h1>
             <div className="mt-6 md:mt-12">
               {cookies?.accessToken ? (
-                <div>
+                <div className="flex items-center justify-center">
                   <button
-                    className="inline-flex items-center md:px-12 md:py-3 px-8 py-2 text-white md:text-2xl text-base font-semibold rounded-md bg-blue-500 hover:bg-blue-400"
+                    className="inline-flex mr-6 items-center md:px-12 md:py-3 px-8 py-2 text-white md:text-2xl text-base font-semibold rounded-md bg-blue-500 hover:bg-blue-400"
                     onClick={handleButtonClick}
                   >
-                    Thử ngay
+                    {!url ? 'Thử ngay' : 'Xem chi tiết nhóm'}
                   </button>
+                  {url && (
+                    <button
+                      className="inline-flex items-center md:px-12 md:py-3 px-8 py-2 text-white md:text-2xl text-base font-semibold rounded-md bg-blue-500 hover:bg-blue-400"
+                      onClick={() => router.push(`${urls.SESSIONS_CREATE}/1`)}
+                    >
+                      Tạo nhóm mới
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="md:flex md:justify-center md:items-center">

@@ -34,6 +34,7 @@ import DirectionRoutes from 'components/common/DirectionRoutes'
 import socketIOClient from 'socket.io-client'
 import Popup from 'components/common/Popup'
 import { useRouter } from 'next/router'
+import urls from 'consts/urls'
 
 const socket = socketIOClient(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
 
@@ -46,18 +47,16 @@ const schema = yup.object().shape({
   }),
 })
 
-const Step2 = memo(({ sid, prevStep, nextStep }) => {
+const Step2 = memo(({ sid }) => {
   const [cookies] = useCookies(['uid'])
   const [showMap, setShowMap] = useState(false)
-  // const [idDetail, setIdDetail] = useState('')
-  // const [isOpen, setIsOpen] = useState(false)
   const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
   const [voteAddress, setVoteAddress] = useState(null)
-  // const [timeVote,setTimeVote] = useState('')
   const [locations, setLocations] = useState({
     userLocation: {},
     listUserLocation: [],
   })
+
   const { data: voteResult } = useQuery([queryKeys.GET_SESSION_RESULT, { sid }], () => getSessionResult({ sid }))
 
   const queryClient = useQueryClient()
@@ -70,6 +69,9 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const { data: addressData } = useQuery([queryKeys.GET_ADDRESS, { sid }], () => getAllAddresses({ sid }), { retry: 1 })
 
   useEffect(() => {
+    const isSessionExpired = JSON.parse(sessionStorage.getItem('isSessionExpired'))
+    let newUserLocation = {}
+
     if (addressData && addressData?.data.length !== 0) {
       const newListUserLocations = addressData?.data.map((location) => ({
         userId: location.userId,
@@ -77,13 +79,14 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
         address: location.name,
         coordinates: [location.longitude, location.latitude],
       }))
-
-      const userLocation = addressData?.data.find((location) => location.userId === cookies.uid)
-      const newUserLocation = {
-        userId: userLocation.userId,
-        name: userLocation.username,
-        address: userLocation.name,
-        coordinates: [userLocation.longitude, userLocation.latitude],
+      if (!isSessionExpired) {
+        const userLocation = addressData?.data.find((location) => location.userId === cookies.uid)
+        newUserLocation = {
+          userId: userLocation.userId,
+          name: userLocation.username,
+          address: userLocation.name,
+          coordinates: [userLocation.longitude, userLocation.latitude],
+        }
       }
       setLocations({
         userLocation: newUserLocation,
@@ -95,7 +98,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const voteSessionMutation = useMutation(voteSession, {
     onSuccess: () => {
       socket.emit('vote')
-      nextStep()
+      router.push(`${urls.SESSIONS}/${sid}/3`)
     },
     onError: (error) => alert(error.message),
   })
@@ -135,9 +138,10 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const onSubmit = (data) => {
     const prevVotedAddress = JSON.parse(localStorage.getItem('votedAddress'))
     if (prevVotedAddress && prevVotedAddress.id === data.votedAddress.id) {
-      nextStep()
+      router.push(`${urls.SESSIONS}/${sid}/3`)
     } else {
       localStorage.setItem('votedAddress', JSON.stringify(data.votedAddress))
+      sessionStorage.setItem('voted', 'true')
       voteSessionMutation.mutate({
         sid: sid,
         uid: cookies.uid,
@@ -225,7 +229,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                       date={new Date(data.data.expireTime)}
                       onComplete={() => {
                         alert('Rất tiếc , đã hết thời gian vote')
-                        nextStep()
+                        router.push(`${urls.SESSIONS}/${sid}/3`)
                       }}
                     />
                   </span>
@@ -277,7 +281,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                 )}
                 <LoadingOverlay isOpen={isLoadingList} message="Đang thêm địa điểm..." />
                 <Field>
-                  <Label htmlFor="votedAddress ">
+                  <Label htmlFor="votedAddress">
                     {new Date(data?.data?.expireTime).getTime() > new Date().getTime() ? (
                       <p className="text-xl text-black-600 font-bold my-4">Chọn địa điểm ăn chơi:</p>
                     ) : (
@@ -286,6 +290,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                   </Label>
                   <AddressVoter
                     name="votedAddress"
+                    showDelete={new Date(data?.data?.expireTime).getTime() > new Date().getTime()}
                     data={data.data.addresses}
                     onClick={(item) => {
                       setVoteAddress(item)
@@ -308,12 +313,11 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                       type="button"
                       variant="danger"
                       onClick={() => {
-                        prevStep()
+                        router.back()
                       }}
                     >
                       Trước đó
                     </Button>
-
                     <Button type="submit" variant="primary">
                       Tiếp theo
                     </Button>
@@ -324,10 +328,10 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                     type="button"
                     variant="primary"
                     onClick={() => {
-                      router.replace('/sessions/create')
+                      router.back()
                     }}
                   >
-                    Back
+                    Quay lại
                   </Button>
                 )}
               </form>
@@ -341,8 +345,6 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
 
 Step2.propTypes = {
   sid: PropTypes.any,
-  prevStep: PropTypes.func,
-  nextStep: PropTypes.func,
 }
 
 Step2.defaultProps = {}
