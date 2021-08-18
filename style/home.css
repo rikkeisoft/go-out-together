@@ -1,9 +1,31 @@
 .bg-image {
   /* The image used */
-  width: 100%;
-  overflow-y: auto;
+  background: url('/assets/images/bg25.png') no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100%;
 }
-
+.bg-image1 {
+  /* The image used */
+  background: url('/assets/images/bg30.png') no-repeat;
+  /* background-attachment: fixed; */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* min-width: 100%; */
+  min-height: 100%;
+}
+.bg-image2 {
+  /* The image used */
+  width: 100%;
+  background: url('/assets/images/bg31.png') no-repeat; 
+  /* background-attachment: fixed; */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100%;
+}
 body::before {
   content: '';
   position: fixed;
@@ -14,7 +36,6 @@ body::before {
   height: 100%;
 
   display: block;
-  background: url('/assets/images/bg25.png') no-repeat;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

@@ -56,7 +56,7 @@ const Step2 = memo(({ sid }) => {
     userLocation: {},
     listUserLocation: [],
   })
-
+console.log('1')
   const { data: voteResult } = useQuery([queryKeys.GET_SESSION_RESULT, { sid }], () => getSessionResult({ sid }))
 
   const queryClient = useQueryClient()

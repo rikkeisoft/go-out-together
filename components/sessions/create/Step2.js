@@ -231,7 +231,9 @@ const Step2 = memo(({ formData, setFormData }) => {
 
                 {renderListLocation()}
 
-                <List name="addresses" />
+                <List
+                  name="addresses"
+                 />
 
                 {!_.isNil(methods.formState.errors.addresses) && <ErrorText>Chọn ít nhất 2 địa điểm</ErrorText>}
               </Field>
