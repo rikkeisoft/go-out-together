@@ -25,6 +25,7 @@ import LoadingOverlay from 'components/common/LoadingOverlay'
 import DetailIcon from 'components/icons/DetailIcon'
 // import Popup from 'components/common/Popup'
 import { useRouter } from 'next/router'
+import urls from 'consts/urls'
 
 const schema = yup.object().shape({
   name: yup.string().required('Nhập vào tên'),
@@ -91,6 +92,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   useEffect(() => {
     if (updateSessionCreatorMutation.isSuccess) {
       if (updateSessionCreatorMutation.data.messageCode === messageCodes.SUCCESS) {
+        router.push(`${urls.SESSIONS_CREATE}/2`)
         nextStep()
       } else {
         alert(updateSessionCreatorMutation.data.message)
@@ -145,9 +147,8 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
                           title="Chi tiết"
                           className="cursor-pointer"
                           onClick={() => {
-                            router.replace(`/sessions/${item.sid}`)
-                            // setIdDetail(item.id)
-                            // setOpenPopup(true)
+                            sessionStorage.setItem('checkOldSession', 'true')
+                            router.replace(`/sessions/detail/${item.sid}/0`)
                           }}
                         >
                           <DetailIcon />
@@ -220,34 +221,6 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
           </FormProvider>
         </div>
       )}
-      {/* {idDetail ? (
-        <Popup isOpen={openPopup} onRequestClose={() => setOpenPopup(false)}>
-          <div className="bg-black text-white  font-bold text-center py-2 mb-2">Thông tin của sessions</div>
-          <div>
-            <p>
-              <span className="font-bold mr-2">Tiêu đề:</span>
-              {itemDetail.title}
-            </p>
-            <p>
-              <span className="font-bold mr-2">Nội dung:</span>
-              {itemDetail.content}
-            </p>
-            <p>
-              <span className="font-bold mr-2">ID Nhóm:</span>
-              {itemDetail.sid}
-            </p>
-            <p>
-              <span className="font-bold mr-2">Kết quả vote:</span>
-              {itemDetail.result || '---'}
-            </p>
-          </div>
-          <div className="flex justify-end mt-2">
-            <Button variant="dark" type="button" onClick={() => setOpenPopup(false)}>
-              Đóng
-            </Button>
-          </div>
-        </Popup>
-      ) : null} */}
       <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
     </>
   )

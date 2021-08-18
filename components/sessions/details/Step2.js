@@ -34,6 +34,7 @@ import DirectionRoutes from 'components/common/DirectionRoutes'
 import socketIOClient from 'socket.io-client'
 import Popup from 'components/common/Popup'
 import { useRouter } from 'next/router'
+import urls from 'consts/urls'
 
 const socket = socketIOClient(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
 
@@ -92,6 +93,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const voteSessionMutation = useMutation(voteSession, {
     onSuccess: () => {
       socket.emit('vote')
+      router.push(`${urls.SESSIONS}/${sid}/3`)
       nextStep()
     },
     onError: (error) => alert(error.message),
@@ -132,6 +134,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
   const onSubmit = (data) => {
     const prevVotedAddress = JSON.parse(localStorage.getItem('votedAddress'))
     if (prevVotedAddress && prevVotedAddress.id === data.votedAddress.id) {
+      router.push(`${urls.SESSIONS}/${sid}/3`)
       nextStep()
     } else {
       localStorage.setItem('votedAddress', JSON.stringify(data.votedAddress))
@@ -222,6 +225,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                       date={new Date(data.data.expireTime)}
                       onComplete={() => {
                         alert('Rất tiếc , đã hết thời gian vote')
+                        router.push(`${urls.SESSIONS}/${sid}/3`)
                         nextStep()
                       }}
                     />
@@ -306,6 +310,7 @@ const Step2 = memo(({ sid, prevStep, nextStep }) => {
                       type="button"
                       variant="danger"
                       onClick={() => {
+                        router.back()
                         prevStep()
                       }}
                     >

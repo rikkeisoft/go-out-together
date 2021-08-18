@@ -24,6 +24,8 @@ import List from 'components/common/List'
 import MapBox from 'components/common/MapBox'
 import SmallTitle from 'components/common/SmallTitle'
 import LoadingOverlay from 'components/common/LoadingOverlay'
+import router from 'next/router'
+import urls from 'consts/urls'
 
 const schema = yup.object().shape({
   title: yup.string().required('Nhập vào tiêu đề'),
@@ -42,11 +44,13 @@ const schema = yup.object().shape({
     .min(2),
 })
 
-const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
+const Step2 = memo(({ formData, setFormData, prevStep, nextStep }) => {
   const [cookies] = useCookies()
   const [showMap, setShowMap] = useState(false)
   const [listDataLocation, setListDataLocation] = useState(null)
   const createSessionMutation = useMutation(createSession)
+
+  if (sessionStorage.getItem('checkOldSession')) sessionStorage.removeItem('checkOldSession')
 
   const methods = useForm({
     resolver: yupResolver(schema),
@@ -82,7 +86,8 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
   useEffect(() => {
     if (createSessionMutation.isSuccess) {
       if (createSessionMutation.data.messageCode === messageCodes.SUCCESS) {
-        setSid(createSessionMutation.data.data.sid)
+        sessionStorage.setItem('sid', createSessionMutation.data.data.sid)
+        router.push(`${urls.SESSIONS_CREATE}/3`)
         nextStep()
       } else {
         alert(createSessionMutation.data.message)
@@ -232,6 +237,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
                   type="button"
                   variant="danger"
                   onClick={() => {
+                    router.back()
                     prevStep()
                   }}
                 >

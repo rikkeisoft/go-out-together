@@ -32,11 +32,28 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
   }
 
   useEffect(() => {
+    // let hanoi, searchMap, mapService
+    // if (window.google?.maps) {
+    //   hanoi = new window.google.maps.LatLng(20.999219111687964, 105.75077611516895)
+    //   searchMap = new window.google.maps.Map(document.getElementById('google-map'), { center: hanoi, zoom: 12 })
+    //   mapService = new window.google.maps.places.PlacesService(searchMap)
+    // }
     if (location) {
       const getLocation = async () => {
         try {
+          // console.log(mapService)
+          // const request = {
+          //   query: location,
+          //   fields: ['name', 'geometry'],
+          //   locationBias: { north: 21.162623422597193, south: 20.86290687846366, east: 105.91278669275977, west: 105.57999631946717 },
+          // }
+          // mapService.findPlaceFromQuery(request, function(results, status) {
+          //   if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+          //     console.log(results)
+          // }})
           const response = await axios.get(
             `${process.env.NEXT_PUBLIC_API_MAPBOX}/${location}.json?proximity=105.75077611516895,20.999219111687964&bbox=105.57999631946717,20.86290687846366,105.91278669275977,21.162623422597193&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
+            // `${process.env.NEXT_PUBLIC_GOOGLE_API_URL}?input=${location}&inputtype=textquery&locationbias=rectangle:21.162623422597193,105.57999631946717,20.86290687846366,105.91278669275977&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`,
           )
           const dataList = response.data.features
           setDataLocation(dataList)
@@ -111,7 +128,10 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
       <Head>
         <title>Home</title>
         <link rel="icon" href="/favicon.ico" />
-        <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
+        <script async src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
+        {/* <script async
+          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}&libraries=places`}>
+        </script> */}
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
       <h1 className="text-center font-semibold text-xl">Hãy chọn địa điểm ở Hà Nội</h1>
@@ -266,6 +286,7 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
           </ul>
         )}
         <div id="map" className="w-full mb-8" style={{ height: '70vh' }}></div>
+        <div id="google-map"></div>
       </div>
     </>
   )

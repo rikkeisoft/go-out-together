@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import useStep from 'hooks/useStep'
 import { useRouter } from 'next/router'
@@ -22,21 +22,24 @@ export default function Create() {
   const router = useRouter()
   const [cookies, , removeCookie] = useCookies(['uid', 'username', 'imgURL'])
   const queryClient = useQueryClient()
-  const { step, formData, backwardStep, prevStep, nextStep, setFormData } = useStep()
-  const [sid, setSid] = useState(null)
+  const { formData, backwardStep, prevStep, nextStep, setFormData } = useStep()
+  const [createStep, setCreateStep] = useState('0')
+
+  useEffect(() => {
+    if (!router.isReady) return
+    setCreateStep(router.query.all[0])
+  }, [router.isReady, router.asPath])
 
   let stepElement = <></>
-  switch (step) {
-    case 1:
+  switch (createStep) {
+    case '1':
       stepElement = <Step1 formData={formData} setFormData={setFormData} nextStep={nextStep} />
       break
-    case 2:
-      stepElement = (
-        <Step2 formData={formData} setFormData={setFormData} prevStep={prevStep} nextStep={nextStep} setSid={setSid} />
-      )
+    case '2':
+      stepElement = <Step2 formData={formData} setFormData={setFormData} prevStep={prevStep} nextStep={nextStep} />
       break
-    case 3:
-      stepElement = <Step3 sid={sid} setFormData={setFormData} backwardStep={backwardStep} />
+    case '3':
+      stepElement = <Step3 setFormData={setFormData} backwardStep={backwardStep} />
       break
     default:
       break

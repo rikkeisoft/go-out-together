@@ -38,11 +38,19 @@ const Step3 = memo(({ sid, prevStep, setFormData }) => {
                 onComplete={() => {
                   refetch()
                   localStorage.removeItem('votedAddress')
+                  sessionStorage.removeItem('redirectURL')
                 }}
               />
             </span>
           </MessageText>
-          <Button type="button" variant="danger" onClick={prevStep}>
+          <Button
+            type="button"
+            variant="danger"
+            onClick={() => {
+              router.back()
+              prevStep()
+            }}
+          >
             Chọn lại
           </Button>
         </Center>

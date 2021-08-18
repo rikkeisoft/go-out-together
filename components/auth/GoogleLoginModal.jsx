@@ -33,7 +33,7 @@ function GoogleLoginModal() {
         queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedIn: true })
         const url = sessionStorage.getItem('redirectURL')
         if (url !== null) router.push(url)
-        else router.push(urls.SESSIONS_CREATE)
+        else router.push(`${urls.SESSIONS_CREATE}/1`)
       }
     })
     return () => unregisterAuthObserver()

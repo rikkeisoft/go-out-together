@@ -20,6 +20,8 @@ import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MapBox from 'components/common/MapBox'
 import LoadingOverlay from 'components/common/LoadingOverlay'
+import router from 'next/router'
+import urls from 'consts/urls'
 
 const schema = yup.object().shape({
   name: yup.string().required('Nhập vào tên'),
@@ -74,8 +76,8 @@ const Step1 = memo(({ sid, formData, setFormData, nextStep }) => {
 
   useEffect(() => {
     if (joinSessionMutation.isSuccess) {
-      console.log(joinSessionMutation.data.messageCode)
       if (joinSessionMutation.data.messageCode === messageCodes.SUCCESS) {
+        router.push(`${urls.SESSIONS}/${sid}/2`)
         nextStep()
       } else {
         alert(joinSessionMutation.data.message)
