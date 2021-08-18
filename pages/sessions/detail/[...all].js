@@ -71,7 +71,7 @@ export default function Details({ error }) {
         <title>Form</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container>
+      <Container className="bg-image2">
         <div className="flex items-center justify-around">
           <Button type="button" variant="danger" onClick={goToHomePage}>
             <ArrowLeftIcon className="w-7" /> Về trang chủ
