@@ -3,7 +3,7 @@ import LoadingOverlay from 'components/common/LoadingOverlay'
 import queryKeys from 'consts/queryKeys'
 import { useRouter } from 'next/router'
 import Home from 'pages'
-import Details from 'pages/sessions/[sid]'
+import Details from 'pages/sessions/detail/[...all].js'
 import { useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import { useQuery, useQueryClient } from 'react-query'
@@ -40,15 +40,13 @@ export default function ProtectedComponent({ children }) {
 
   useEffect(() => {
     if (!router.isReady) return
-    const isReloaded = sessionStorage.getItem('pageReloaded')
-    if (isReloaded) {
-      sessionStorage.getItem('redirectURL') && sessionStorage.removeItem('redirectURL')
-    }
-    sessionStorage.setItem('pageReloaded', 'true')
-    if (router.query.id === undefined && router.asPath !== '/') {
-      sessionStorage.setItem('redirectURL', router.asPath)
-    } else if (router.query.id !== undefined && router.pathname === '/sessions/[sid]') {
-      sessionStorage.setItem('redirectURL', `/sessions/${router.query.sid}`)
+    // const isReloaded = sessionStorage.getItem('pageReloaded')
+    // if (isReloaded) {
+    //   sessionStorage.getItem('redirectURL') && sessionStorage.removeItem('redirectURL')
+    // }
+    // sessionStorage.setItem('pageReloaded', 'true')
+    if (router.query.all !== undefined && router.pathname === '/sessions/detail/[...all]') {
+      sessionStorage.setItem('redirectURL', `/sessions/detail/${router.query.all[0]}/${router.query.all[1]}`)
     } else return
   }, [router.isReady, router.pathname])
 
@@ -57,7 +55,7 @@ export default function ProtectedComponent({ children }) {
   }
 
   if (error) {
-    if (router.pathname === '/sessions/[sid]') return <Details error={error.message} />
+    if (router.pathname === '/sessions/detail/[...all]') return <Details error={error.message} />
     return <Home />
   }
 

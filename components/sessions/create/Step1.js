@@ -25,6 +25,7 @@ import LoadingOverlay from 'components/common/LoadingOverlay'
 import DetailIcon from 'components/icons/DetailIcon'
 // import Popup from 'components/common/Popup'
 import { useRouter } from 'next/router'
+import urls from 'consts/urls'
 
 const schema = yup.object().shape({
   name: yup.string().required('Nhập vào tên'),
@@ -36,7 +37,7 @@ const schema = yup.object().shape({
   }),
 })
 
-const Step1 = memo(({ formData, setFormData, nextStep }) => {
+const Step1 = memo(({ formData, setFormData }) => {
   const [cookies] = useCookies()
   const [showMap, setShowMap] = useState(false)
   const [userLocation, setUserLocation] = useState(null)
@@ -44,6 +45,11 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   const [dataOldSessions, setDataOldSessions] = useState([])
   // // const [openPopup, setOpenPopup] = useState(false)
   // const [idDetail, setIdDetail] = useState('')
+  const router = useRouter()
+  sessionStorage.getItem('redirectURL') && sessionStorage.removeItem('redirectURL')
+  sessionStorage.getItem('isSessionExpired') && sessionStorage.removeItem('isSessionExpired')
+  sessionStorage.getItem('sid') && sessionStorage.removeItem('sid')
+  sessionStorage.getItem('isAdmin') && sessionStorage.removeItem('isAdmin')
 
   const updateSessionCreatorMutation = useMutation(updateSessionCreator)
 
@@ -91,21 +97,19 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   useEffect(() => {
     if (updateSessionCreatorMutation.isSuccess) {
       if (updateSessionCreatorMutation.data.messageCode === messageCodes.SUCCESS) {
-        nextStep()
+        router.push(`${urls.SESSIONS_CREATE}/2`)
       } else {
         alert(updateSessionCreatorMutation.data.message)
       }
     }
   }, [updateSessionCreatorMutation.isSuccess])
-  const router = useRouter()
 
-  // let itemDetail = {}
-  // if (idDetail) {
-  //   const findIdex = oldSessions?.data.findIndex((item) => item.id === idDetail)
-  //   if (findIdex > -1) {
-  //     itemDetail = oldSessions?.data[findIdex]
-  //   }
-  // }
+  const handleCheckOldSession = (item) => {
+    sessionStorage.getItem('redirectToOldSession') && sessionStorage.removeItem('redirectToOldSession')
+
+    sessionStorage.setItem('checkOldSession', 'true')
+    router.push(`/sessions/detail/${item.sid}/0`)
+  }
 
   return (
     <>
@@ -141,15 +145,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
                       <td className="p-3 border-r"> {item.sid}</td>
                       <td className="p-3 border-r"> {item.title}</td>
                       <td className="p-3 border-r">
-                        <span
-                          title="Chi tiết"
-                          className="cursor-pointer"
-                          onClick={() => {
-                            router.replace(`/sessions/${item.sid}`)
-                            // setIdDetail(item.id)
-                            // setOpenPopup(true)
-                          }}
-                        >
+                        <span title="Chi tiết" className="cursor-pointer" onClick={() => handleCheckOldSession(item)}>
                           <DetailIcon />
                         </span>
                       </td>
@@ -168,10 +164,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
       ) : showMap ? (
         <MapBox
           isOneLocaion={true}
-          data={(data) => {
-            console.log(data)
-            setUserLocation(data)
-          }}
+          data={(data) => setUserLocation(data)}
           show={() => {
             setShowMap(false)
           }}
@@ -220,34 +213,6 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
           </FormProvider>
         </div>
       )}
-      {/* {idDetail ? (
-        <Popup isOpen={openPopup} onRequestClose={() => setOpenPopup(false)}>
-          <div className="bg-black text-white  font-bold text-center py-2 mb-2">Thông tin của sessions</div>
-          <div>
-            <p>
-              <span className="font-bold mr-2">Tiêu đề:</span>
-              {itemDetail.title}
-            </p>
-            <p>
-              <span className="font-bold mr-2">Nội dung:</span>
-              {itemDetail.content}
-            </p>
-            <p>
-              <span className="font-bold mr-2">ID Nhóm:</span>
-              {itemDetail.sid}
-            </p>
-            <p>
-              <span className="font-bold mr-2">Kết quả vote:</span>
-              {itemDetail.result || '---'}
-            </p>
-          </div>
-          <div className="flex justify-end mt-2">
-            <Button variant="dark" type="button" onClick={() => setOpenPopup(false)}>
-              Đóng
-            </Button>
-          </div>
-        </Popup>
-      ) : null} */}
       <LoadingOverlay isOpen={updateSessionCreatorMutation.isLoading} message="Đang xử lí..." />
     </>
   )
@@ -256,7 +221,6 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
 Step1.propTypes = {
   formData: PropTypes.object,
   setFormData: PropTypes.func,
-  nextStep: PropTypes.func,
 }
 Step1.defaultProps = {}
 

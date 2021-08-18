@@ -24,6 +24,8 @@ import List from 'components/common/List'
 import MapBox from 'components/common/MapBox'
 import SmallTitle from 'components/common/SmallTitle'
 import LoadingOverlay from 'components/common/LoadingOverlay'
+import router from 'next/router'
+import urls from 'consts/urls'
 
 const schema = yup.object().shape({
   title: yup.string().required('Nhập vào tiêu đề'),
@@ -42,11 +44,14 @@ const schema = yup.object().shape({
     .min(2),
 })
 
-const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
+const Step2 = memo(({ formData, setFormData }) => {
   const [cookies] = useCookies()
   const [showMap, setShowMap] = useState(false)
   const [listDataLocation, setListDataLocation] = useState(null)
   const createSessionMutation = useMutation(createSession)
+
+  if (sessionStorage.getItem('checkOldSession')) sessionStorage.removeItem('checkOldSession')
+  if (sessionStorage.getItem('redirectToOldSession')) sessionStorage.removeItem('redirectToOldSession')
 
   const methods = useForm({
     resolver: yupResolver(schema),
@@ -55,13 +60,17 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
 
   const onSubmit = (data) => {
     setFormData(Object.assign({}, formData, data))
-    createSessionMutation.mutate({
-      uid: cookies.uid,
-      title: data.title,
-      content: data.content,
-      timeLimit: data.timeLimit,
-      addresses: data.addresses,
-    })
+    if (sessionStorage.getItem('sid')) {
+      router.push(`${urls.SESSIONS_CREATE}/3`)
+    } else {
+      createSessionMutation.mutate({
+        uid: cookies.uid,
+        title: data.title,
+        content: data.content,
+        timeLimit: data.timeLimit,
+        addresses: data.addresses,
+      })
+    }
   }
 
   useEffect(() => {
@@ -82,8 +91,8 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
   useEffect(() => {
     if (createSessionMutation.isSuccess) {
       if (createSessionMutation.data.messageCode === messageCodes.SUCCESS) {
-        setSid(createSessionMutation.data.data.sid)
-        nextStep()
+        sessionStorage.setItem('sid', createSessionMutation.data.data.sid)
+        router.push(`${urls.SESSIONS_CREATE}/3`)
       } else {
         alert(createSessionMutation.data.message)
       }
@@ -232,7 +241,7 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
                   type="button"
                   variant="danger"
                   onClick={() => {
-                    prevStep()
+                    router.back()
                   }}
                 >
                   Trước đó
@@ -255,8 +264,6 @@ const Step2 = memo(({ formData, setFormData, prevStep, nextStep, setSid }) => {
 Step2.propTypes = {
   formData: PropTypes.object,
   setFormData: PropTypes.func,
-  prevStep: PropTypes.func,
-  nextStep: PropTypes.func,
   setSid: PropTypes.func,
 }
 

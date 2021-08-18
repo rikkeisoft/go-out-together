@@ -18,27 +18,34 @@ import Step3 from 'components/sessions/details/Step3'
 import UserAvatar from 'components/avatar/UserAvatar'
 import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
 import GoogleLoginModal from 'components/auth/GoogleLoginModal'
+import { useEffect, useState } from 'react'
 
 export default function Details({ error }) {
   const [cookies, , removeCookie] = useCookies()
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { sid } = router.query
+  const sid = router.query.all[0]
+  const { formData, setFormData } = useStep()
+  const [detailStep, setDetailStep] = useState('0')
 
-  const { step, formData, setStep, prevStep, nextStep, setFormData } = useStep(0)
+  useEffect(() => {
+    if (!router.isReady) return
+    setDetailStep(router.query.all[1])
+  }, [router.isReady, router.asPath])
+
   let stepElement = <></>
-  switch (step) {
-    case 0:
-      stepElement = <Step0 sid={sid} uid={cookies.uid} setStep={setStep} />
+  switch (detailStep) {
+    case '0':
+      stepElement = <Step0 sid={sid} uid={cookies.uid} />
       break
-    case 1:
-      stepElement = <Step1 sid={sid} formData={formData} setFormData={setFormData} nextStep={nextStep} />
+    case '1':
+      stepElement = <Step1 sid={sid} formData={formData} setFormData={setFormData} />
       break
-    case 2:
-      stepElement = <Step2 sid={sid} prevStep={prevStep} nextStep={nextStep} />
+    case '2':
+      stepElement = <Step2 sid={sid} />
       break
-    case 3:
-      stepElement = <Step3 sid={sid} prevStep={prevStep} setFormData={setFormData} />
+    case '3':
+      stepElement = <Step3 sid={sid} setFormData={setFormData} />
       break
     default:
       break
@@ -54,6 +61,7 @@ export default function Details({ error }) {
     removeCookie('uid', { path: '/' })
     removeCookie('username', { path: '/' })
     removeCookie('imgURL', { path: '/' })
+    removeCookie('address', { path: '/' })
     auth.signOut()
   }
 

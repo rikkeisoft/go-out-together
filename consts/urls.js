@@ -1,5 +1,5 @@
 export default {
   HOME: '/',
   SESSIONS_CREATE: '/sessions/create',
-  SESSIONS: '/sessions',
+  SESSIONS: '/sessions/detail',
 }
