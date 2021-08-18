@@ -5,8 +5,8 @@ import PropTypes from 'prop-types'
 
 const Container = memo(({ className, children }) => {
   return (
-    <div className=" relative w-screen h-screen">
-      <div className={ className}>{children}</div>
+    <div className="relative w-screen h-screen">
+      <div className={ className }>{children}</div>
     </div>
   )
 })

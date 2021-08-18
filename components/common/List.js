@@ -6,7 +6,6 @@ import TrashIcon from 'components/icons/TrashIcon'
 
 const List = memo(({ name }) => {
   const { control, watch } = useFormContext()
-
   return (
     <Controller
       control={control}
@@ -16,10 +15,13 @@ const List = memo(({ name }) => {
         <table className="w-full font-bold mt-4">
           <tbody>
             {value.map((item, index) => {
+              console.log('---', value)
               return (
                 <tr key={`item-` + index} className="hover:bg-gray-100 border border-transparent rounded-md text-lg">
                   <td className="pl-4 py-2 rounded-tl-md rounded-bl-md">{item.name}</td>
                   <td className="pr-4 py-2 w-10 rounded-tr-md rounded-br-md">
+                   {!(sessionStorage.getItem('sid')) ? (
+
                     <button
                       type="button"
                       onClick={() => {
@@ -31,6 +33,7 @@ const List = memo(({ name }) => {
                     >
                       <TrashIcon className="w-6" />
                     </button>
+                    ) : null}
                   </td>
                 </tr>
               )
