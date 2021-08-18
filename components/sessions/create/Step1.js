@@ -41,6 +41,7 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
   const [showMap, setShowMap] = useState(false)
   const [userLocation, setUserLocation] = useState(null)
   const [isToggleView, setIsToggleView] = useState(true)
+  const [dataOldSessions, setDataOldSessions] = useState([])
   // // const [openPopup, setOpenPopup] = useState(false)
   // const [idDetail, setIdDetail] = useState('')
 
@@ -54,6 +55,14 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
     retry: 1,
   })
 
+  useEffect(() => {
+    if (!isLoading) {
+      oldSessions?.data?.sort((a, b) => b.id - a.id)
+      setDataOldSessions(oldSessions)
+    }
+  }, [uid, isLoading])
+
+  console.log('dataOldSessions', dataOldSessions)
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: defaultValues,
@@ -126,8 +135,8 @@ const Step1 = memo(({ formData, setFormData, nextStep }) => {
                     </td>
                   </tr>
                 ) : (
-                  oldSessions?.data.length !== 0 &&
-                  oldSessions?.data.map((item, index) => (
+                  dataOldSessions?.data?.length !== 0 &&
+                  dataOldSessions?.data?.map((item, index)  => (
                     <tr className=" sm:table-row border" key={index}>
                       <td className="p-3 border-r"> {item.sid}</td>
                       <td className="p-3 border-r"> {item.title}</td>
