@@ -50,6 +50,7 @@ const Step1 = memo(({ formData, setFormData }) => {
   sessionStorage.getItem('isSessionExpired') && sessionStorage.removeItem('isSessionExpired')
   sessionStorage.getItem('sid') && sessionStorage.removeItem('sid')
   sessionStorage.getItem('isAdmin') && sessionStorage.removeItem('isAdmin')
+  sessionStorage.getItem('redirectToOldSession') && sessionStorage.removeItem('redirectToOldSession')
 
   const updateSessionCreatorMutation = useMutation(updateSessionCreator)
 
@@ -68,7 +69,6 @@ const Step1 = memo(({ formData, setFormData }) => {
     }
   }, [uid, isLoading])
 
-  console.log('dataOldSessions', dataOldSessions)
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: defaultValues,
@@ -140,7 +140,7 @@ const Step1 = memo(({ formData, setFormData }) => {
                   </tr>
                 ) : (
                   dataOldSessions?.data?.length !== 0 &&
-                  dataOldSessions?.data?.map((item, index)  => (
+                  dataOldSessions?.data?.map((item, index) => (
                     <tr className=" sm:table-row border" key={index}>
                       <td className="p-3 border-r"> {item.sid}</td>
                       <td className="p-3 border-r"> {item.title}</td>

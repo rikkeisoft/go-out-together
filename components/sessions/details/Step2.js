@@ -288,24 +288,24 @@ const Step2 = memo(({ sid }) => {
                       <p className="text-xl text-black-600 font-bold my-4">Các địa điểm ăn chơi:</p>
                     )}
                   </Label>
-                    <AddressVoter
-                      name="votedAddress"
-                      showDelete={new Date(data?.data?.expireTime).getTime() > new Date().getTime()}
-                      data={data.data.addresses}
-                      onClick={(item) => {
-                        setVoteAddress(item)
-                        setShowDirectionRoutes(true)
-                      }}
-                      onDelete={deleteAddress}
-                    />
-                    <LoadingOverlay isOpen={isLoadingAdress} message="Đang Xóa địa điểm vote" />
-                {!_.isNil(methods.formState.errors.votedAddress) &&
-                  new Date(data?.data?.expireTime).getTime() > new Date().getTime() && (
-                    <ErrorText>
-                      {' '}
-                      <p className="font-bold">Chọn địa chỉ để vote</p>
-                    </ErrorText>
-                  )}
+                  <AddressVoter
+                    name="votedAddress"
+                    showDelete={new Date(data?.data?.expireTime).getTime() > new Date().getTime()}
+                    data={data.data.addresses}
+                    onClick={(item) => {
+                      setVoteAddress(item)
+                      setShowDirectionRoutes(true)
+                    }}
+                    onDelete={deleteAddress}
+                  />
+                  <LoadingOverlay isOpen={isLoadingAdress} message="Đang Xóa địa điểm vote" />
+                  {!_.isNil(methods.formState.errors.votedAddress) &&
+                    new Date(data?.data?.expireTime).getTime() > new Date().getTime() && (
+                      <ErrorText>
+                        {' '}
+                        <p className="font-bold">Chọn địa chỉ để vote</p>
+                      </ErrorText>
+                    )}
                 </Field>
                 {new Date(data.data.expireTime).getTime() > new Date().getTime() ? (
                   <ButtonGroup>

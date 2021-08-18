@@ -13,6 +13,8 @@ export default function Home() {
   const [cookies] = useCookies(['accessToken'])
   const router = useRouter()
   const url = sessionStorage.getItem('redirectURL')
+  // sessionStorage.getItem('isAdmin') && sessionStorage.removeItem('isAdmin')
+  // sessionStorage.getItem('redirectToOldSession') && sessionStorage.removeItem('redirectToOldSession')
 
   useEffect(() => {
     if (url !== null) {
