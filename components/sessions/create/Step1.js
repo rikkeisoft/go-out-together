@@ -23,7 +23,6 @@ import Button from 'components/common/Button'
 import MapBox from 'components/common/MapBox'
 import LoadingOverlay from 'components/common/LoadingOverlay'
 import DetailIcon from 'components/icons/DetailIcon'
-// import Popup from 'components/common/Popup'
 import { useRouter } from 'next/router'
 import urls from 'consts/urls'
 
@@ -43,8 +42,6 @@ const Step1 = memo(({ formData, setFormData }) => {
   const [userLocation, setUserLocation] = useState(null)
   const [isToggleView, setIsToggleView] = useState(true)
   const [dataOldSessions, setDataOldSessions] = useState([])
-  // // const [openPopup, setOpenPopup] = useState(false)
-  // const [idDetail, setIdDetail] = useState('')
   const router = useRouter()
   sessionStorage.getItem('redirectURL') && sessionStorage.removeItem('redirectURL')
   sessionStorage.getItem('isSessionExpired') && sessionStorage.removeItem('isSessionExpired')
