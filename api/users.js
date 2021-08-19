@@ -20,6 +20,11 @@ export const updateSessionCreator = (data) => {
   return axiosClient.post(url, data)
 }
 
+export const updateUserInfo = (data) => {
+  const url = 'users/update'
+  return axiosClient.put(url, data)
+}
+
 export const joinSession = (data) => {
   const url = 'sessions/join'
   return axiosClient.post(url, data)
