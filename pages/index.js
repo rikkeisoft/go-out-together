@@ -36,10 +36,9 @@ export default function Home() {
         <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
-
-      <Container>
+      <Container className="bg-image">
         <Center>
-          <div className="py-36 md:py-80">
+          <div className="py-34 md:py-40">
             <h1 className="mb-3 text-gray-800 text-2xl md:text-5xl font-bold">GO OUT TOGETHER</h1>
             <h1 className="mb-3 text-gray-800 text-2xl md:text-5xl font-bold">
               Tạo nhóm và cùng bạn bè chọn địa điểm vui chơi
@@ -71,7 +70,7 @@ export default function Home() {
             </div>
           </div>
         </Center>
-      </Container>
+        </Container>
     </MainLayout>
   )
 }
