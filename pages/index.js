@@ -38,7 +38,7 @@ export default function Home() {
       </Head>
       <Container className="bg-image">
         <Center>
-          <div className="py-36 md:py-60">
+          <div className="py-34 md:py-40">
             <h1 className="mb-3 text-gray-800 text-2xl md:text-5xl font-bold">GO OUT TOGETHER</h1>
             <h1 className="mb-3 text-gray-800 text-2xl md:text-5xl font-bold">
               Tạo nhóm và cùng bạn bè chọn địa điểm vui chơi
