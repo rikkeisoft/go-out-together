@@ -17,6 +17,8 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
   })
 
   const handleSignOut = () => {
+    localStorage.clear()
+    sessionStorage.clear()
     onSignOut()
     setVisbile(!visible)
   }
