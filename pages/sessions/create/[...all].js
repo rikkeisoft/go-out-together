@@ -45,10 +45,10 @@ export default function Create() {
       break
   }
 
-  const goToHomePage = () => router.push(`${urls.LOGIN}`)
+  const goToHomePage = () => router.push(`${urls.HOME}`)
 
   const handleSignOut = () => {
-    goToHomePage()
+    router.push(`${urls.LOGIN}`)
     queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedOut: true })
     sessionStorage.removeItem('redirectURL')
     removeCookie('accessToken', { path: '/' })

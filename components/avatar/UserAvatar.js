@@ -56,13 +56,13 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
       {visible && (
         <div className="absolute left-6 top-14 md:left-5 top-12 md:top-14 p-1 md:py-1 z-10 border-white rounded-sm border bg-white">
           <button
-            className="w-full p-0.5 md:w-20 md:px-2 md:py-1 rounded-sm bg-transparent text-red-500 text-xs font-bold"
+            className="w-full p-0.5 md:w-20 md:px-2 md:py-1 rounded-sm bg-transparent text-red-500 text-xs font-bold hover:bg-gray-300"
             onClick={handleChangeAvatar}
           >
             Thay đổi avatar
           </button>
           <button
-            className="w-full p-0.5 md:w-20 md:px-2 md:py-1 rounded-sm bg-transparent text-red-500 text-xs font-bold"
+            className="w-full p-0.5 md:w-20 md:px-2 md:py-1 rounded-sm bg-transparent text-red-500 text-xs font-bold hover:bg-gray-300"
             onClick={handleSignOut}
           >
             Đăng xuất

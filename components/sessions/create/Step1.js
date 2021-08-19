@@ -71,6 +71,8 @@ const Step1 = memo(({ formData, setFormData }) => {
   useEffect(() => {
     if (updateSessionCreatorMutation.isSuccess) {
       if (updateSessionCreatorMutation.data.messageCode === messageCodes.SUCCESS) {
+        sessionStorage.removeItem('voted')
+        sessionStorage.getItem('sid') && sessionStorage.removeItem('sid')
         router.push(`${urls.SESSIONS_CREATE}/2`)
       } else {
         alert(updateSessionCreatorMutation.data.message)
