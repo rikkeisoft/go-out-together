@@ -2,28 +2,17 @@ import Head from 'next/head'
 import MainLayout from 'layouts/MainLayout'
 import Container from 'components/common/Container'
 import Center from 'components/common/Center'
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import urls from 'consts/urls'
 import GoogleLoginModal from 'components/auth/GoogleLoginModal'
 import { useCookies } from 'react-cookie'
 
 export default function Login() {
-  const [redirectURL, setRedirectURL] = useState(`${urls.HOME}`)
   const [cookies] = useCookies(['accessToken', 'imgURL'])
   const router = useRouter()
-  const url = sessionStorage.getItem('redirectURL')
-
-  useEffect(() => {
-    if (url !== null) {
-      setRedirectURL(url)
-    }
-  }, [])
 
   const handleButtonClick = () => {
-    if (url) {
-      router.back()
-    } else router.push(redirectURL)
+    router.push(`${urls.HOME}`)
   }
 
   return (
@@ -48,12 +37,12 @@ export default function Login() {
                     className="inline-flex items-center md:px-12 md:py-3 px-8 py-2 text-white md:text-2xl text-base font-semibold rounded-md bg-blue-500 hover:bg-blue-400"
                     onClick={handleButtonClick}
                   >
-                    {!url ? 'Thử ngay' : 'Xem chi tiết nhóm'}
+                    Thử ngay
                   </button>
                 </div>
               ) : (
                 <div className="md:flex md:justify-center md:items-center">
-                  <span className="font-semibold text-2xl font-semibold">Đăng nhập ngay: </span>
+                  <span className="font-semibold text-2xl">Đăng nhập ngay: </span>
                   <GoogleLoginModal />
                 </div>
               )}

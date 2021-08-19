@@ -14,17 +14,15 @@ import queryKeys from 'consts/queryKeys'
 import ButtonGroup from 'components/common/ButtonGroup'
 import DetailIcon from 'components/icons/DetailIcon'
 import { getOldSessions } from 'api/sessions'
+import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
 
 export default function Home() {
   const [dataOldSessions, setDataOldSessions] = useState([])
   const [cookies, , removeCookie] = useCookies(['accessToken', 'imgURL'])
   const router = useRouter()
   const queryClient = useQueryClient()
-  sessionStorage.getItem('redirectURL') && sessionStorage.removeItem('redirectURL')
   sessionStorage.getItem('isSessionExpired') && sessionStorage.removeItem('isSessionExpired')
-  sessionStorage.getItem('sid') && sessionStorage.removeItem('sid')
-  sessionStorage.getItem('isAdmin') && sessionStorage.removeItem('isAdmin')
-  sessionStorage.getItem('redirectToOldSession') && sessionStorage.removeItem('redirectToOldSession')
+  const url = sessionStorage.getItem('redirectURL')
 
   const uid = cookies.uid
   const { data: oldSessions, isLoading } = useQuery([queryKeys.GET_OLD, { uid }], () => getOldSessions({ uid }), {
@@ -52,7 +50,7 @@ export default function Home() {
 
   const handleCheckOldSession = (item) => {
     sessionStorage.getItem('redirectToOldSession') && sessionStorage.removeItem('redirectToOldSession')
-
+    sessionStorage.getItem('isAdmin') && sessionStorage.removeItem('isAdmin')
     sessionStorage.setItem('checkOldSession', 'true')
     router.push(`/sessions/detail/${item.sid}/0`)
   }
@@ -67,7 +65,13 @@ export default function Home() {
       </Head>
       <Container className="bg-image1">
         <div className="flex items-center justify-around">
-          <h1 className="font-bold text-3xl cursor-pointer">Go out together</h1>
+          {url ? (
+            <Button type="button" variant="danger" onClick={() => router.back()}>
+              <ArrowLeftIcon className="w-7" /> Quay lại
+            </Button>
+          ) : (
+            <h1 className="font-bold text-3xl cursor-pointer">Go out together</h1>
+          )}
           <UserAvatar imgURL={cookies?.imgURL} username={cookies?.username} onSignOut={handleSignOut} />
         </div>
         <Center>

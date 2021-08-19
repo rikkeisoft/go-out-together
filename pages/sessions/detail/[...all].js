@@ -21,12 +21,13 @@ import GoogleLoginModal from 'components/auth/GoogleLoginModal'
 import { useEffect, useState } from 'react'
 
 export default function Details({ error }) {
-  const [cookies, , removeCookie] = useCookies(['imgURL'])
+  const [cookies, , removeCookie] = useCookies(['imgURL', 'uid'])
   const router = useRouter()
   const queryClient = useQueryClient()
   const sid = router.query.all[0]
   const { formData, setFormData } = useStep()
   const [detailStep, setDetailStep] = useState(null)
+  const checkOldSession = sessionStorage.getItem('checkOldSession')
 
   useEffect(() => {
     if (!router.isReady) return
@@ -51,10 +52,10 @@ export default function Details({ error }) {
       break
   }
 
-  const goToHomePage = () => router.push(`${urls.LOGIN}`)
+  const goToHomePage = () => router.push(`${urls.HOME}`)
 
   const handleSignOut = () => {
-    goToHomePage()
+    router.push(`${urls.LOGIN}`)
     queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedOut: true })
     sessionStorage.removeItem('redirectURL')
     removeCookie('accessToken', { path: '/' })
@@ -73,9 +74,13 @@ export default function Details({ error }) {
       </Head>
       <Container className="bg-image2">
         <div className="flex items-center justify-around">
-          <Button type="button" variant="danger" onClick={goToHomePage}>
-            <ArrowLeftIcon className="w-7" /> Về trang chủ
-          </Button>
+          {checkOldSession ? (
+            <h1 className="font-bold text-3xl cursor-pointer">Go out together</h1>
+          ) : (
+            <Button type="button" variant="danger" onClick={goToHomePage}>
+              <ArrowLeftIcon className="w-7" /> Về trang chủ
+            </Button>
+          )}
           <UserAvatar imgURL={cookies?.imgURL} username={cookies?.username} onSignOut={handleSignOut} />
         </div>
         <Center>

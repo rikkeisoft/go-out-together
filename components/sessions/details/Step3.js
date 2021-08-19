@@ -80,7 +80,6 @@ const Step3 = memo(({ sid, setFormData }) => {
               variant="primary"
               onClick={() => {
                 setFormData()
-                sessionStorage.removeItem('voted')
                 sessionStorage.removeItem('redirectURL')
                 router.push(`${urls.SESSIONS_CREATE}/1`)
               }}
