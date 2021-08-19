@@ -21,7 +21,7 @@ import GoogleLoginModal from 'components/auth/GoogleLoginModal'
 import { useEffect, useState } from 'react'
 
 export default function Details({ error }) {
-  const [cookies, , removeCookie] = useCookies()
+  const [cookies, , removeCookie] = useCookies(['imgURL'])
   const router = useRouter()
   const queryClient = useQueryClient()
   const sid = router.query.all[0]
@@ -30,11 +30,8 @@ export default function Details({ error }) {
 
   useEffect(() => {
     if (!router.isReady) return
-    console.log(router.asPath)
     setDetailStep(router.query.all[1])
   }, [router.isReady, router.asPath])
-
-  console.log(detailStep)
 
   let stepElement = <></>
   switch (detailStep) {
@@ -54,7 +51,7 @@ export default function Details({ error }) {
       break
   }
 
-  const goToHomePage = () => router.push(urls.HOME)
+  const goToHomePage = () => router.push(`${urls.LOGIN}`)
 
   const handleSignOut = () => {
     goToHomePage()

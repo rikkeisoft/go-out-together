@@ -1,15 +1,15 @@
 import { checkUser } from 'api/users'
 import LoadingOverlay from 'components/common/LoadingOverlay'
 import queryKeys from 'consts/queryKeys'
+import urls from 'consts/urls'
 import { useRouter } from 'next/router'
-import Home from 'pages'
 import Details from 'pages/sessions/detail/[...all].js'
 import { useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import { useQuery, useQueryClient } from 'react-query'
 
 export default function ProtectedComponent({ children }) {
-  const [, , removeCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
+  const [, setCookie, removeCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
   const queryClient = useQueryClient()
   const { error, isLoading } = useQuery(
     queryKeys.CHECK_USER,
@@ -23,8 +23,9 @@ export default function ProtectedComponent({ children }) {
       }
 
       try {
-        await checkUser()
+        const data = await checkUser()
         queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedIn: true })
+        setCookie('imgURL', data?.data?.avatar_url)
         return
       } catch (error) {
         removeCookie('username', { path: '/' })
@@ -56,7 +57,8 @@ export default function ProtectedComponent({ children }) {
 
   if (error) {
     if (router.pathname === '/sessions/detail/[...all]') return <Details error={error.message} />
-    return <Home />
+    router.push(`${urls.LOGIN}`)
+    return
   }
 
   return <>{children}</>

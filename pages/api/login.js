@@ -45,9 +45,9 @@ export default async function handler(req, res) {
       }
     } else {
       let user = result[0]
-      if (user.username !== username || user.avatar_url !== avatar_url) {
-        queryString = `UPDATE users SET username = ?, avatar_url = ? WHERE uuid = ?`
-        values = [username, avatar_url, uuid]
+      if (user.username !== username) {
+        queryString = `UPDATE users SET username = ? WHERE uuid = ?`
+        values = [username, uuid]
         try {
           result = await mysql.query(queryString, values)
         } catch (err) {
