@@ -6,12 +6,28 @@ import Button from 'components/common/Button'
 import { useCookies } from 'react-cookie'
 import { useMutation } from 'react-query'
 import { updateUserInfo } from 'api/users'
+import AvatarEditor from 'react-avatar-editor'
+// import Preview from './Preview.jsx'
 
 export default function UserAvatar({ imgURL, username, onSignOut }) {
   const [cookies, setCookie] = useCookies(['uid', 'imgURL'])
   const [visible, setVisbile] = useState(false)
   const [openPopup, setOpenPopup] = useState(false)
-  const [avatarURL, setAvatarURL] = useState(imgURL)
+  // const [scale, setScale] = useState(1)
+  const initialState = {
+    image: imgURL,
+    allowZoomOut: false,
+    position: { x: 0.5, y: 0.5 },
+    scale: 1,
+    rotate: 0,
+    borderRadius: 0,
+    preview: null,
+    width: 200,
+    height: 200,
+  }
+  const [avatarURL, setAvatarURL] = useState(initialState)
+  // const [allowZoomOut, setAllowZoomOut] = useState(false)
+  
   const { mutateAsync } = useMutation((data) => updateUserInfo(data), {
     onSuccess: () => setCookie('imgURL', avatarURL),
   })
@@ -34,7 +50,7 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
   }
 
   const handleCancelSaveAvatar = () => {
-    setAvatarURL(imgURL)
+    setAvatarURL(avatarURL)
     setOpenPopup(false)
   }
 
@@ -45,12 +61,28 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
         uuid: cookies.uid,
         avatarURL,
       },
+      // this.setState({
+      //   preview: {
+      //     img,
+      //     rect,
+      //     scale: this.state.scale,
+      //     width: this.state.width,
+      //     height: this.state.height,
+      //     borderRadius: this.state.borderRadius,
+      //   },
+      // }),
       {
         onSettled: () => setOpenPopup(false),
       },
     )
   }
-
+  const handleScale = e => {
+    const scale = parseFloat(e.target.value)
+    setAvatarURL({ ...avatarURL, scale: scale })
+  }
+  const handlePositionChange = position => {
+    setAvatarURL({ ...avatarURL, position })
+  }
   return (
     <div className="relative" onClick={() => setVisbile(!visible)}>
       {imgURL && <Avatar imgURL={imgURL} username={username} />}
@@ -75,8 +107,40 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
         <Popup isOpen={openPopup} onRequestClose={() => setOpenPopup(false)}>
           <div className="">
             <div className="mb-6 flex items-center justify-center">
-              <img src={avatarURL} alt="avatar" className="w-64 h-64 object-cover" />
+            <AvatarEditor 
+                    scale={parseFloat(avatarURL.scale)}
+                    width={avatarURL.width}
+                    height={avatarURL.height}
+                    position={avatarURL.position}
+                    onPositionChange={handlePositionChange}
+                    rotate={parseFloat(avatarURL.rotate)}
+                    borderRadius={avatarURL.width / (100 / avatarURL.borderRadius)}
+                    image={avatarURL.image}
+                    className="editor-canvas"
+            />
+            {/* <Preview
+
+            width={
+              initialState.preview.scale < 1
+                ? initialState.preview.width
+                : initialState.preview.height
+            rect={initialState.preview.rect}
+          /> */}
+              {/* <img src={avatarURL} alt="avatar" className="w-64 h-64 object-cover" /> */}
+          
             </div>
+            <div>
+            <input
+            className="w-64"
+          name="scale"
+          type="range"
+          onChange={handleScale}
+          min={avatarURL.allowZoomOut ? '0.1' : '1'}
+          max="1.5"
+          step="0.01"
+          defaultValue="1"
+        />
+        </div>
             <input type="file" onChange={handleUploadImage} />
           </div>
           <div className="flex items-center justify-around">
