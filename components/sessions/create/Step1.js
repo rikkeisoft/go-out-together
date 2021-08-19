@@ -10,19 +10,14 @@ import { ErrorMessage } from '@hookform/error-message'
 import { useMutation } from 'react-query'
 import messageCodes from 'consts/messageCodes'
 import { updateSessionCreator } from 'api/users'
-import { getOldSessions } from 'api/sessions'
-import queryKeys from 'consts/queryKeys'
-import { useQuery } from 'react-query'
 import Field from 'components/common/Field'
 import Label from 'components/common/Label'
 import TextField from 'components/common/TextField'
 import AddressField from 'components/common/AddressField'
 import ErrorText from 'components/common/ErrorText'
-import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MapBox from 'components/common/MapBox'
 import LoadingOverlay from 'components/common/LoadingOverlay'
-import DetailIcon from 'components/icons/DetailIcon'
 import { useRouter } from 'next/router'
 import urls from 'consts/urls'
 
@@ -40,31 +35,13 @@ const Step1 = memo(({ formData, setFormData }) => {
   const [cookies] = useCookies()
   const [showMap, setShowMap] = useState(false)
   const [userLocation, setUserLocation] = useState(null)
-  const [isToggleView, setIsToggleView] = useState(true)
-  const [dataOldSessions, setDataOldSessions] = useState([])
   const router = useRouter()
-  sessionStorage.getItem('redirectURL') && sessionStorage.removeItem('redirectURL')
-  sessionStorage.getItem('isSessionExpired') && sessionStorage.removeItem('isSessionExpired')
-  sessionStorage.getItem('sid') && sessionStorage.removeItem('sid')
-  sessionStorage.getItem('isAdmin') && sessionStorage.removeItem('isAdmin')
-  sessionStorage.getItem('redirectToOldSession') && sessionStorage.removeItem('redirectToOldSession')
 
   const updateSessionCreatorMutation = useMutation(updateSessionCreator)
 
   const defaultValues = Object.assign({}, formData, {
     name: cookies.username,
   })
-  const uid = cookies.uid
-  const { data: oldSessions, isLoading } = useQuery([queryKeys.GET_OLD, { uid }], () => getOldSessions({ uid }), {
-    retry: 1,
-  })
-
-  useEffect(() => {
-    if (!isLoading) {
-      oldSessions?.data?.sort((a, b) => b.id - a.id)
-      setDataOldSessions(oldSessions)
-    }
-  }, [uid, isLoading])
 
   const methods = useForm({
     resolver: yupResolver(schema),
@@ -101,64 +78,13 @@ const Step1 = memo(({ formData, setFormData }) => {
     }
   }, [updateSessionCreatorMutation.isSuccess])
 
-  const handleCheckOldSession = (item) => {
-    sessionStorage.getItem('redirectToOldSession') && sessionStorage.removeItem('redirectToOldSession')
-
-    sessionStorage.setItem('checkOldSession', 'true')
-    router.push(`/sessions/detail/${item.sid}/0`)
-  }
-
   return (
     <>
       <Head>
         <title>Bước 1</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {isToggleView ? (
-        <>
-          <div className="flex justify-center text-xl font-bold">Thông tin các nhóm đã tham gia</div>
-          <div className="md:w-8/12 mt-8 mx-auto border-gray-200">
-            <table className="min-w-full break-all bg-white border-r text-center table-auto">
-              <thead className="bg-gray-800 text-white ">
-                <tr className=" sm:table-row  ">
-                  <th className="w-2/6   py-3 px-4 uppercase font-semibold text-sm border-r">ID Nhóm</th>
-                  <th className="w-3/6  py-3 px-4 uppercase font-semibold text-sm border-r">Tiêu đề</th>
-                  <th className="w-1/6  py-3 px-4 uppercase font-semibold text-sm border-r"></th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-700">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={3}>
-                      <div className="flex justify-center items-center py-3">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  dataOldSessions?.data?.length !== 0 &&
-                  dataOldSessions?.data?.map((item, index) => (
-                    <tr className=" sm:table-row border" key={index}>
-                      <td className="p-3 border-r"> {item.sid}</td>
-                      <td className="p-3 border-r"> {item.title}</td>
-                      <td className="p-3 border-r">
-                        <span title="Chi tiết" className="cursor-pointer" onClick={() => handleCheckOldSession(item)}>
-                          <DetailIcon />
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-            <ButtonGroup>
-              <Button type="submit" variant="primary" onClick={() => setIsToggleView(!isToggleView)}>
-                Tạo nhóm
-              </Button>
-            </ButtonGroup>
-          </div>
-        </>
-      ) : showMap ? (
+      {showMap ? (
         <MapBox
           isOneLocaion={true}
           data={(data) => setUserLocation(data)}
@@ -193,18 +119,12 @@ const Step1 = memo(({ formData, setFormData }) => {
                 {!_.isNil(methods.formState.errors.address) && <ErrorText>Nhập vào địa chỉ</ErrorText>}
               </Field>
               <div className="  mx-auto flex justify-between">
-                <ButtonGroup>
-                  <Button type="button" variant="primary" onClick={() => setIsToggleView(!isToggleView)}>
-                    {isToggleView ? 'Tạo nhóm' : 'Quay lại'}
-                  </Button>
-                </ButtonGroup>
-                {!isToggleView ? (
-                  <ButtonGroup>
-                    <Button type="submit" variant="primary" onClick={() => {}}>
-                      Tiếp theo
-                    </Button>
-                  </ButtonGroup>
-                ) : null}
+                <Button type="button" variant="primary" onClick={() => router.back()}>
+                  Quay lại
+                </Button>
+                <Button type="submit" variant="primary" onClick={() => {}}>
+                  Tiếp theo
+                </Button>
               </div>
             </form>
           </FormProvider>

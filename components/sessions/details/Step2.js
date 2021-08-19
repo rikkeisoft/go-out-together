@@ -48,7 +48,7 @@ const schema = yup.object().shape({
 })
 
 const Step2 = memo(({ sid }) => {
-  const [cookies] = useCookies(['uid'])
+  const [cookies] = useCookies()
   const [showMap, setShowMap] = useState(false)
   const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
   const [voteAddress, setVoteAddress] = useState(null)
@@ -56,7 +56,7 @@ const Step2 = memo(({ sid }) => {
     userLocation: {},
     listUserLocation: [],
   })
-console.log('1')
+  console.log('1')
   const { data: voteResult } = useQuery([queryKeys.GET_SESSION_RESULT, { sid }], () => getSessionResult({ sid }))
 
   const queryClient = useQueryClient()

@@ -45,7 +45,7 @@ export default function Create() {
       break
   }
 
-  const goToHomePage = () => router.push(urls.HOME)
+  const goToHomePage = () => router.push(`${urls.LOGIN}`)
 
   const handleSignOut = () => {
     goToHomePage()
