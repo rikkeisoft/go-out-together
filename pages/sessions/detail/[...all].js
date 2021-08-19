@@ -30,8 +30,11 @@ export default function Details({ error }) {
 
   useEffect(() => {
     if (!router.isReady) return
+    console.log(router.asPath)
     setDetailStep(router.query.all[1])
   }, [router.isReady, router.asPath])
+
+  console.log(detailStep)
 
   let stepElement = <></>
   switch (detailStep) {
