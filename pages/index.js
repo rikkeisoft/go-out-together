@@ -5,27 +5,54 @@ import Center from 'components/common/Center'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import urls from 'consts/urls'
-import GoogleLoginModal from 'components/auth/GoogleLoginModal'
 import { useCookies } from 'react-cookie'
+import Button from 'components/common/Button'
+import UserAvatar from 'components/avatar/UserAvatar'
+import { useQuery, useQueryClient } from 'react-query'
+import { auth } from 'lib/firebase'
+import queryKeys from 'consts/queryKeys'
+import ButtonGroup from 'components/common/ButtonGroup'
+import DetailIcon from 'components/icons/DetailIcon'
+import { getOldSessions } from 'api/sessions'
+import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
 
 export default function Home() {
-  const [redirectURL, setRedirectURL] = useState(`${urls.SESSIONS_CREATE}/1`)
-  const [cookies] = useCookies(['accessToken'])
+  const [dataOldSessions, setDataOldSessions] = useState([])
+  const [cookies, , removeCookie] = useCookies(['accessToken', 'imgURL'])
   const router = useRouter()
+  const queryClient = useQueryClient()
+  sessionStorage.getItem('isSessionExpired') && sessionStorage.removeItem('isSessionExpired')
   const url = sessionStorage.getItem('redirectURL')
-  // sessionStorage.getItem('isAdmin') && sessionStorage.removeItem('isAdmin')
-  // sessionStorage.getItem('redirectToOldSession') && sessionStorage.removeItem('redirectToOldSession')
+
+  const uid = cookies.uid
+  const { data: oldSessions, isLoading } = useQuery([queryKeys.GET_OLD, { uid }], () => getOldSessions({ uid }), {
+    retry: 1,
+  })
 
   useEffect(() => {
-    if (url !== null) {
-      setRedirectURL(url)
+    if (!isLoading) {
+      oldSessions?.data?.sort((a, b) => b.id - a.id)
+      setDataOldSessions(oldSessions)
     }
-  }, [])
+  }, [uid, isLoading])
 
-  const handleButtonClick = () => {
-    if (url) {
-      router.back()
-    } else router.push(redirectURL)
+  const handleSignOut = () => {
+    router.push(`${urls.LOGIN}`)
+    queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedOut: true })
+    sessionStorage.removeItem('redirectURL')
+    removeCookie('accessToken', { path: '/' })
+    removeCookie('uid', { path: '/' })
+    removeCookie('username', { path: '/' })
+    removeCookie('imgURL', { path: '/' })
+    removeCookie('address', { path: '/' })
+    auth.signOut()
+  }
+
+  const handleCheckOldSession = (item) => {
+    sessionStorage.getItem('redirectToOldSession') && sessionStorage.removeItem('redirectToOldSession')
+    sessionStorage.getItem('isAdmin') && sessionStorage.removeItem('isAdmin')
+    sessionStorage.setItem('checkOldSession', 'true')
+    router.push(`/sessions/detail/${item.sid}/0`)
   }
 
   return (
@@ -36,41 +63,61 @@ export default function Home() {
         <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
-      <Container className="bg-image">
+      <Container className="bg-image1">
+        <div className="flex items-center justify-around">
+          {url ? (
+            <Button type="button" variant="danger" onClick={() => router.back()}>
+              <ArrowLeftIcon className="w-7" /> Quay lại
+            </Button>
+          ) : (
+            <h1 className="font-bold text-3xl cursor-pointer">Go out together</h1>
+          )}
+          <UserAvatar imgURL={cookies?.imgURL} username={cookies?.username} onSignOut={handleSignOut} />
+        </div>
         <Center>
-          <div className="py-34 md:py-40">
-            <h1 className="mb-3 text-gray-800 text-2xl md:text-5xl font-bold">GO OUT TOGETHER</h1>
-            <h1 className="mb-3 text-gray-800 text-2xl md:text-5xl font-bold">
-              Tạo nhóm và cùng bạn bè chọn địa điểm vui chơi
-            </h1>
-            <div className="mt-6 md:mt-12">
-              {cookies?.accessToken ? (
-                <div className="flex items-center justify-center">
-                  <button
-                    className="inline-flex mr-6 items-center md:px-12 md:py-3 px-8 py-2 text-white md:text-2xl text-base font-semibold rounded-md bg-blue-500 hover:bg-blue-400"
-                    onClick={handleButtonClick}
-                  >
-                    {!url ? 'Thử ngay' : 'Xem chi tiết nhóm'}
-                  </button>
-                  {url && (
-                    <button
-                      className="inline-flex items-center md:px-12 md:py-3 px-8 py-2 text-white md:text-2xl text-base font-semibold rounded-md bg-blue-500 hover:bg-blue-400"
-                      onClick={() => router.push(`${urls.SESSIONS_CREATE}/1`)}
-                    >
-                      Tạo nhóm mới
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div className="md:flex md:justify-center md:items-center">
-                  <span className="font-semibold text-2xl font-semibold">Đăng nhập ngay: </span>
-                  <GoogleLoginModal />
-                </div>
-              )}
-            </div>
+          <div className="flex justify-center text-xl font-bold">Thông tin các nhóm đã tham gia</div>
+          <div className="md:w-8/12 mt-8 mx-auto border-gray-200">
+            <table className="min-w-full break-all bg-white border-r text-center table-auto">
+              <thead className="bg-gray-800 text-white ">
+                <tr className=" sm:table-row  ">
+                  <th className="w-2/6   py-3 px-4 uppercase font-semibold text-sm border-r">ID Nhóm</th>
+                  <th className="w-3/6  py-3 px-4 uppercase font-semibold text-sm border-r">Tiêu đề</th>
+                  <th className="w-1/6  py-3 px-4 uppercase font-semibold text-sm border-r"></th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-700">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={3}>
+                      <div className="flex justify-center items-center py-3">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  dataOldSessions?.data?.length !== 0 &&
+                  dataOldSessions?.data?.map((item, index) => (
+                    <tr className=" sm:table-row border" key={index}>
+                      <td className="p-3 border-r"> {item.sid}</td>
+                      <td className="p-3 border-r"> {item.title}</td>
+                      <td className="p-3 border-r">
+                        <span title="Chi tiết" className="cursor-pointer" onClick={() => handleCheckOldSession(item)}>
+                          <DetailIcon />
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+            <ButtonGroup>
+              <Button type="submit" variant="primary" onClick={() => router.push(`${urls.SESSIONS_CREATE}/1`)}>
+                Tạo nhóm
+              </Button>
+            </ButtonGroup>
           </div>
         </Center>
-        </Container>
+      </Container>
     </MainLayout>
   )
 }

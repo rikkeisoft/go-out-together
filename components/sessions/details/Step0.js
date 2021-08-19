@@ -41,7 +41,7 @@ const Step0 = memo(({ sid, uid }) => {
         alert(data.messsage)
       }
     }
-  }, [isSuccess, isLoading])
+  }, [isSuccess])
 
   return <LoadingOverlay isOpen={isLoading} message="Đang kiểm tra thông tin người dùng..." />
 })

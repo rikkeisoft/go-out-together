@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    let queryString, values, result
+    let queryString, values, result, imgURL
 
     queryString = 'SELECT username, avatar_url FROM users WHERE uuid = ?'
     values = [uuid]
@@ -32,6 +32,8 @@ export default async function handler(req, res) {
 
     if (result.length === 0) {
       // new user -> insert
+      imgURL = avatar_url
+
       queryString = 'INSERT INTO users (uuid, username, avatar_url) VALUES (?, ?, ?)'
       values = [uuid, username, avatar_url]
       try {
@@ -43,9 +45,10 @@ export default async function handler(req, res) {
     } else {
       // user already in db -> check update info
       let user = result[0]
+      imgURL = user.avatar_url
 
-      if (user.username !== username || user.avatar_url !== avatar_url) {
-        queryString = `UPDATE users SET username = ?, avatar_url = ? WHERE uuid = ?`
+      if (user.username !== username) {
+        queryString = `UPDATE users SET username = ? WHERE uuid = ?`
         values = [username, avatar_url, uuid]
         try {
           await mysql.query(queryString, values)
@@ -72,6 +75,7 @@ export default async function handler(req, res) {
       message: 'Đăng nhập thành công',
       data: {
         accessToken,
+        avatarURL: imgURL,
       },
     })
   } catch (exception) {

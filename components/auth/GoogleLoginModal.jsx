@@ -14,7 +14,10 @@ function GoogleLoginModal() {
   const router = useRouter()
   const [cookies, setCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
   const { mutate } = useMutation((userInfo) => login(userInfo), {
-    onSuccess: (data) => setCookie('accessToken', data.data.accessToken, { path: '/' }),
+    onSuccess: (data) => {
+      setCookie('imgURL', data.data.avatarURL, { path: '/' })
+      setCookie('accessToken', data.data.accessToken, { path: '/' })
+    },
   })
 
   useEffect(() => {
@@ -29,11 +32,10 @@ function GoogleLoginModal() {
         })
         setCookie('uid', uid, { path: '/' })
         setCookie('username', displayName, { path: '/' })
-        setCookie('imgURL', photoURL, { path: '/' })
         queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedIn: true })
         const url = sessionStorage.getItem('redirectURL')
         if (url !== null) router.push(url)
-        else router.push(`${urls.SESSIONS_CREATE}/1`)
+        else router.push(`${urls.HOME}`)
       }
     })
     return () => unregisterAuthObserver()
