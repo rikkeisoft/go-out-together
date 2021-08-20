@@ -136,14 +136,21 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
                 className="editor-canvas"
               />
             </div>
+            <div className="flex justify-around mb-2">
+            {/* <div className="flex items-center justify-center"> */}
+            <label className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded">
+              <span>Upload a file</span>
+              <input type="file" className="hidden" onChange={handleUploadImage} />
+            </label>
             <button
-              className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded"
-              onClick={onCrop}
-            >
-              Cắt ảnh
-            </button>
-            <div>
+                className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded"
+                onClick={onCrop}
+              >
+                Cắt ảnh
+              </button>
+          </div>
               <input
+                className="w-96"
                 name="scale"
                 type="range"
                 value={avatarURL.scale}
@@ -152,9 +159,6 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
                 max="1.5"
                 step="0.01"
               />
-            </div>
-
-            <input type="file" onChange={handleUploadImage} />
           </div>
           {/* <img src={avatarURL.image} /> */}
           <div className="flex items-center justify-around">
