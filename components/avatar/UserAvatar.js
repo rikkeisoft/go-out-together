@@ -17,6 +17,7 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
   // const [scale, setScale] = useState(1)
   const initialState = {
     image: imgURL,
+    name: null,
     allowZoomOut: false,
     position: { x: 0, y: 0 },
     scale: 1,
@@ -52,7 +53,7 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
 
     const imageFirebaseURL = await uploadImage(image)
     if (imageFirebaseURL) {
-      setAvatarURL({ ...avatarURL, image: imageFirebaseURL })
+      setAvatarURL({ ...avatarURL, image: imageFirebaseURL, name: image.name })
     }
   }
 
@@ -84,13 +85,15 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
   const onCrop = () => {
     if (avatarInputRef.current) {
       const imageUrl = avatarInputRef.current.getImageScaledToCanvas().toDataURL()
-      // setAvatarURL({ ...avatarURL, image: imageUrl })
       let imageURL
       fetch(imageUrl)
         .then((res) => res.blob())
-        .then((blob) => {
-          imageURL = window.URL.createObjectURL(blob)
-          setAvatarURL({ ...avatarURL, image: imageURL })
+        .then(async (blob) => {
+          imageURL = new File([blob], avatarURL.name, { type: 'image/png' })
+          const imageFirebaseURL = await uploadImage(imageURL)
+          if (imageFirebaseURL) {
+            setAvatarURL({ ...avatarURL, image: imageFirebaseURL })
+          }
         })
     }
   }
