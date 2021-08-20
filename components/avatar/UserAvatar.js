@@ -7,14 +7,13 @@ import { useCookies } from 'react-cookie'
 import { useMutation } from 'react-query'
 import { updateUserInfo } from 'api/users'
 import AvatarEditor from 'react-avatar-editor'
-// import Preview from './Preview.jsx'
+import CropIcon from 'components/icons/CropIcon'
 
 export default function UserAvatar({ imgURL, username, onSignOut }) {
   const avatarInputRef = useRef(null)
   const [cookies, setCookie] = useCookies(['uid', 'imgURL'])
   const [visible, setVisbile] = useState(false)
   const [openPopup, setOpenPopup] = useState(false)
-  // const [scale, setScale] = useState(1)
   const initialState = {
     image: imgURL,
     name: null,
@@ -25,12 +24,10 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
     editor: null,
     borderRadius: 0,
     preview: null,
-    width: 250,
-    height: 250,
+    width: 300,
+    height: 300,
   }
   const [avatarURL, setAvatarURL] = useState(initialState)
-  // const [allowZoomOut, setAllowZoomOut] = useState(false)
-
   const { mutateAsync } = useMutation((data) => updateUserInfo(data), {
     onSuccess: () => setCookie('imgURL', avatarURL.image),
   })
@@ -123,7 +120,7 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
       {openPopup && (
         <Popup isOpen={openPopup} onRequestClose={() => setOpenPopup(false)}>
           <div className="">
-            <div className="mb-6 flex items-center justify-center md:w-600 md:h-300 border-2  ">
+            <div className="mb-6 flex items-center justify-center md:w-600 md:h-300">
               <AvatarEditor
                 ref={avatarInputRef}
                 scale={parseFloat(avatarURL.scale)}
@@ -133,26 +130,26 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
                 onPositionChange={handlePositionChange}
                 rotate={parseFloat(avatarURL.rotate)}
                 borderRadius={200}
-                color={[255, 255, 255, 0.5]}
+                color={[255,255,255,0.4]}
                 image={avatarURL.image}
                 crossOrigin="anonymous"
                 className="editor-canvas"
               />
             </div>
             <div className="flex justify-around my-2">
-              {/* <div className="flex items-center justify-center"> */}
-              <label className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded">
-                <span>Upload a file</span>
-                <input type="file" className="hidden" onChange={handleUploadImage} />
-              </label>
-              <button
+            <label className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded">
+              <span>Upload a file</span>
+              <input type="file" className="hidden" onChange={handleUploadImage} />
+            </label>
+            <button
                 className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded"
                 onClick={onCrop}
               >
+                <CropIcon className="w-6 mr-1"/>
                 Cắt ảnh
               </button>
-            </div>
-            <div className="flex items-center justify-center">
+          </div>
+          <div className=" mx-6 my-4 flex items-center justify-center">
               <input
                 className="md:w-80 h-1"
                 name="scale"
@@ -165,8 +162,7 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
               />
             </div>
           </div>
-          {/* <img src={avatarURL.image} /> */}
-          <div className="flex items-center justify-around mt-2">
+          <div className="flex items-center justify-around">
             <Button type="button" variant="danger" onClick={handleCancelSaveAvatar}>
               Hủy
             </Button>
