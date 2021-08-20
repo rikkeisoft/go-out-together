@@ -3,7 +3,6 @@ import LoadingOverlay from 'components/common/LoadingOverlay'
 import queryKeys from 'consts/queryKeys'
 import urls from 'consts/urls'
 import { useRouter } from 'next/router'
-import Login from 'pages/login'
 import Details from 'pages/sessions/detail/[...all].js'
 import { useEffect } from 'react'
 import { useCookies } from 'react-cookie'
@@ -11,8 +10,9 @@ import { useQuery, useQueryClient } from 'react-query'
 
 export default function ProtectedComponent({ children }) {
   const [, setCookie, removeCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
+  const router = useRouter()
   const queryClient = useQueryClient()
-  const { error, isLoading, refetch, isSuccess } = useQuery(
+  const { error, isLoading, refetch } = useQuery(
     queryKeys.CHECK_USER,
     async () => {
       try {
@@ -30,7 +30,6 @@ export default function ProtectedComponent({ children }) {
     },
     { retry: false },
   )
-  const router = useRouter()
 
   useEffect(() => {
     if (!router.isReady) return
@@ -59,13 +58,17 @@ export default function ProtectedComponent({ children }) {
     }
   }, [isLoading, error])
 
-  if (error) {
-    return <Login />
+  if (isLoading) {
+    return <LoadingOverlay isOpen={isLoading} message="Vui lòng chờ..." />
   }
 
-  if (isSuccess) {
-    return <>{children}</>
-  }
-
-  return <LoadingOverlay isOpen={isLoading} message="Vui lòng chờ..." />
+  return (
+    <>
+      {router.pathname === '/login' ? (
+        children
+      ) : (
+        <LoadingOverlay isOpen={router.pathname !== '/login'} message="Vui lòng chờ..." />
+      )}
+    </>
+  )
 }
