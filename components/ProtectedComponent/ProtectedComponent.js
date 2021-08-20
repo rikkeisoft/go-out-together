@@ -66,8 +66,10 @@ export default function ProtectedComponent({ children }) {
     <>
       {router.pathname === '/login' ? (
         children
-      ) : (
+      ) : error ? (
         <LoadingOverlay isOpen={router.pathname !== '/login'} message="Vui lòng chờ..." />
+      ) : (
+        children
       )}
     </>
   )
