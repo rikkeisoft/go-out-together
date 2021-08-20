@@ -133,26 +133,26 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
                 onPositionChange={handlePositionChange}
                 rotate={parseFloat(avatarURL.rotate)}
                 borderRadius={200}
-                color={[255,255,255,0.5]}
+                color={[255, 255, 255, 0.5]}
                 image={avatarURL.image}
                 crossOrigin="anonymous"
                 className="editor-canvas"
               />
             </div>
             <div className="flex justify-around my-2">
-            {/* <div className="flex items-center justify-center"> */}
-            <label className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded">
-              <span>Upload a file</span>
-              <input type="file" className="hidden" onChange={handleUploadImage} />
-            </label>
-            <button
+              {/* <div className="flex items-center justify-center"> */}
+              <label className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded">
+                <span>Upload a file</span>
+                <input type="file" className="hidden" onChange={handleUploadImage} />
+              </label>
+              <button
                 className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded"
                 onClick={onCrop}
               >
                 Cắt ảnh
               </button>
-          </div>
-          <div className="flex items-center justify-center">
+            </div>
+            <div className="flex items-center justify-center">
               <input
                 className="md:w-80 h-1"
                 name="scale"
@@ -163,7 +163,7 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
                 max="1.5"
                 step="0.01"
               />
-              </div>
+            </div>
           </div>
           {/* <img src={avatarURL.image} /> */}
           <div className="flex items-center justify-around mt-2">

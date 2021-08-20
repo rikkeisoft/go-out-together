@@ -11,7 +11,6 @@ import UserAvatar from 'components/avatar/UserAvatar'
 import { useQuery, useQueryClient } from 'react-query'
 import { auth } from 'lib/firebase'
 import queryKeys from 'consts/queryKeys'
-import ButtonGroup from 'components/common/ButtonGroup'
 import DetailIcon from 'components/icons/DetailIcon'
 import { getOldSessions } from 'api/sessions'
 import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
@@ -77,26 +76,21 @@ export default function Home() {
         <Center>
           <div className="flex justify-center text-xl font-bold">Thông tin các nhóm đã tham gia</div>
           <div className="md:w-8/12 mt-8 mx-auto border-gray-200">
-            <table className="min-w-full break-all bg-white border-r text-center table-auto">
-              <thead className="bg-gray-800 text-white ">
-                <tr className=" sm:table-row  ">
-                  <th className="w-2/6   py-3 px-4 uppercase font-semibold text-sm border-r">ID Nhóm</th>
-                  <th className="w-3/6  py-3 px-4 uppercase font-semibold text-sm border-r">Tiêu đề</th>
-                  <th className="w-1/6  py-3 px-4 uppercase font-semibold text-sm border-r"></th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-700">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={3}>
-                      <div className="flex justify-center items-center py-3">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                      </div>
-                    </td>
+            {isLoading ? (
+              <div className="flex justify-center items-center py-3">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+              </div>
+            ) : dataOldSessions?.data?.length !== 0 ? (
+              <table className="min-w-full break-all bg-white border-r text-center table-auto">
+                <thead className="bg-gray-800 text-white ">
+                  <tr className=" sm:table-row  ">
+                    <th className="w-2/6 py-3 px-4 uppercase font-semibold text-sm border-r">ID Nhóm</th>
+                    <th className="w-3/6 py-3 px-4 uppercase font-semibold text-sm border-r">Tiêu đề</th>
+                    <th className="w-1/6 py-3 px-4 uppercase font-semibold text-sm border-r"></th>
                   </tr>
-                ) : (
-                  dataOldSessions?.data?.length !== 0 &&
-                  dataOldSessions?.data?.map((item, index) => (
+                </thead>
+                <tbody className="text-gray-700">
+                  {dataOldSessions?.data?.map((item, index) => (
                     <tr className=" sm:table-row border" key={index}>
                       <td className="p-3 border-r"> {item.sid}</td>
                       <td className="p-3 border-r"> {item.title}</td>
@@ -106,15 +100,17 @@ export default function Home() {
                         </span>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-            <ButtonGroup>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className="text-xl">Bạn chưa tham gia nhóm nào</p>
+            )}
+            <div className="mt-6 flex justify-center items-center">
               <Button type="submit" variant="primary" onClick={() => router.push(`${urls.SESSIONS_CREATE}/1`)}>
                 Tạo nhóm
               </Button>
-            </ButtonGroup>
+            </div>
           </div>
         </Center>
       </Container>
