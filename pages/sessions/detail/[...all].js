@@ -19,6 +19,7 @@ import UserAvatar from 'components/avatar/UserAvatar'
 import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
 import GoogleLoginModal from 'components/auth/GoogleLoginModal'
 import { useEffect, useState } from 'react'
+import LoadingOverlay from 'components/common/LoadingOverlay'
 
 export default function Details({ error }) {
   const [cookies, , removeCookie] = useCookies(['imgURL', 'uid'])
@@ -31,7 +32,9 @@ export default function Details({ error }) {
 
   useEffect(() => {
     if (!router.isReady) return
-    setDetailStep(router.query.all[1])
+    if (router.query.all[1] !== detailStep) {
+      setDetailStep(router.query.all[1])
+    }
   }, [router.isReady, router.asPath])
 
   let stepElement = <></>
@@ -64,6 +67,12 @@ export default function Details({ error }) {
     removeCookie('imgURL', { path: '/' })
     removeCookie('address', { path: '/' })
     auth.signOut()
+  }
+
+  if (detailStep !== router.query?.all[1]) {
+    return (
+      <LoadingOverlay isOpen={detailStep !== router.query?.all[1]} message="Đang kiểm tra thông tin người dùng..." />
+    )
   }
 
   return (
