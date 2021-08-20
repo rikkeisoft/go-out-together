@@ -25,8 +25,8 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
     editor: null,
     borderRadius: 0,
     preview: null,
-    width: 300,
-    height: 300,
+    width: 250,
+    height: 250,
   }
   const [avatarURL, setAvatarURL] = useState(initialState)
   // const [allowZoomOut, setAllowZoomOut] = useState(false)
@@ -123,7 +123,7 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
       {openPopup && (
         <Popup isOpen={openPopup} onRequestClose={() => setOpenPopup(false)}>
           <div className="">
-            <div className="mb-6 flex items-center justify-center">
+            <div className="mb-6 flex items-center justify-center md:w-600 md:h-300 border-2  ">
               <AvatarEditor
                 ref={avatarInputRef}
                 scale={parseFloat(avatarURL.scale)}
@@ -133,12 +133,13 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
                 onPositionChange={handlePositionChange}
                 rotate={parseFloat(avatarURL.rotate)}
                 borderRadius={200}
+                color={[255,255,255,0.5]}
                 image={avatarURL.image}
                 crossOrigin="anonymous"
                 className="editor-canvas"
               />
             </div>
-            <div className="flex justify-around mb-2">
+            <div className="flex justify-around my-2">
             {/* <div className="flex items-center justify-center"> */}
             <label className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded">
               <span>Upload a file</span>
@@ -151,8 +152,9 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
                 Cắt ảnh
               </button>
           </div>
+          <div className="flex items-center justify-center">
               <input
-                className="w-96"
+                className="md:w-80 h-1"
                 name="scale"
                 type="range"
                 value={avatarURL.scale}
@@ -161,9 +163,10 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
                 max="1.5"
                 step="0.01"
               />
+              </div>
           </div>
           {/* <img src={avatarURL.image} /> */}
-          <div className="flex items-center justify-around">
+          <div className="flex items-center justify-around mt-2">
             <Button type="button" variant="danger" onClick={handleCancelSaveAvatar}>
               Hủy
             </Button>
