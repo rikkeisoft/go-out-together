@@ -37,10 +37,10 @@ const AddressVoter = memo(({ name, showDelete, data, onOpenModalMap, onClick, on
           <tbody>
             {data?.map((item) => {
               return (
-                  <tr 
-                    key={`item-` + item.aid}
-                    className="hover:bg-gray-100 font-bold border border-transparent rounded-md"
-                  >
+                <tr
+                  key={`item-` + item.aid}
+                  className="hover:bg-gray-100 font-bold border border-transparent rounded-md"
+                >
                   {showDelete ? (
                     <td className="p-2 cursor-pointer border border-transparent rounded-tl-md rounded-bl-md">
                       <label className="cursor-pointer text-lg">
@@ -56,12 +56,16 @@ const AddressVoter = memo(({ name, showDelete, data, onOpenModalMap, onClick, on
                         />
                       </label>
 
-                        <span onClick={() => onOpenModalMap(item)}>{item.name} ({item.voteCount} người vote)</span>
+                      <span onClick={() => onOpenModalMap(item)}>
+                        {item.name.split(',')[0]} ({item.voteCount} người vote)
+                      </span>
                     </td>
                   ) : (
                     <td className="p-2 cursor-pointer border border-transparent rounded-tl-md rounded-bl-md">
                       <label className="cursor-pointer text-lg">
-                       <span onClick={() => onOpenModalMap(item)}>{item.name} ({item.voteCount} người vote)</span>
+                        <span onClick={() => onOpenModalMap(item)}>
+                          {item.name.split(',')[0]} ({item.voteCount} người vote)
+                        </span>
                       </label>
                     </td>
                   )}
