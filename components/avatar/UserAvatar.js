@@ -130,26 +130,26 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
                 onPositionChange={handlePositionChange}
                 rotate={parseFloat(avatarURL.rotate)}
                 borderRadius={200}
-                color={[255,255,255,0.4]}
+                color={[255, 255, 255, 0.4]}
                 image={avatarURL.image}
                 crossOrigin="anonymous"
                 className="editor-canvas"
               />
             </div>
             <div className="flex justify-around my-2">
-            <label className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded">
-              <span>Upload a file</span>
-              <input type="file" className="hidden" onChange={handleUploadImage} />
-            </label>
-            <button
+              <label className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded">
+                <span>Upload a file</span>
+                <input type="file" className="hidden" onChange={handleUploadImage} />
+              </label>
+              <button
                 className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded"
                 onClick={onCrop}
               >
-                <CropIcon className="w-6 mr-1"/>
+                <CropIcon className="w-6 mr-1" />
                 Cắt ảnh
               </button>
-          </div>
-          <div className=" mx-6 my-4 flex items-center justify-center">
+            </div>
+            <div className=" mx-6 my-4 flex items-center justify-center">
               <input
                 className="md:w-80 h-1"
                 name="scale"

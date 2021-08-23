@@ -23,15 +23,16 @@ import LoadingOverlay from 'components/common/LoadingOverlay'
 
 export default function Details({ error }) {
   const [cookies, , removeCookie] = useCookies(['imgURL', 'uid'])
+  const [sid, setSid] = useState(null)
   const router = useRouter()
   const queryClient = useQueryClient()
-  const sid = router.query.all[0]
   const { formData, setFormData } = useStep()
   const [detailStep, setDetailStep] = useState(null)
   const checkOldSession = sessionStorage.getItem('checkOldSession')
 
   useEffect(() => {
     if (!router.isReady) return
+    setSid(router.query.all[0])
     if (router.query.all[1] !== detailStep) {
       setDetailStep(router.query.all[1])
     }
@@ -69,7 +70,7 @@ export default function Details({ error }) {
     auth.signOut()
   }
 
-  if (detailStep !== router.query?.all[1]) {
+  if (router.isReady && detailStep !== router.query?.all[1]) {
     return (
       <LoadingOverlay isOpen={detailStep !== router.query?.all[1]} message="Đang kiểm tra thông tin người dùng..." />
     )
