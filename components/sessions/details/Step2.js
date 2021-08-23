@@ -291,10 +291,11 @@ const Step2 = memo(({ sid }) => {
                     name="votedAddress"
                     showDelete={new Date(data?.data?.expireTime).getTime() > new Date().getTime()}
                     data={data.data.addresses}
-                    onClick={(item) => {
+                    onOpenModalMap={(item) => {
                       setVoteAddress(item)
                       setShowDirectionRoutes(true)
                     }}
+                    onClick={(item) => setVoteAddress(item)}
                     onDelete={deleteAddress}
                   />
                   <LoadingOverlay isOpen={isLoadingAdress} message="Đang Xóa địa điểm vote" />
