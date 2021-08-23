@@ -52,14 +52,17 @@ export default function ProtectedComponent({ children }) {
   }, [router.isReady, router.asPath])
 
   useEffect(() => {
-    if (error) {
-      if (router.pathname === '/sessions/detail/[...all]') return <Details error={error.message} />
+    if (error && router.pathname !== '/sessions/detail/[...all]') {
       router.push(`${urls.LOGIN}`)
     }
   }, [isLoading, error])
 
   if (isLoading) {
     return <LoadingOverlay isOpen={isLoading} message="Vui lòng chờ..." />
+  }
+
+  if (error && router.pathname === '/sessions/detail/[...all]') {
+    return <Details error={error.message} />
   }
 
   return (
