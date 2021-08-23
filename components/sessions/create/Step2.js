@@ -43,7 +43,6 @@ const schema = yup.object().shape({
     )
     .min(2),
 })
-
 const Step2 = memo(({ formData, setFormData }) => {
   const [cookies] = useCookies()
   const [showMap, setShowMap] = useState(false)
@@ -214,6 +213,22 @@ const Step2 = memo(({ formData, setFormData }) => {
                     {
                       label: '20 phút',
                       value: 20,
+                    },
+                    {
+                      label: '1 tiếng',
+                      value: 60,
+                    },
+                    {
+                      label: '2 tiếng',
+                      value: 120,
+                    },
+                    {
+                      label: '1 ngày',
+                      value: 1440,
+                    },
+                    {
+                      label: '2 ngày',
+                      value: 2880,
                     },
                   ]}
                 />

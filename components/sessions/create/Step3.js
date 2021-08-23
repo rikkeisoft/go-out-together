@@ -7,6 +7,7 @@ import Button from 'components/common/Button'
 import MessageText from 'components/common/MessageText'
 import urls from 'consts/urls'
 import CopyableLink from 'components/common/CopyableLink'
+import { FacebookShareButton, FacebookIcon } from 'react-share'
 
 const Step3 = memo(({ setFormData }) => {
   const router = useRouter()
@@ -34,6 +35,13 @@ const Step3 = memo(({ setFormData }) => {
         >
           {sharedLink}
         </CopyableLink>
+
+        <FacebookShareButton url={sharedLink}>
+          <div className="flex items-center">
+            <span className="mr-2 text-xl font-semibold">Share with Facebook:</span>
+            <FacebookIcon size={64} round={true} />
+          </div>
+        </FacebookShareButton>
       </Center>
       <div className="mt-6 text-center">
         <Button

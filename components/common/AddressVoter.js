@@ -6,10 +6,11 @@ import TrashIcon from 'components/icons/TrashIcon'
 import Popup from './Popup'
 import Button from './Button'
 
-const AddressVoter = memo(({ name, showDelete, data, onClick, onDelete }) => {
+const AddressVoter = memo(({ name, showDelete, data, onOpenModalMap, onClick, onDelete }) => {
   const { control, watch, setValue } = useFormContext()
   const [openPopup, setOpenPopup] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState(null)
+  // const [openShowDirectionRoutes, setOpenShowDirectionRoutes] = useState(ShowDirectionRoutes)
 
   useEffect(() => {
     const votedAddress = localStorage.getItem('votedAddress')
@@ -34,12 +35,12 @@ const AddressVoter = memo(({ name, showDelete, data, onClick, onDelete }) => {
       render={({ field: { value } }) => (
         <table className="w-full">
           <tbody>
-            {data.map((item) => {
+            {data?.map((item) => {
               return (
-                <tr
-                  key={`item-` + item.aid}
-                  className="hover:bg-gray-100 font-bold border border-transparent rounded-md"
-                >
+                  <tr 
+                    key={`item-` + item.aid}
+                    className="hover:bg-gray-100 font-bold border border-transparent rounded-md"
+                  >
                   {showDelete ? (
                     <td className="p-2 cursor-pointer border border-transparent rounded-tl-md rounded-bl-md">
                       <label className="cursor-pointer text-lg">
@@ -53,21 +54,14 @@ const AddressVoter = memo(({ name, showDelete, data, onClick, onDelete }) => {
                           checked={item.aid === value?.aid}
                           disabled={item.id === selectedItemId}
                         />
-                        {item.name} ({item.voteCount} người vote)
                       </label>
+
+                        <span onClick={() => onOpenModalMap(item)}>{item.name} ({item.voteCount} người vote)</span>
                     </td>
                   ) : (
                     <td className="p-2 cursor-pointer border border-transparent rounded-tl-md rounded-bl-md">
                       <label className="cursor-pointer text-lg">
-                        <input
-                          type="radio"
-                          className="mr-4"
-                          onChange={() => {
-                            onClick(item)
-                          }}
-                          checked={item.aid === value?.aid}
-                        />
-                        {item.name} ({item.voteCount} người vote)
+                       <span onClick={() => onOpenModalMap(item)}>{item.name} ({item.voteCount} người vote)</span>
                       </label>
                     </td>
                   )}
