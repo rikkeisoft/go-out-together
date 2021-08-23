@@ -24,7 +24,11 @@ export default function Home() {
   const url = sessionStorage.getItem('redirectURL')
 
   const uid = cookies.uid
-  const { data: oldSessions, isLoading } = useQuery([queryKeys.GET_OLD, { uid }], () => getOldSessions({ uid }), {
+  const {
+    data: oldSessions,
+    isLoading,
+    isError,
+  } = useQuery([queryKeys.GET_OLD, { uid }], () => getOldSessions({ uid }), {
     retry: 1,
   })
 
@@ -80,7 +84,7 @@ export default function Home() {
               <div className="flex justify-center items-center py-3">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
               </div>
-            ) : dataOldSessions?.data?.length !== 0 ? (
+            ) : dataOldSessions?.data?.length !== 0 && !isError ? (
               <table className="min-w-full break-all bg-white border-r text-center table-auto">
                 <thead className="bg-gray-800 text-white ">
                   <tr className=" sm:table-row  ">
