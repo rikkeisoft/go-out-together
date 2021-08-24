@@ -1,4 +1,5 @@
 import ProtectedComponent from 'components/ProtectedComponent/ProtectedComponent'
+import Head from 'next/head'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import 'tailwindcss/tailwind.css'
 import '../style/home.css'
@@ -12,12 +13,33 @@ const queryClient = new QueryClient({
 })
 
 function MyApp({ Component, pageProps }) {
+  const ogDescription = `Trong cuộc sống, đôi khi thật khó để lựa chọn địa điểm đi chơi cùng gia đình hay bạn bè. 
+  Mỗi người một ý tưởng, mỗi địa điểm lại có lợi thế riêng. 
+  Hãy để Go out together giúp mọi người dễ dàng hơn trong việc chọn ra địa điểm vui chơi nhanh nhất.`
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <ProtectedComponent>
-        <Component {...pageProps} />
-      </ProtectedComponent>
-    </QueryClientProvider>
+    <>
+      <Head>
+        <meta
+          name="description"
+          content="Bạn chưa biết làm sao để có thể chọn địa điểm vui chơi cùng bạn bè? Hãy sử dụng ngay Go out together!"
+        />
+        <meta property="og:site_name" content="Go out together - Vote địa điểm đi chơi thật dễ dàng" key="ogsitename" />
+        <meta property="og:description" content={ogDescription} key="ogdesc" />
+        <meta property="og:title" content="Go out together" key="ogtitle" />
+        <meta property="og:url" content="https://rikkeisoft-go-out-together.vercel.app" key="ogurl" />
+        <meta
+          key="ogimage"
+          property="og:image"
+          content="https://images.unsplash.com/photo-1629659740606-66c36a82cc24?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80"
+        />
+      </Head>
+      <QueryClientProvider client={queryClient}>
+        <ProtectedComponent>
+          <Component {...pageProps} />
+        </ProtectedComponent>
+      </QueryClientProvider>
+    </>
   )
 }
 
