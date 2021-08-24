@@ -35,6 +35,7 @@ import socketIOClient from 'socket.io-client'
 import Popup from 'components/common/Popup'
 import { useRouter } from 'next/router'
 import urls from 'consts/urls'
+import FacebookShare from 'components/common/FacebookShare'
 
 const socket = socketIOClient(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
 
@@ -56,6 +57,7 @@ const Step2 = memo(({ sid }) => {
     userLocation: {},
     listUserLocation: [],
   })
+  const sharedLink = process.env.NEXT_PUBLIC_BASE_URL + urls.SESSIONS + '/' + sid + '/0'
   const { data: voteResult } = useQuery([queryKeys.GET_SESSION_RESULT, { sid }], () => getSessionResult({ sid }))
 
   const queryClient = useQueryClient()
@@ -260,6 +262,10 @@ const Step2 = memo(({ sid }) => {
               )}
             </Popup>
           </div>
+          {new Date(data?.data?.expireTime).getTime() > new Date().getTime() ? (
+            <FacebookShare sharedLink={sharedLink} title={data.data.title} memberCount={data.data.members.length} />
+          ) : null}
+
           <div className="px-1 pt-4">
             <FormProvider {...methods}>
               <form onSubmit={methods.handleSubmit(onSubmit)}>
