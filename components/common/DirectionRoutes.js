@@ -103,7 +103,6 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             `https://api.mapbox.com/directions/v5/mapbox/cycling/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&overview=full&access_token=${process.env.NEXT_PUBLIC_TOKEN_MAPBOX}`,
           )
           const data = response.data.routes[0]
-          // console.log(data)
           const coordinates = data.geometry.coordinates
           saveRoute(coordinates)
           setRoute([...routesRef.current])

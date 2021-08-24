@@ -99,7 +99,6 @@ const Step1 = memo(({ sid, formData, setFormData }) => {
         <MapBox
           isOneLocaion={true}
           data={(data) => {
-            console.log(data)
             setUserLocation(data)
           }}
           show={() => {
