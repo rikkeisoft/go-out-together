@@ -55,11 +55,6 @@ const Routes = () => {
           },
         })
       }
-
-      if (start !== end) {
-        const distance = response.data.routes[0].distance
-        console.log('Quãng đường::', distance)
-      }
     }
 
     map.on('load', () => {

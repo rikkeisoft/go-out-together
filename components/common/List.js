@@ -15,7 +15,6 @@ const List = memo(({ name }) => {
         <table className="w-full font-bold mt-4">
           <tbody>
             {value.map((item, index) => {
-              console.log('---', value)
               return (
                 <tr key={`item-` + index} className="hover:bg-gray-100 border border-transparent rounded-md text-lg">
                   <td className="pl-4 py-2 rounded-tl-md rounded-bl-md">{item.name}</td>

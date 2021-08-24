@@ -10,8 +10,6 @@ const Map = () => {
   const [listLocation, setListLocation] = useState([])
   const [showListLocation, setShowListLocation] = useState(true)
 
-  // proximity=105.77791972881141,21.028422014324164&
-
   useEffect(() => {
     if (location) {
       const getLocation = async () => {
@@ -28,11 +26,6 @@ const Map = () => {
       getLocation()
     }
   }, [location])
-
-  console.log(selectedLocation)
-  // 0: 105.799588
-  // 1: 21.03202
-  // 105.777909, 21.028412
 
   useEffect(() => {
     setLocation(selectedLocation.place_name)
