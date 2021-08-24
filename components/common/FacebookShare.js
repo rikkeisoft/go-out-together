@@ -2,9 +2,10 @@ import { FacebookIcon, FacebookShareButton } from 'react-share'
 import PropTypes from 'prop-types'
 
 function FacebookShare({ sharedLink, title, memberCount }) {
-  const message = memberCount === 0 ? 'Chưa có ai tham gia vote' : `Đang có ${memberCount} đang tham gia rồi`
+  const message =
+    memberCount === 0 ? 'Chưa có thành viên nào tham gia' : `Đã có ${memberCount} thành viên đang tham gia`
   return (
-    <FacebookShareButton url={sharedLink} quote={`Tiêu đề: ${title} | ${message}`}>
+    <FacebookShareButton url={sharedLink} quote={`Chủ đề: ${title} | ${message}`}>
       <div className="flex items-center">
         <span className="mr-2 text-xl font-semibold">Chia sẻ qua Facebook:</span>
         <FacebookIcon size={64} round={true} />
