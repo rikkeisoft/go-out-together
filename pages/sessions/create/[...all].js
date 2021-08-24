@@ -39,7 +39,7 @@ export default function Create() {
       stepElement = <Step2 formData={formData} setFormData={setFormData} />
       break
     case '3':
-      stepElement = <Step3 setFormData={setFormData} />
+      stepElement = <Step3 formData={formData} setFormData={setFormData} />
       break
     default:
       break
