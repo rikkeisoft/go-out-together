@@ -5,7 +5,7 @@ import { auth } from 'lib/firebase'
 function GoogleLogin() {
   // Configure FirebaseUI.
   const uiConfig = {
-    signInFlow: 'popup',
+    signInFlow: 'redirect',
     signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID, firebase.auth.FacebookAuthProvider.PROVIDER_ID],
     callbacks: {
       signInSuccessWithAuthResult: () => false,

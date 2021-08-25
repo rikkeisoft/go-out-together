@@ -50,7 +50,6 @@ export default function Create() {
   const handleSignOut = () => {
     router.push(`${urls.LOGIN}`)
     queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedOut: true })
-    sessionStorage.removeItem('redirectURL')
     removeCookie('accessToken', { path: '/' })
     removeCookie('uid', { path: '/' })
     removeCookie('username', { path: '/' })
