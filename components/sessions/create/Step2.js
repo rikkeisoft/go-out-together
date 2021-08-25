@@ -48,9 +48,7 @@ const Step2 = memo(({ formData, setFormData }) => {
   const [showMap, setShowMap] = useState(false)
   const [listDataLocation, setListDataLocation] = useState(null)
   const createSessionMutation = useMutation(createSession)
-
-  if (sessionStorage.getItem('checkOldSession')) sessionStorage.removeItem('checkOldSession')
-  if (sessionStorage.getItem('redirectToOldSession')) sessionStorage.removeItem('redirectToOldSession')
+  const sid = sessionStorage.getItem('sid')
 
   const methods = useForm({
     resolver: yupResolver(schema),
@@ -71,6 +69,11 @@ const Step2 = memo(({ formData, setFormData }) => {
       })
     }
   }
+
+  useEffect(() => {
+    if (sessionStorage.getItem('checkOldSession')) sessionStorage.removeItem('checkOldSession')
+    if (sessionStorage.getItem('redirectToOldSession')) sessionStorage.removeItem('redirectToOldSession')
+  }, [])
 
   useEffect(() => {
     if (listDataLocation) {
@@ -263,7 +266,7 @@ const Step2 = memo(({ formData, setFormData }) => {
                 </Button>
 
                 <Button type="submit" variant="primary">
-                  Tạo nhóm
+                  {sid ? 'Tiếp theo' : 'Tạo nhóm'}
                 </Button>
               </ButtonGroup>
             </form>

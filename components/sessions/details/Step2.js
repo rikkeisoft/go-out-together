@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useState, lazy, Suspense } from 'react'
 import Head from 'next/head'
 import PropTypes from 'prop-types'
 import { useForm, FormProvider } from 'react-hook-form'
@@ -28,7 +28,7 @@ import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MessageText from 'components/common/MessageText'
 import MemberList from 'components/common/MemberList'
-import MapBox from 'components/common/MapBox'
+// import MapBox from 'components/common/MapBox'
 import LoadingOverlay from 'components/common/LoadingOverlay'
 import DirectionRoutes from 'components/common/DirectionRoutes'
 import socketIOClient from 'socket.io-client'
@@ -36,6 +36,8 @@ import Popup from 'components/common/Popup'
 import { useRouter } from 'next/router'
 import urls from 'consts/urls'
 import FacebookShare from 'components/common/FacebookShare'
+
+const MapBox = lazy(() => import('components/common/MapBox'))
 
 const socket = socketIOClient(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
 
@@ -152,6 +154,7 @@ const Step2 = memo(({ sid }) => {
   }
 
   const handleOnAddLocation = async (newLocations) => {
+    if (newLocations.length === 0) return
     const newData = newLocations.map((location) => ({
       aid: location.id,
       name: location.place_name,
@@ -189,15 +192,17 @@ const Step2 = memo(({ sid }) => {
       </Head>
 
       {showMap && (
-        <MapBox
-          listAddress={data.data.addresses}
-          data={(data) => {
-            handleOnAddLocation(data)
-          }}
-          show={() => {
-            setShowMap(false)
-          }}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <MapBox
+            listAddress={data.data.addresses}
+            data={(data) => {
+              handleOnAddLocation(data)
+            }}
+            show={() => {
+              setShowMap(false)
+            }}
+          />
+        </Suspense>
       )}
       <LoadingOverlay isOpen={isLoading} message="Đang lấy thông tin session..." />
       {!(new Date(data?.data?.expireTime).getTime() > new Date().getTime()) ? (
@@ -230,6 +235,7 @@ const Step2 = memo(({ sid }) => {
                       date={new Date(data.data.expireTime)}
                       onComplete={() => {
                         alert('Rất tiếc , đã hết thời gian vote')
+                        localStorage.removeItem('votedAddress')
                         router.push(`${urls.SESSIONS}/${sid}/3`)
                       }}
                     />
@@ -325,14 +331,14 @@ const Step2 = memo(({ sid }) => {
                       Trước đó
                     </Button>
                     <Button type="submit" variant="primary">
-                      Tiếp theo
+                      Vote ngay
                     </Button>
                     <LoadingOverlay isOpen={voteSessionMutation.isLoading} message="Đang xử lí..." />
                   </ButtonGroup>
                 ) : (
                   <Button
                     type="button"
-                    variant="primary"
+                    variant="danger"
                     onClick={() => {
                       router.back()
                     }}

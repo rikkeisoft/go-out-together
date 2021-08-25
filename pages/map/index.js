@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import Head from 'next/head'
 import axios from 'axios'
@@ -9,6 +9,7 @@ const Map = () => {
   const [selectedLocation, setSelectedLocation] = useState('')
   const [listLocation, setListLocation] = useState([])
   const [showListLocation, setShowListLocation] = useState(true)
+  const inputRef = useRef(null)
 
   useEffect(() => {
     if (location) {
@@ -72,6 +73,7 @@ const Map = () => {
         ) : (
           <form>
             <input
+              ref={inputRef}
               type="text"
               value={location || ''}
               className="w-80 p-2 pr-10 inline outline-none border border-black whitespace-nowrap overflow-hidden overflow-ellipsis"
@@ -84,6 +86,7 @@ const Map = () => {
             <span
               className="absolute right-1.5 top-1.5"
               onClick={() => {
+                inputRef.current.focus()
                 setLocation('')
               }}
             >
@@ -115,6 +118,7 @@ const Map = () => {
                     setSelectedLocation(item)
                     setListLocation([...listLocation, item])
                     setShowListLocation(false)
+                    inputRef.current.focus()
                   }}
                 >
                   <svg

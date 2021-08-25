@@ -121,7 +121,7 @@ const Step1 = memo(({ formData, setFormData }) => {
                 {!_.isNil(methods.formState.errors.address) && <ErrorText>Nhập vào địa chỉ</ErrorText>}
               </Field>
               <div className="  mx-auto flex justify-between">
-                <Button type="button" variant="primary" onClick={() => router.back()}>
+                <Button type="button" variant="danger" onClick={() => router.back()}>
                   Quay lại
                 </Button>
                 <Button type="submit" variant="primary" onClick={() => {}}>

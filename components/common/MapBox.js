@@ -4,7 +4,6 @@ import mapboxgl from 'mapbox-gl'
 import Head from 'next/head'
 import axios from 'axios'
 import Button from './Button'
-// import * as turf from '@turf/turf'
 
 const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
   const [location, setLocation] = useState(null)
@@ -13,6 +12,11 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
   const [listLocation, setListLocation] = useState([])
   const [showListLocation, setShowListLocation] = useState(true)
   const selectedLocationRef = useRef([])
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    inputRef.current.focus()
+  }, [])
 
   useEffect(() => {
     if (selectedLocationRef.current && !isOneLocaion) {
@@ -113,9 +117,6 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
         <title>Home</title>
         <link rel="icon" href="/favicon.ico" />
         <script async src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
-        {/* <script async
-          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}&libraries=places`}>
-        </script> */}
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
       <h1 className="text-center font-semibold text-xl">Hãy chọn địa điểm ở Hà Nội</h1>
@@ -151,11 +152,14 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
                 <ul className="my-3">
                   {listLocation.length !== 0 && <span>Danh sách địa điểm được thêm vào: </span>}
                   {listLocation.map((location) => (
-                    <li key={location.id} className="px-3 py-2 mb-2 border border-gray-400">
+                    <li key={location.id} className="px-3 py-2 mb-2 border border-gray-400 bg-gray-100">
                       {location.place_name}
                       <span
                         className="ml-2 cursor-pointer"
-                        onClick={() => handleDeleteAddressListLocation(location.id)}
+                        onClick={() => {
+                          handleDeleteAddressListLocation(location.id)
+                          inputRef.current.focus()
+                        }}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -178,6 +182,7 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
             <form className="mb-4 flex flex-col-reverse items-center md:flex-row md:justify-between">
               <div className="relative w-full md:w-80 bg-white border md:border-0 border-gray-400">
                 <input
+                  ref={inputRef}
                   type="text"
                   value={location || ''}
                   className="w-11/12 md:w-80 p-2 pr-10 inline outline-none whitespace-nowrap overflow-hidden overflow-ellipsis"
@@ -188,9 +193,10 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
                   }}
                 />
                 <span
-                  className="absolute top-1.5 md:left-72"
+                  className="absolute top-1.5 md:left-72 cursor-pointer"
                   onClick={() => {
                     setLocation('')
+                    inputRef.current.focus()
                   }}
                 >
                   <svg
@@ -210,7 +216,7 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
               <div className="mb-2 md:mb-0">
                 <Button
                   type="submit"
-                  variant="primary"
+                  variant={listLocation.length !== 0 ? 'primary' : 'danger'}
                   onClick={() => {
                     if (isOneLocaion) {
                       data(selectedLocation)
@@ -221,7 +227,7 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
                   }}
                   disabled={checkDisabledButton()}
                 >
-                  Thêm địa điểm
+                  {listLocation.length !== 0 ? 'Thêm địa điểm' : 'Quay lại'}
                 </Button>
               </div>
             </form>
@@ -270,7 +276,6 @@ const MapBox = ({ listAddress, show, isOneLocaion, data }) => {
           </ul>
         )}
         <div id="map" className="w-full mb-8" style={{ height: '70vh' }}></div>
-        <div id="google-map"></div>
       </div>
     </>
   )

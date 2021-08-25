@@ -10,7 +10,6 @@ const AddressVoter = memo(({ name, showDelete, data, onOpenModalMap, onClick, on
   const { control, watch, setValue } = useFormContext()
   const [openPopup, setOpenPopup] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState(null)
-  // const [openShowDirectionRoutes, setOpenShowDirectionRoutes] = useState(ShowDirectionRoutes)
 
   useEffect(() => {
     const votedAddress = localStorage.getItem('votedAddress')
@@ -18,11 +17,10 @@ const AddressVoter = memo(({ name, showDelete, data, onOpenModalMap, onClick, on
       setValue(name, JSON.parse(votedAddress), { shouldValidate: true })
       setSelectedItemId(JSON.parse(votedAddress).id)
     }
+    if (!_.isNil(watch(name)) && _.isNil(data.find((item) => item.aid === watch(name)?.aid))) {
+      setValue(name, null, { shouldValidate: true })
+    }
   }, [])
-
-  if (!_.isNil(watch(name)) && _.isNil(data.find((item) => item.aid === watch(name)?.aid))) {
-    setValue(name, null, { shouldValidate: true })
-  }
 
   const onSelect = (item) => {
     setValue(name, item, { shouldValidate: true })

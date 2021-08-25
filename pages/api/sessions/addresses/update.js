@@ -15,11 +15,11 @@ const schema = yup.object().shape({
   ),
 })
 
-const findAddressID = async (queryString, values, address) => {
+const findAddressID = (queryString, values, address) => {
   queryString = `SELECT id FROM addresses WHERE aid = ?`
   values = [address.aid]
   try {
-    const result = await mysql.query(queryString, values)
+    const result = mysql.query(queryString, values)
     return result
   } catch (err) {
     cleanUp(mysql)
@@ -27,11 +27,11 @@ const findAddressID = async (queryString, values, address) => {
   }
 }
 
-const insertAddress = async (queryString, values, address) => {
+const insertAddress = (queryString, values, address) => {
   queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
   values = [address.aid, address.name, address.latitude, address.longitude]
   try {
-    const result = await mysql.query(queryString, values)
+    const result = mysql.query(queryString, values)
     return result
   } catch (err) {
     cleanUp(mysql)
@@ -39,11 +39,11 @@ const insertAddress = async (queryString, values, address) => {
   }
 }
 
-const getCurrentSessionID = async (queryString, values, addressId) => {
+const getCurrentSessionID = (queryString, values, addressId) => {
   queryString = `SELECT DISTINCT session_id FROM session_address WHERE address_id = ?`
   values = [addressId]
   try {
-    const result = await mysql.query(queryString, values)
+    const result = mysql.query(queryString, values)
     return result
   } catch (err) {
     cleanUp(mysql)
@@ -51,11 +51,11 @@ const getCurrentSessionID = async (queryString, values, addressId) => {
   }
 }
 
-const insertToSessionAddress = async (queryString, values, sessionId, addressId) => {
+const insertToSessionAddress = (queryString, values, sessionId, addressId) => {
   queryString = `INSERT INTO session_address (session_id, address_id) VALUES (?, ?)`
   values = [sessionId, addressId]
   try {
-    const result = await mysql.query(queryString, values)
+    const result = mysql.query(queryString, values)
     return result
   } catch (err) {
     cleanUp(mysql)

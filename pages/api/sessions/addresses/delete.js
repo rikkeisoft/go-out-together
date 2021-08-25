@@ -49,13 +49,13 @@ export default async function handler(req, res) {
       result = await mysql.query(queryString, values)
     } catch (err) {
       cleanUp(mysql)
-      throw new ApiException(500, 'Không xoa được address', err)
+      throw new ApiException(500, 'Không xóa được address', err)
     }
 
     cleanUp(mysql)
     res.status(200).json({
       messageCode: messageCodes.SUCCESS,
-      message: 'Thêm địa chỉ vào session thành công',
+      message: 'Xóa địa chỉ thành công',
     })
   } catch (exception) {
     if (exception instanceof ApiException) {
