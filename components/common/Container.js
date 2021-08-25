@@ -4,11 +4,7 @@ import classnames from 'classnames'
 // import BackgroundImage from 'components/common/BackgroundImage'
 
 const Container = memo(({ className, children }) => {
-  return (
-    <div className={classnames('relative w-screen h-screen', className)}>
-      <div>{children}</div>
-    </div>
-  )
+  return <div className={classnames('relative w-screen min-h-screen', className)}>{children}</div>
 })
 
 Container.propTypes = {

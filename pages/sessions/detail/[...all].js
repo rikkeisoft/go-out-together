@@ -61,7 +61,6 @@ export default function Details({ error }) {
   const handleSignOut = () => {
     router.push(`${urls.LOGIN}`)
     queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedOut: true })
-    sessionStorage.removeItem('redirectURL')
     removeCookie('accessToken', { path: '/' })
     removeCookie('uid', { path: '/' })
     removeCookie('username', { path: '/' })
@@ -85,7 +84,7 @@ export default function Details({ error }) {
       <Container className="bg-image2">
         <div className="flex items-center justify-around">
           {checkOldSession ? (
-            <h1 className="font-bold text-3xl cursor-pointer">Go out together</h1>
+            <h1 className="text-2xl font-bold md:text-3xl cursor-pointer">Go out together</h1>
           ) : (
             <Button type="button" variant="danger" onClick={goToHomePage}>
               <ArrowLeftIcon className="w-7" /> Về trang chủ

@@ -8,9 +8,12 @@ import { useMutation } from 'react-query'
 import { updateUserInfo } from 'api/users'
 import AvatarEditor from 'react-avatar-editor'
 import CropIcon from 'components/icons/CropIcon'
+import useClickOutside from 'hooks/useClickOutside'
 
 export default function UserAvatar({ imgURL, username, onSignOut }) {
   const avatarInputRef = useRef(null)
+  const avatarButtonRef = useRef(null)
+  const menuRef = useRef(null)
   const [cookies, setCookie] = useCookies(['uid', 'imgURL'])
   const [visible, setVisbile] = useState(false)
   const [openPopup, setOpenPopup] = useState(false)
@@ -36,14 +39,21 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
     setAvatarURL({ ...avatarURL, image: imgURL })
   }, [imgURL])
 
+  const handleChangeMenuStatus = () => setVisbile(!visible)
+  useClickOutside(menuRef, avatarButtonRef, (value) => setVisbile(value))
+
   const handleSignOut = () => {
+    handleChangeMenuStatus()
     localStorage.clear()
     sessionStorage.clear()
     onSignOut()
     setVisbile(!visible)
   }
 
-  const handleChangeAvatar = () => setOpenPopup(true)
+  const handleChangeAvatar = () => {
+    handleChangeMenuStatus()
+    setOpenPopup(true)
+  }
 
   const handleUploadImage = async (e) => {
     const image = e.target.files[0]
@@ -97,11 +107,18 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
 
   return (
     <>
-      <div className="relative" onClick={() => setVisbile(!visible)}>
-        {imgURL && <Avatar imgURL={avatarURL.image} username={username} />}
+      <div className="relative">
+        {imgURL && (
+          <button ref={avatarButtonRef}>
+            <Avatar imgURL={avatarURL.image} username={username} />
+          </button>
+        )}
 
         {visible && (
-          <div className="absolute left-6 top-14 md:left-5 top-12 md:top-14 p-1 md:py-1 z-10 border-white rounded-sm border bg-white">
+          <div
+            ref={menuRef}
+            className="absolute left-6 top-16 md:left-5 p-1 md:py-1 z-10 border-white rounded-sm border bg-white"
+          >
             <button
               className="w-full p-0.5 md:w-20 md:px-2 md:py-1 rounded-sm bg-transparent text-red-500 text-xs font-bold hover:bg-gray-300"
               onClick={handleChangeAvatar}
@@ -138,7 +155,7 @@ export default function UserAvatar({ imgURL, username, onSignOut }) {
             </div>
             <div className="flex justify-around my-2">
               <label className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded">
-                <span>Upload a file</span>
+                <span>Tải ảnh lên</span>
                 <input type="file" className="hidden" onChange={handleUploadImage} />
               </label>
               <button
