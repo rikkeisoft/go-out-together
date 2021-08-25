@@ -16,6 +16,7 @@ const Step0 = memo(({ sid, uid }) => {
   useEffect(() => {
     if (sessionStorage.getItem('isAdmin') || sessionStorage.getItem('redirectToOldSession')) {
       router.back()
+      return
     }
     if (isSuccess) {
       if (data.messageCode === messageCodes.SUCCESS) {
