@@ -18,10 +18,9 @@ const metaData = {
   Mỗi người một ý tưởng, mỗi địa điểm lại có lợi thế riêng. 
   Hãy để Go out together giúp mọi người dễ dàng hơn trong việc chọn ra địa điểm vui chơi nhanh nhất.`,
   ogSitename: 'Go out together - Chọn địa điểm đi chơi thật dễ dàng',
-  ogTitle: 'Go out together',
+  ogTitle: 'Go out together - Chọn địa điểm đi chơi thật dễ dàng',
   ogUrl: 'https://rikkeisoft-go-out-together.vercel.app',
-  ogImage:
-    'https://images.unsplash.com/photo-1629659740606-66c36a82cc24?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80',
+  ogImage: 'https://images.wallpaperscraft.com/image/autumn_river_trees_nature_86232_1920x1080.jpg',
 }
 
 function MyApp({ Component, pageProps }) {
