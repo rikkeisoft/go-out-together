@@ -65,7 +65,7 @@ export default function Home() {
         <script async src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
-      <Container className="bg-image1">
+      <Container className="bg-image15 bg">
         <div className="flex items-center justify-around">
           {url ? (
             <Button type="button" variant="danger" onClick={() => router.back()}>

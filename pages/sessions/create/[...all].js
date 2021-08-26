@@ -64,7 +64,7 @@ export default function Create() {
         <title>Form</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container className="bg-image1">
+      <Container className="bg-image13 bg">
         <div className="flex items-center justify-around">
           <Button type="button" variant="danger" onClick={goToHomePage}>
             <ArrowLeftIcon className="w-7" /> Về trang chủ

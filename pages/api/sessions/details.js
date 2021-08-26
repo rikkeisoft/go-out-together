@@ -108,7 +108,6 @@ export default async function handler(req, res) {
       avatarUrl: user[0].avatar_url,
     }))
     const addressResult = await Promise.all(addressPromises)
-    console.log(addressResult)
     const addresses = addressResult.map((address) => ({
       id: address[0].id,
       aid: address[0].aid,
