@@ -11,9 +11,22 @@ const schema = yup.object().shape({
       name: yup.string().required(),
       latitude: yup.number().required(),
       longitude: yup.number().required(),
+      uuid: yup.string().required(),
     }),
   ),
 })
+
+const getUserId = (queryString, values, uuid) => {
+  queryString = `SELECT id FROM users WHERE uuid = ?`
+  values = [uuid]
+  try {
+    const result = mysql.query(queryString, values)
+    return result
+  } catch (err) {
+    cleanUp(mysql)
+    throw new ApiException(500, 'Không lấy được id từ bảng addresses', err)
+  }
+}
 
 const findAddressID = (queryString, values, address) => {
   queryString = `SELECT id FROM addresses WHERE aid = ?`
@@ -51,9 +64,9 @@ const getCurrentSessionID = (queryString, values, addressId) => {
   }
 }
 
-const insertToSessionAddress = (queryString, values, sessionId, addressId) => {
-  queryString = `INSERT INTO session_address (session_id, address_id) VALUES (?, ?)`
-  values = [sessionId, addressId]
+const insertToSessionAddress = (queryString, values, sessionId, addressId, userId) => {
+  queryString = `INSERT INTO session_address (session_id, address_id, added_user_id) VALUES (?, ?, ?)`
+  values = [sessionId, addressId, userId]
   try {
     const result = mysql.query(queryString, values)
     return result
@@ -102,7 +115,8 @@ export default async function handler(req, res) {
       result = await getCurrentSessionID(queryString, values, addressId)
 
       if (result.findIndex((ele) => ele.session_id === sessionId) === -1) {
-        result = await insertToSessionAddress(queryString, values, sessionId, addressId)
+        let userId = await getUserId(queryString, values, address.uuid)
+        result = await insertToSessionAddress(queryString, values, sessionId, addressId, userId[0].id)
       }
 
       return result

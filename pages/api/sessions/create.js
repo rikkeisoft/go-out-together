@@ -78,17 +78,6 @@ export default async function handler(req, res) {
       addressIds.push(result.insertId)
     }
 
-    for (let addressId of addressIds) {
-      queryString = `INSERT INTO session_address (session_id, address_id) VALUES (?, ?)`
-      values = [sessionId, addressId]
-      try {
-        result = await mysql.query(queryString, values)
-      } catch (err) {
-        cleanUp(mysql)
-        throw new ApiException(500, 'Không thêm được bản ghi mới vào bảng session_address', err)
-      }
-    }
-
     queryString = `SELECT id, address_id FROM users WHERE uuid = ?`
     values = [uid]
     try {
@@ -103,6 +92,17 @@ export default async function handler(req, res) {
     }
     const userId = result[0].id
     const addressId = result[0].address_id
+
+    for (let addressId of addressIds) {
+      queryString = `INSERT INTO session_address (session_id, address_id, added_user_id) VALUES (?, ?, ?)`
+      values = [sessionId, addressId, userId]
+      try {
+        result = await mysql.query(queryString, values)
+      } catch (err) {
+        cleanUp(mysql)
+        throw new ApiException(500, 'Không thêm được bản ghi mới vào bảng session_address', err)
+      }
+    }
 
     // insert admin to session_user
     queryString = `INSERT INTO session_user (session_id, user_id, address_id) VALUES (?, ?, ?)`
