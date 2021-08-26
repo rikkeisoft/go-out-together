@@ -76,14 +76,17 @@ export default async function handler(req, res) {
     let addressIds = result.map((row) => row.address_id)
     const addressPromises = addressIds.map((addressId) => {
       queryString = `
-      SELECT id, aid, name, latitude, longitude,
+      SELECT addresses.id, addresses.aid, addresses.name, addresses.latitude, addresses.longitude, users.name as username,
       (
       SELECT COUNT(address_id) FROM session_address_user 
       WHERE session_id = ? AND address_id = ?
       ) AS vote_count
-      FROM addresses
-      WHERE id = ?`
-      values = [sessionId, addressId, addressId]
+      FROM ((addresses
+      INNER JOIN session_address 
+      ON addresses.id = session_address.address_id)
+      LEFT JOIN users ON session_address.added_user_id = users.id)
+      WHERE session_address.session_id = ? AND session_address.address_id = ?`
+      values = [sessionId, addressId, sessionId, addressId]
       try {
         result = mysql.query(queryString, values)
       } catch (err) {
@@ -105,12 +108,14 @@ export default async function handler(req, res) {
       avatarUrl: user[0].avatar_url,
     }))
     const addressResult = await Promise.all(addressPromises)
+    console.log(addressResult)
     const addresses = addressResult.map((address) => ({
       id: address[0].id,
       aid: address[0].aid,
       name: address[0].name,
       latitude: address[0].latitude,
       longitude: address[0].longitude,
+      username: address[0].username,
       voteCount: address[0].vote_count,
     }))
 
