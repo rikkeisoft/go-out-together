@@ -160,6 +160,7 @@ const Step2 = memo(({ sid }) => {
       name: location.place_name,
       longitude: location.center[0],
       latitude: location.center[1],
+      uuid: cookies.uid,
     }))
 
     try {
@@ -310,7 +311,7 @@ const Step2 = memo(({ sid }) => {
                     onClick={(item) => setVoteAddress(item)}
                     onDelete={deleteAddress}
                   />
-                  <LoadingOverlay isOpen={isLoadingAdress} message="Đang Xóa địa điểm vote" />
+                  <LoadingOverlay isOpen={isLoadingAdress} message="Đang xóa địa điểm..." />
                   {!_.isNil(methods.formState.errors.votedAddress) &&
                     new Date(data?.data?.expireTime).getTime() > new Date().getTime() && (
                       <ErrorText>

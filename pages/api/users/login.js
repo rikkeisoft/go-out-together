@@ -34,8 +34,8 @@ export default async function handler(req, res) {
       // new user -> insert
       imgURL = avatar_url
 
-      queryString = 'INSERT INTO users (uuid, username, avatar_url) VALUES (?, ?, ?)'
-      values = [uuid, username, avatar_url]
+      queryString = 'INSERT INTO users (uuid, username, name, avatar_url) VALUES (?, ?, ?, ?)'
+      values = [uuid, username, username, avatar_url]
       try {
         result = await mysql.query(queryString, values)
       } catch (err) {

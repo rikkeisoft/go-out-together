@@ -37,10 +37,14 @@ const AddressVoter = memo(({ name, showDelete, data, onOpenModalMap, onClick, on
               return (
                 <tr
                   key={`item-` + item.aid}
+                  title={item.username ? `${item.username} đã thêm địa chỉ này` : ''}
                   className="hover:bg-gray-100 font-bold border border-transparent rounded-md"
                 >
                   {showDelete ? (
-                    <td className="p-2 cursor-pointer border border-transparent rounded-tl-md rounded-bl-md">
+                    <td
+                      title={item.username ? `${item.username} đã thêm địa chỉ này` : ''}
+                      className="p-2 cursor-pointer border border-transparent rounded-tl-md rounded-bl-md"
+                    >
                       <label className="cursor-pointer text-lg">
                         <input
                           type="radio"
