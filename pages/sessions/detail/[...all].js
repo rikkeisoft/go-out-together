@@ -20,15 +20,28 @@ import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
 import GoogleLoginModal from 'components/auth/GoogleLoginModal'
 import { useEffect, useState } from 'react'
 import LoadingOverlay from 'components/common/LoadingOverlay'
+import socketIOClient from 'socket.io-client'
+
+const socket = socketIOClient(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
 
 export default function Details({ error }) {
   const [cookies, , removeCookie] = useCookies(['imgURL', 'uid'])
   const [sid, setSid] = useState(null)
+  const [bgClassname, setBgClassname] = useState(() => localStorage.getItem('bgClassname') ?? 'bg-image32 bg')
   const router = useRouter()
   const queryClient = useQueryClient()
   const { formData, setFormData } = useStep()
   const [detailStep, setDetailStep] = useState(null)
   const checkOldSession = sessionStorage.getItem('checkOldSession')
+
+  // socketio
+  useEffect(() => {
+    // new background image
+    if (sid) {
+      socket.emit('new_bg_image', { newBgClassname: bgClassname })
+      return socket.off('new_bg_image')
+    }
+  }, [bgClassname])
 
   useEffect(() => {
     if (!router.isReady) return
@@ -37,6 +50,11 @@ export default function Details({ error }) {
       setDetailStep(router.query.all[1])
     }
   }, [router.isReady, router.asPath])
+
+  const handleOnChangeBg = (newBgClassname) => {
+    localStorage.setItem('bgClassname', newBgClassname)
+    setBgClassname(newBgClassname)
+  }
 
   let stepElement = <></>
   switch (detailStep) {
@@ -47,7 +65,7 @@ export default function Details({ error }) {
       stepElement = <Step1 sid={sid} formData={formData} setFormData={setFormData} />
       break
     case '2':
-      stepElement = <Step2 sid={sid} />
+      stepElement = <Step2 sid={sid} onChangeBg={handleOnChangeBg} />
       break
     case '3':
       stepElement = <Step3 sid={sid} setFormData={setFormData} />
@@ -56,7 +74,9 @@ export default function Details({ error }) {
       break
   }
 
-  const goToHomePage = () => router.push(`${urls.HOME}`)
+  const goToHomePage = () => {
+    router.push(`${urls.HOME}`)
+  }
 
   const handleSignOut = () => {
     router.push(`${urls.LOGIN}`)
@@ -81,7 +101,7 @@ export default function Details({ error }) {
         <title>Form</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container className="bg-image2">
+      <Container className={bgClassname}>
         <div className="flex items-center justify-around">
           {checkOldSession ? (
             <h1 className="text-2xl font-bold md:text-3xl cursor-pointer">Go out together</h1>

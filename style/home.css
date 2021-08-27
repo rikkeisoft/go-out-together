@@ -1,26 +1,36 @@
-.bg-image {
-  background: url('/assets/images/bg34.png') no-repeat;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  padding-top: 20px;
-}
-.bg-image1 {
-  background: url('/assets/images/bg32.png') no-repeat;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  min-width: 100%;
-  overflow-y: auto;
-  padding-top: 20px;
-}
-.bg-image2 {
-  background: url('/assets/images/bg25.png') no-repeat;
+.bg {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   min-width: 100%;
   padding-top: 20px;
+}
+.bg-image3 {
+  background-image: url('/assets/images/bg3.png');
+}
+.bg-image7 {
+  background-image: url('/assets/images/bg7.png');
+}
+.bg-image13 {
+  background-image: url('/assets/images/bg13.png');
+}
+.bg-image14 {
+  background-image: url('/assets/images/bg14.png');
+}
+.bg-image15 {
+  background-image: url('/assets/images/bg15.png');
+}
+.bg-image25 {
+  background-image: url('/assets/images/bg25.png');
+}
+.bg-image32 {
+  background-image: url('/assets/images/bg32.png');
+}
+.bg-image34 {
+  background-image: url('/assets/images/bg34.png');
+}
+.bg-image36 {
+  background-image: url('/assets/images/bg36.png');
 }
 body {
   overflow-x: hidden;
