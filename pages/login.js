@@ -23,7 +23,7 @@ export default function Login() {
         <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
       </Head>
-      <Container className="bg-image">
+      <Container className="bg bg-image34">
         <Center>
           <div className="py-34 md:py-40">
             <h1 className="mb-3 text-gray-800 text-2xl md:text-5xl font-bold">GO OUT TOGETHER</h1>

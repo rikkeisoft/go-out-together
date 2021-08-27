@@ -10,7 +10,6 @@ import Countdown from 'react-countdown'
 import queryKeys from 'consts/queryKeys'
 import messageCodes from 'consts/messageCodes'
 import AddressVoter from 'components/common/AddressVoter'
-
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import {
   getAllAddresses,
@@ -28,7 +27,6 @@ import ButtonGroup from 'components/common/ButtonGroup'
 import Button from 'components/common/Button'
 import MessageText from 'components/common/MessageText'
 import MemberList from 'components/common/MemberList'
-// import MapBox from 'components/common/MapBox'
 import LoadingOverlay from 'components/common/LoadingOverlay'
 import DirectionRoutes from 'components/common/DirectionRoutes'
 import socketIOClient from 'socket.io-client'
@@ -50,8 +48,58 @@ const schema = yup.object().shape({
   }),
 })
 
-const Step2 = memo(({ sid }) => {
+const bgList = [
+  {
+    bgClassname: 'bg-image3',
+    imgSrc: '/assets/images/bg3.png',
+    selected: false,
+  },
+  {
+    bgClassname: 'bg-image7',
+    imgSrc: '/assets/images/bg7.png',
+    selected: false,
+  },
+  {
+    bgClassname: 'bg-image13',
+    imgSrc: '/assets/images/bg13.png',
+    selected: false,
+  },
+  {
+    bgClassname: 'bg-image14',
+    imgSrc: '/assets/images/bg14.png',
+    selected: false,
+  },
+  {
+    bgClassname: 'bg-image15',
+    imgSrc: '/assets/images/bg15.png',
+    selected: false,
+  },
+  {
+    bgClassname: 'bg-image25',
+    imgSrc: '/assets/images/bg25.png',
+    selected: false,
+  },
+  {
+    bgClassname: 'bg-image32',
+    imgSrc: '/assets/images/bg32.png',
+    selected: false,
+  },
+  {
+    bgClassname: 'bg-image34',
+    imgSrc: '/assets/images/bg34.png',
+    selected: false,
+  },
+  {
+    bgClassname: 'bg-image36',
+    imgSrc: '/assets/images/bg36.png',
+    selected: false,
+  },
+]
+
+const Step2 = memo(({ sid, onChangeBg }) => {
   const [cookies] = useCookies()
+  const [openSelectBgPopup, setOpenSelectBgPopup] = useState(false)
+  const [backgroundList, setBackgroundList] = useState(bgList)
   const [showMap, setShowMap] = useState(false)
   const [showDirectionRoutes, setShowDirectionRoutes] = useState(false)
   const [voteAddress, setVoteAddress] = useState(null)
@@ -59,16 +107,20 @@ const Step2 = memo(({ sid }) => {
     userLocation: {},
     listUserLocation: [],
   })
+  // get vote result
   const sharedLink = process.env.NEXT_PUBLIC_BASE_URL + urls.SESSIONS + '/' + sid + '/0'
   const { data: voteResult } = useQuery([queryKeys.GET_SESSION_RESULT, { sid }], () => getSessionResult({ sid }))
 
+  // add new locations to session
   const queryClient = useQueryClient()
   const { isLoading: isLoadingList, mutateAsync } = useMutation((address) => updateSessionAddresses(address), {
-    onSuccess: () => socket.emit('add_location'),
+    onSuccess: () => socket.emit('add_location', sid),
   })
+  // delete a location
   const { isLoading: isLoadingAdress, mutateAsync: deleteAsync } = useMutation((info) => deleteSessionAddress(info), {
-    onSuccess: () => socket.emit('delete_location'),
+    onSuccess: () => socket.emit('delete_location', sid),
   })
+  // get all users's address
   const { data: addressData } = useQuery([queryKeys.GET_ADDRESS, { sid }], () => getAllAddresses({ sid }), { retry: 1 })
 
   useEffect(() => {
@@ -100,7 +152,7 @@ const Step2 = memo(({ sid }) => {
 
   const voteSessionMutation = useMutation(voteSession, {
     onSuccess: () => {
-      socket.emit('vote')
+      socket.emit('vote', sid)
       router.push(`${urls.SESSIONS}/${sid}/3`)
     },
     onError: (error) => alert(error.message),
@@ -110,13 +162,18 @@ const Step2 = memo(({ sid }) => {
     resolver: yupResolver(schema),
   })
 
+  // get all session's detail
   const { isLoading, isSuccess, data } = useQuery([queryKeys.CHECK_SESSION, { sid }], () => getSessionDetails({ sid }))
+  const isSessionNotExpired = new Date(data?.data?.expireTime).getTime() > new Date().getTime()
+
   // socketio
   useEffect(() => {
     // new user come
-    socket.emit('new_user_coming')
+    if (sid) {
+      socket.emit('new_user_coming', sid)
 
-    return socket.off('new_user_coming')
+      return socket.off('new_user_coming')
+    }
   }, [])
 
   useEffect(() => {
@@ -134,6 +191,9 @@ const Step2 = memo(({ sid }) => {
 
     // get noti voted location
     socket.on('refetch_vote', () => queryClient.invalidateQueries(queryKeys.CHECK_SESSION))
+
+    // get new bgclassname
+    socket.on('change_new_bg_image', (newBgClassname) => onChangeBg(newBgClassname))
 
     return socket.offAny()
   })
@@ -206,7 +266,7 @@ const Step2 = memo(({ sid }) => {
         </Suspense>
       )}
       <LoadingOverlay isOpen={isLoading} message="Đang lấy thông tin session..." />
-      {!(new Date(data?.data?.expireTime).getTime() > new Date().getTime()) ? (
+      {!isSessionNotExpired ? (
         <Center>
           <MessageText>
             <p className="mt-3">Địa điểm được vote nhiều nhất</p>
@@ -228,7 +288,7 @@ const Step2 = memo(({ sid }) => {
               <MessageText>Nội dung: {data.data.content}</MessageText>
             </div>
             <div>
-              {new Date(data?.data?.expireTime).getTime() > new Date().getTime() ? (
+              {isSessionNotExpired ? (
                 <MessageText>
                   Vote sẽ kết thúc sau:
                   <span className="text-red-500 ml-1">
@@ -269,8 +329,13 @@ const Step2 = memo(({ sid }) => {
               )}
             </Popup>
           </div>
-          {new Date(data?.data?.expireTime).getTime() > new Date().getTime() ? (
-            <FacebookShare sharedLink={sharedLink} title={data.data.title} memberCount={data.data.members.length} />
+          {isSessionNotExpired ? (
+            <div className="mt-2 flex flex-col md:flex-row items-center justify-between">
+              <FacebookShare sharedLink={sharedLink} title={data.data.title} memberCount={data.data.members.length} />
+              <Button type="button" variant="primary" onClick={() => setOpenSelectBgPopup(true)}>
+                Đổi ảnh nền
+              </Button>
+            </div>
           ) : null}
 
           <div className="px-1 pt-4">
@@ -279,7 +344,7 @@ const Step2 = memo(({ sid }) => {
                 {data.data.addresses.length >= 5 ? (
                   <p className="text-red-500 text-xl">Chỉ giới hạn tối đa 5 địa điểm!</p>
                 ) : (
-                  new Date(data?.data?.expireTime).getTime() > new Date().getTime() && (
+                  isSessionNotExpired && (
                     <Button
                       type="button"
                       variant="primary"
@@ -294,7 +359,7 @@ const Step2 = memo(({ sid }) => {
                 <LoadingOverlay isOpen={isLoadingList} message="Đang thêm địa điểm..." />
                 <Field>
                   <Label htmlFor="votedAddress">
-                    {new Date(data?.data?.expireTime).getTime() > new Date().getTime() ? (
+                    {isSessionNotExpired ? (
                       <p className="text-xl text-black-600 font-bold my-4">Chọn địa điểm ăn chơi:</p>
                     ) : (
                       <p className="text-xl text-black-600 font-bold my-4">Các địa điểm ăn chơi:</p>
@@ -302,7 +367,7 @@ const Step2 = memo(({ sid }) => {
                   </Label>
                   <AddressVoter
                     name="votedAddress"
-                    showDelete={new Date(data?.data?.expireTime).getTime() > new Date().getTime()}
+                    showDelete={isSessionNotExpired}
                     data={data.data.addresses}
                     onOpenModalMap={(item) => {
                       setVoteAddress(item)
@@ -312,13 +377,12 @@ const Step2 = memo(({ sid }) => {
                     onDelete={deleteAddress}
                   />
                   <LoadingOverlay isOpen={isLoadingAdress} message="Đang xóa địa điểm..." />
-                  {!_.isNil(methods.formState.errors.votedAddress) &&
-                    new Date(data?.data?.expireTime).getTime() > new Date().getTime() && (
-                      <ErrorText>
-                        {' '}
-                        <p className="font-bold">Chọn địa chỉ để vote</p>
-                      </ErrorText>
-                    )}
+                  {!_.isNil(methods.formState.errors.votedAddress) && isSessionNotExpired && (
+                    <ErrorText>
+                      {' '}
+                      <p className="font-bold">Chọn địa chỉ để vote</p>
+                    </ErrorText>
+                  )}
                 </Field>
                 {new Date(data.data.expireTime).getTime() > new Date().getTime() ? (
                   <ButtonGroup>
@@ -352,6 +416,51 @@ const Step2 = memo(({ sid }) => {
           </div>
         </div>
       )}
+      <Popup isOpen={openSelectBgPopup} onRequestClose={() => setOpenSelectBgPopup(false)}>
+        <div>
+          <h2 className="mb-4 text-xl font-bold">Hãy chọn một hình bên dưới:</h2>
+          <div className="px-4 h-96 overflow-y-auto flex flex-col md:flex-row md:items-center md:justify-between md:flex-wrap">
+            {backgroundList.map((bg) => (
+              <p key={bg.imgSrc} className="w-full md:w-4/12 mb-4 flex items-center justify-center">
+                <img
+                  src={bg.imgSrc}
+                  alt="bg"
+                  className={
+                    bg.selected
+                      ? 'w-full h-full md:w-3/5 md:h-64 border-4 border-blue-600 cursor-pointer'
+                      : 'w-full h-full md:w-3/5 md:h-64 cursor-pointer hover:border-4 hover:border-blue-600'
+                  }
+                  onClick={() => {
+                    const index = backgroundList.findIndex((ele) => ele.bgClassname === bg.bgClassname)
+                    const newBackgroundList = backgroundList.map((ele) => ({ ...ele, selected: false }))
+                    setBackgroundList([
+                      ...newBackgroundList.slice(0, index),
+                      { ...newBackgroundList[index], selected: true },
+                      ...newBackgroundList.slice(index + 1),
+                    ])
+                  }}
+                />
+              </p>
+            ))}
+          </div>
+          <div className="mt-4 flex items-center justify-around">
+            <Button type="button" variant="danger" onClick={() => setOpenSelectBgPopup(false)}>
+              Hủy
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              onClick={() => {
+                const selectedBg = backgroundList.find((ele) => ele.selected === true)
+                onChangeBg(`${selectedBg.bgClassname} bg`)
+                setOpenSelectBgPopup(false)
+              }}
+            >
+              Xong
+            </Button>
+          </div>
+        </div>
+      </Popup>
     </>
   )
 })
