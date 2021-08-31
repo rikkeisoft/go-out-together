@@ -15,7 +15,7 @@ module.exports = {
     'prettier',
     'plugin:prettier/recommended',
   ],
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module',
@@ -28,7 +28,13 @@ module.exports = {
       version: 'detect',
     },
   },
-  plugins: ['eslint-plugin-import', 'eslint-plugin-react', 'eslint-plugin-jsdoc', 'eslint-plugin-prefer-arrow'],
+  plugins: [
+    'eslint-plugin-import',
+    'eslint-plugin-react',
+    'eslint-plugin-jsdoc',
+    'eslint-plugin-prefer-arrow',
+    '@typescript-eslint',
+  ],
   rules: {
     'react/prop-types': 0,
     'react/react-in-jsx-scope': 0,
@@ -59,6 +65,19 @@ module.exports = {
     'jsx-a11y/no-static-element-interactions': ['warn'],
     'jsx-a11y/anchor-is-valid': ['warn'],
     semi: ['error', 'never'],
+    '@typescript-eslint/member-delimiter-style': [
+      'warn',
+      {
+        multiline: {
+          delimiter: 'semi',
+          requireLast: true,
+        },
+        singleline: {
+          delimiter: 'semi',
+          requireLast: false,
+        },
+      },
+    ],
     'no-multiple-empty-lines': [
       'error',
       {
