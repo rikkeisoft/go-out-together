@@ -137,7 +137,7 @@ const Step1 = memo(({ sid, formData, setFormData }) => {
               </Field>
 
               <ButtonGroup>
-                <Button type="submit" variant="primary" onClick={() => {}}>
+                <Button type="submit" variant="primary">
                   Tiếp theo
                 </Button>
               </ButtonGroup>
