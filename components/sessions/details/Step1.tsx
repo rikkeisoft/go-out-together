@@ -105,7 +105,7 @@ const Step1 = memo(({ sid, formData, setFormData }: Step1Props) => {
     <>
       <Head>
         <title>Bước 1</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel='icon' href='/favicon.ico' />
       </Head>
       {showMap ? (
         <MapBox
@@ -122,21 +122,21 @@ const Step1 = memo(({ sid, formData, setFormData }: Step1Props) => {
           <FormProvider {...methods}>
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <Field>
-                <Label htmlFor="name">Tên:</Label>
-                <TextField id="name" name="name" />
+                <Label htmlFor='name'>Tên:</Label>
+                <TextField id='name' name='name' />
                 <ErrorMessage
                   errors={methods.formState.errors}
-                  name="name"
+                  name='name'
                   render={({ message }) => <ErrorText>{message}</ErrorText>}
                 />
               </Field>
 
               <Field>
-                <Label htmlFor="address">Địa điểm hiện tại của bạn:</Label>
-                <div className="py-2">
+                <Label htmlFor='address'>Địa điểm hiện tại của bạn:</Label>
+                <div className='py-2'>
                   <Button
-                    type="button"
-                    variant="primary"
+                    type='button'
+                    variant='primary'
                     onClick={() => {
                       setShowMap(true)
                     }}
@@ -144,12 +144,12 @@ const Step1 = memo(({ sid, formData, setFormData }: Step1Props) => {
                     Chọn địa điểm trên bản đồ
                   </Button>
                 </div>
-                <AddressField name="address" />
+                <AddressField name='address' />
                 {!_.isNil(methods.formState.errors.address) && <ErrorText>Nhập vào địa chỉ</ErrorText>}
               </Field>
 
               <ButtonGroup>
-                <Button type="submit" variant="primary" onClick={() => {}}>
+                <Button type='submit' variant='primary'>
                   Tiếp theo
                 </Button>
               </ButtonGroup>
@@ -157,7 +157,7 @@ const Step1 = memo(({ sid, formData, setFormData }: Step1Props) => {
           </FormProvider>
         </FormCard>
       )}
-      <LoadingOverlay isOpen={isLoading} message="Đang xử lí..." />
+      <LoadingOverlay isOpen={isLoading} message='Đang xử lí...' />
     </>
   )
 })
