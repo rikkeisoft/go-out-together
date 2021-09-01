@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 
-export default function useStep() {
+export default function useStep(): { formData: {}; setFormData: Dispatch<SetStateAction<{}>> } {
   const [formData, setFormData] = useState({})
 
   return {

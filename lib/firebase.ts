@@ -14,7 +14,7 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig)
 }
 
-export const uploadImage = async (image) => {
+export const uploadImage = async (image: File): Promise<string> => {
   if (image) {
     const ref = firebase.storage().ref().child(`/images/${image.name}`)
     let downloadURL = ''

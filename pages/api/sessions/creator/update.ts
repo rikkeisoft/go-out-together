@@ -2,6 +2,8 @@ import { mysql, cleanUp } from 'lib/db'
 import * as yup from 'yup'
 import messageCodes from 'consts/messageCodes'
 import ApiException from 'exceptions/ApiException'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { StringOrNumberGeneric, UpdateSessionCreatorParams } from 'lib/interfaces'
 
 const schema = yup.object().shape({
   uid: yup.string().required(),
@@ -14,13 +16,13 @@ const schema = yup.object().shape({
   }),
 })
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'POST') {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { uid, name, address } = req.body
+    const { uid, name, address } = req.body as unknown as UpdateSessionCreatorParams
 
     try {
       await schema.validate({ uid, name, address })
@@ -28,7 +30,7 @@ export default async function handler(req, res) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    let queryString, values, result
+    let queryString: string, values: StringOrNumberGeneric[], result
 
     queryString = 'SELECT id FROM addresses WHERE aid = ?'
     values = [address.aid]

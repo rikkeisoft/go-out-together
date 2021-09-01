@@ -2,18 +2,20 @@ import { mysql, cleanUp } from 'lib/db'
 import * as yup from 'yup'
 import messageCodes from 'consts/messageCodes'
 import ApiException from 'exceptions/ApiException'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { GetOldSessionsParams, StringOrNumberGeneric } from 'lib/interfaces'
 
 const schema = yup.object().shape({
   uid: yup.string().required(),
 })
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'GET') {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { uid } = req.query
+    const { uid } = req.query as unknown as GetOldSessionsParams
 
     try {
       await schema.validate({ uid })
@@ -21,7 +23,7 @@ export default async function handler(req, res) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    let queryString, values, result
+    let queryString: string, values: StringOrNumberGeneric[], result
 
     queryString = `SELECT id FROM users WHERE uuid = ?`
     values = [uid]
@@ -35,7 +37,7 @@ export default async function handler(req, res) {
       cleanUp(mysql)
       throw new ApiException(500, 'Không tìm thấy session')
     }
-    const userId = result[0].id
+    const userId: number = result[0].id
 
     queryString = `
 		SELECT sessions.id, sessions.sid, sessions.title, sessions.content

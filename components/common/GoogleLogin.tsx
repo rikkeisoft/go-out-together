@@ -2,7 +2,7 @@ import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 import firebase from 'firebase'
 import { auth } from 'lib/firebase'
 
-function GoogleLogin() {
+function GoogleLogin(): JSX.Element {
   // Configure FirebaseUI.
   const uiConfig = {
     signInFlow: 'redirect',

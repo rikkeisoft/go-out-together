@@ -1,33 +1,41 @@
-import { Address, JoinSessionParams } from 'lib/interfaces'
+import { JoinSessionParams, LoginParams, UpdateSessionCreatorParams, UpdateUserInfoParams } from 'lib/interfaces'
 import axiosClient from './axiosClient'
-
-interface UpdateSessionCreatorProps {
-  uid: string
-  name: string
-  address: Address
-}
 
 interface OnlyMessageResponse {
   messageCode: number
   message: string
 }
 
-export const login = (userInfo) => {
+interface LoginResponse extends OnlyMessageResponse {
+  data: {
+    accessToken: string
+    avatarURL: string
+  }
+}
+
+interface CheckUserResponse extends OnlyMessageResponse {
+  data: {
+    avatar_url: string
+    username: string
+  }
+}
+
+export const login = (userInfo: LoginParams): Promise<LoginResponse> => {
   const url = '/users/login'
   return axiosClient.post(url, userInfo)
 }
 
-export const checkUser = (uuid: string) => {
+export const checkUser = (): Promise<CheckUserResponse> => {
   const url = '/users/check'
-  return axiosClient.post(url, uuid)
+  return axiosClient.post(url)
 }
 
-export const updateSessionCreator = (data: UpdateSessionCreatorProps): Promise<OnlyMessageResponse> => {
+export const updateSessionCreator = (data: UpdateSessionCreatorParams): Promise<OnlyMessageResponse> => {
   const url = 'sessions/creator/update'
   return axiosClient.post(url, data)
 }
 
-export const updateUserInfo = (data) => {
+export const updateUserInfo = (data: UpdateUserInfoParams): Promise<OnlyMessageResponse> => {
   const url = 'users/update'
   return axiosClient.put(url, data)
 }

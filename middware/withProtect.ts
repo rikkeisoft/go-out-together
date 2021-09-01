@@ -3,11 +3,16 @@ import jwt from 'jsonwebtoken'
 import _ from 'lodash'
 import { mysql, cleanUp } from 'lib/db'
 import ApiException from 'exceptions/ApiException'
+import { NextApiRequest, NextApiResponse } from 'next'
 
-export default function withProtect(handler) {
-  return async (req, res) => {
+interface Request {
+  userId: string
+}
+
+export default function withProtect(handler: (req: NextApiRequest, res: NextApiResponse) => void) {
+  return async (req: NextApiRequest & Request, res: NextApiResponse): Promise<unknown> => {
     try {
-      let token
+      let token: string
       if (req.cookies && req.cookies.accessToken) {
         token = req.cookies.accessToken
       }
@@ -16,14 +21,14 @@ export default function withProtect(handler) {
         throw new ApiException(401, 'Bạn cần đăng nhập để truy cập trang')
       }
 
-      let decoded
+      let decoded: { userId: string }
       try {
         decoded = jwt.verify(token, process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET)
       } catch (err) {
         throw new ApiException(400, 'Xác nhận token thất bại', err)
       }
 
-      let queryString, values, result
+      let queryString: string, values: string[], result: any
 
       queryString = `SELECT username FROM users WHERE uuid = ?`
       values = [decoded.userId]

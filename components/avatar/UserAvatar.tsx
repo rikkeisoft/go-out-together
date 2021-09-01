@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, MouseEvent } from 'react'
 import Avatar from '../../components/common/Avatar'
 import Popup from '../../components/common/Popup'
 import { uploadImage } from 'lib/firebase'
@@ -21,7 +21,7 @@ interface UpdateUserData {
   avatarURL: string
 }
 
-export default function UserAvatar({ imgURL, username, onSignOut }: UserAvatarProps) {
+export default function UserAvatar({ imgURL, username, onSignOut }: UserAvatarProps): JSX.Element {
   const avatarInputRef = useRef(null)
   const avatarButtonRef = useRef(null)
   const menuRef = useRef(null)
@@ -66,7 +66,7 @@ export default function UserAvatar({ imgURL, username, onSignOut }: UserAvatarPr
     setOpenPopup(true)
   }
 
-  const handleUploadImage = async (e) => {
+  const handleUploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const image = e.target.files[0]
 
     const imageFirebaseURL = await uploadImage(image)
@@ -118,7 +118,7 @@ export default function UserAvatar({ imgURL, username, onSignOut }: UserAvatarPr
 
   return (
     <>
-      <div className="relative">
+      <div className='relative'>
         {imgURL && (
           <button ref={avatarButtonRef}>
             <Avatar imgURL={avatarURL.image} username={username} />
@@ -128,16 +128,16 @@ export default function UserAvatar({ imgURL, username, onSignOut }: UserAvatarPr
         {visible && (
           <div
             ref={menuRef}
-            className="absolute left-6 top-16 md:left-5 p-1 md:py-1 z-10 border-white rounded-sm border bg-white"
+            className='absolute left-6 top-16 md:left-5 p-1 md:py-1 z-10 border-white rounded-sm border bg-white'
           >
             <button
-              className="w-full p-0.5 md:w-20 md:px-2 md:py-1 rounded-sm bg-transparent text-red-500 text-xs font-bold hover:bg-gray-300"
+              className='w-full p-0.5 md:w-20 md:px-2 md:py-1 rounded-sm bg-transparent text-red-500 text-xs font-bold hover:bg-gray-300'
               onClick={handleChangeAvatar}
             >
               Thay đổi avatar
             </button>
             <button
-              className="w-full p-0.5 md:w-20 md:px-2 md:py-1 rounded-sm bg-transparent text-red-500 text-xs font-bold hover:bg-gray-300"
+              className='w-full p-0.5 md:w-20 md:px-2 md:py-1 rounded-sm bg-transparent text-red-500 text-xs font-bold hover:bg-gray-300'
               onClick={handleSignOut}
             >
               Đăng xuất
@@ -147,8 +147,8 @@ export default function UserAvatar({ imgURL, username, onSignOut }: UserAvatarPr
       </div>
       {openPopup && (
         <Popup isOpen={openPopup} onRequestClose={() => setOpenPopup(false)}>
-          <div className="">
-            <div className="mb-6 flex items-center justify-center md:w-600 md:h-300">
+          <div className=''>
+            <div className='mb-6 flex items-center justify-center md:w-600 md:h-300'>
               <AvatarEditor
                 ref={avatarInputRef}
                 scale={Number(avatarURL.scale)}
@@ -160,41 +160,41 @@ export default function UserAvatar({ imgURL, username, onSignOut }: UserAvatarPr
                 borderRadius={200}
                 color={[255, 255, 255, 0.4]}
                 image={avatarURL.image}
-                crossOrigin="anonymous"
-                className="editor-canvas"
+                crossOrigin='anonymous'
+                className='editor-canvas'
               />
             </div>
-            <div className="flex justify-around my-2">
-              <label className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded">
+            <div className='flex justify-around my-2'>
+              <label className='bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded'>
                 <span>Tải ảnh lên</span>
-                <input type="file" className="hidden" onChange={handleUploadImage} />
+                <input type='file' className='hidden' onChange={handleUploadImage} />
               </label>
               <button
-                className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded"
+                className='bg-gray-300 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded'
                 onClick={onCrop}
               >
-                <CropIcon className="w-6 mr-1" />
+                <CropIcon className='w-6 mr-1' />
                 Cắt ảnh
               </button>
             </div>
-            <div className=" mx-6 my-4 flex items-center justify-center">
+            <div className=' mx-6 my-4 flex items-center justify-center'>
               <input
-                className="md:w-80 h-1"
-                name="scale"
-                type="range"
+                className='md:w-80 h-1'
+                name='scale'
+                type='range'
                 value={avatarURL.scale}
                 onChange={handleScale}
                 min={avatarURL.allowZoomOut ? '0.1' : '1'}
-                max="1.5"
-                step="0.01"
+                max='1.5'
+                step='0.01'
               />
             </div>
           </div>
-          <div className="flex items-center justify-around">
-            <Button type="button" variant="danger" onClick={handleCancelSaveAvatar}>
+          <div className='flex items-center justify-around'>
+            <Button type='button' variant='danger' onClick={handleCancelSaveAvatar}>
               Hủy
             </Button>
-            <Button type="button" variant="primary" onClick={handleSaveAvatar}>
+            <Button type='button' variant='primary' onClick={handleSaveAvatar}>
               Lưu
             </Button>
           </div>

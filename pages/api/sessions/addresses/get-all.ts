@@ -2,18 +2,20 @@ import { mysql, cleanUp } from 'lib/db'
 import * as yup from 'yup'
 import messageCodes from 'consts/messageCodes'
 import ApiException from 'exceptions/ApiException'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { SessionIdParams } from 'lib/interfaces'
 
 const schema = yup.object().shape({
   sid: yup.string().required(),
 })
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'GET') {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { sid } = req.query
+    const { sid } = req.query as unknown as SessionIdParams
 
     try {
       await schema.validate({ sid })
@@ -21,7 +23,7 @@ export default async function handler(req, res) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    let queryString, values, result
+    let queryString: string, values: string[], result
 
     queryString = `SELECT id FROM sessions WHERE sid = ?`
     values = [sid]

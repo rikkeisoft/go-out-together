@@ -2,13 +2,14 @@ import { mysql, cleanUp } from 'lib/db'
 import * as yup from 'yup'
 import messageCodes from 'consts/messageCodes'
 import ApiException from 'exceptions/ApiException'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 const schema = yup.object().shape({
   addressId: yup.number().required(),
   sid: yup.string().required(),
 })
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'DELETE') {
       throw new ApiException(405, 'Không tìm thấy api route')
@@ -22,7 +23,7 @@ export default async function handler(req, res) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    let queryString: string, values: string[], result: any
+    let queryString: string, values: string[], result
 
     queryString = `SELECT id FROM sessions WHERE sid = ?`
     values = [sid]

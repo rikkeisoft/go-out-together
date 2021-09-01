@@ -28,7 +28,7 @@ interface Props {
   isError: boolean
 }
 
-export default function Details({ isError }: Props) {
+export default function Details({ isError }: Props): JSX.Element {
   const [cookies, , removeCookie] = useCookies(['imgURL', 'uid'])
   const [sid, setSid] = useState(null)
   const [bgClassname, setBgClassname] = useState(() => localStorage.getItem('bgClassname') ?? 'bg-image32 bg')
@@ -95,7 +95,7 @@ export default function Details({ isError }: Props) {
 
   if (router.isReady && detailStep !== router.query?.all[1]) {
     return (
-      <LoadingOverlay isOpen={detailStep !== router.query?.all[1]} message="Đang kiểm tra thông tin người dùng..." />
+      <LoadingOverlay isOpen={detailStep !== router.query?.all[1]} message='Đang kiểm tra thông tin người dùng...' />
     )
   }
 
@@ -103,28 +103,28 @@ export default function Details({ isError }: Props) {
     <MainLayout>
       <Head>
         <title>Form</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel='icon' href='/favicon.ico' />
       </Head>
       <Container className={bgClassname}>
-        <div className="flex items-center justify-around">
+        <div className='flex items-center justify-around'>
           {checkOldSession ? (
-            <h1 className="text-2xl font-bold md:text-3xl cursor-pointer">Go out together</h1>
+            <h1 className='text-2xl font-bold md:text-3xl cursor-pointer'>Go out together</h1>
           ) : (
-            <Button type="button" variant="danger" onClick={goToHomePage}>
-              <ArrowLeftIcon className="w-7" /> Về trang chủ
+            <Button type='button' variant='danger' onClick={goToHomePage}>
+              <ArrowLeftIcon className='w-7' /> Về trang chủ
             </Button>
           )}
           <UserAvatar imgURL={cookies?.imgURL} username={cookies?.username} onSignOut={handleSignOut} />
         </div>
         <Center>
           <TitleText>Bạn đang tham gia nhóm: </TitleText>
-          <span className="inline-block text-2xl font-bold text-blue-500 whitespace-nowrap overflow-hidden overflow-ellipsis">
+          <span className='inline-block text-2xl font-bold text-blue-500 whitespace-nowrap overflow-hidden overflow-ellipsis'>
             {sid}
           </span>
         </Center>
         {isError ? (
-          <div className="text-center">
-            <p className="font-semibold text-xl">Đăng nhập ngay: </p>
+          <div className='text-center'>
+            <p className='font-semibold text-xl'>Đăng nhập ngay: </p>
             <GoogleLoginModal />
           </div>
         ) : (

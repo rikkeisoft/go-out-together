@@ -41,7 +41,7 @@ interface FormAddressInput {
 interface Step1Props {
   sid: string
   formData: {}
-  setFormData: (props: any) => unknown
+  setFormData: (params: FormAddressInput) => unknown
 }
 
 const Step1 = memo(({ sid, formData, setFormData }: Step1Props) => {
@@ -61,7 +61,8 @@ const Step1 = memo(({ sid, formData, setFormData }: Step1Props) => {
   })
 
   const onSubmit = async (data: FormAddressInput) => {
-    setFormData(Object.assign({}, formData, data))
+    const params = Object.assign({}, formData, data)
+    setFormData(params)
     const isSessionExpired = JSON.parse(sessionStorage.getItem('isSessionExpired'))
     if (isSessionExpired) {
       router.push(`${urls.SESSIONS}/${sid}/2`)

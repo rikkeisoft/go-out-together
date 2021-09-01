@@ -3,7 +3,7 @@ import * as yup from 'yup'
 import messageCodes from 'consts/messageCodes'
 import ApiException from 'exceptions/ApiException'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { CheckSessionParams } from 'lib/interfaces'
+import { CheckSessionParams, StringOrNumberGeneric } from 'lib/interfaces'
 
 const schema = yup.object().shape({
   uid: yup.string().required(),
@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    let queryString: string, values: string[], result: any
+    let queryString: string, values: StringOrNumberGeneric[], result
 
     queryString = `SELECT id, expire_time FROM sessions WHERE sid = ?`
     values = [sid]

@@ -5,7 +5,7 @@ export interface ChildrenProps {
 }
 
 export interface ClassNameProps {
-  className: string
+  className?: string
 }
 
 interface Geometry {
@@ -32,6 +32,14 @@ export interface Address {
   uuid?: string
 }
 
+export interface OldSession {
+  content: string
+  id: number
+  result: string[]
+  sid: string
+  title: string
+}
+
 export interface UserLocation {
   userId?: number
   name?: string
@@ -56,6 +64,10 @@ export interface CheckSessionParams extends SessionIdParams {
   uid: string
 }
 
+export interface GetOldSessionsParams {
+  uid: string
+}
+
 export interface JoinSessionParams extends SessionIdParams {
   uid: string
   name: string
@@ -75,3 +87,23 @@ export interface VoteSessionParams extends SessionIdParams {
   uid: string
   aid: string
 }
+
+// user
+export interface LoginParams {
+  uuid: string
+  username: string
+  avatar_url: string
+}
+
+export interface UpdateUserInfoParams {
+  uuid: string
+  avatarURL: string
+}
+export interface UpdateSessionCreatorParams {
+  uid: string
+  name: string
+  address: Address
+}
+
+// api
+export type StringOrNumberGeneric = string | number

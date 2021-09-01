@@ -4,6 +4,8 @@ import { nanoid } from 'nanoid'
 import messageCodes from 'consts/messageCodes'
 import { getExpireTime } from 'lib/date'
 import ApiException from 'exceptions/ApiException'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { Address, CreateSessionParams, StringOrNumberGeneric } from 'lib/interfaces'
 
 const schema = yup.object().shape({
   uid: yup.string().required(),
@@ -20,13 +22,13 @@ const schema = yup.object().shape({
   ),
 })
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'POST') {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { uid, title, content, timeLimit, addresses } = req.body
+    const { uid, title, content, timeLimit, addresses } = req.body as unknown as CreateSessionParams
 
     try {
       await schema.validate({ uid, title, content, timeLimit, addresses })
@@ -37,7 +39,7 @@ export default async function handler(req, res) {
     const expireTime = getExpireTime(timeLimit)
 
     const sid = nanoid()
-    let queryString, values, result
+    let queryString: string, values: StringOrNumberGeneric[], result
 
     queryString = `INSERT INTO sessions (sid, title, content, expire_time, creator) VALUES (?, ?, ?, ?, ?) `
     values = [sid, title, content, expireTime, uid]
@@ -48,9 +50,9 @@ export default async function handler(req, res) {
       throw new ApiException(500, 'Không chèn được dữ liệu vào bảng sessions', err)
     }
 
-    const sessionId = result.insertId
+    const sessionId: string = result.insertId
 
-    let addressIds = []
+    let addressIds: StringOrNumberGeneric[] = []
     for (let address of addresses) {
       queryString = `SELECT id FROM addresses WHERE aid = ?`
       values = [address.aid]
@@ -90,8 +92,8 @@ export default async function handler(req, res) {
       cleanUp(mysql)
       throw new ApiException(500, 'Không tìm thấy người dùng')
     }
-    const userId = result[0].id
-    const addressId = result[0].address_id
+    const userId: number = result[0].id
+    const addressId: number = result[0].address_id
 
     for (let addressId of addressIds) {
       queryString = `INSERT INTO session_address (session_id, address_id, added_user_id) VALUES (?, ?, ?)`

@@ -18,7 +18,7 @@ import Step3 from '../../../components/sessions/create/Step3'
 import UserAvatar from '../../../components/avatar/UserAvatar'
 import ArrowLeftIcon from '../../../components/icons/ArrowLeftIcon'
 
-export default function Create() {
+export default function Create(): JSX.Element {
   const router = useRouter()
   const [cookies, , removeCookie] = useCookies(['uid', 'username', 'imgURL'])
   const queryClient = useQueryClient()
@@ -62,12 +62,12 @@ export default function Create() {
     <MainLayout>
       <Head>
         <title>Form</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel='icon' href='/favicon.ico' />
       </Head>
-      <Container className="bg-image13 bg">
-        <div className="flex items-center justify-around">
-          <Button type="button" variant="danger" onClick={goToHomePage}>
-            <ArrowLeftIcon className="w-7" /> Về trang chủ
+      <Container className='bg-image13 bg'>
+        <div className='flex items-center justify-around'>
+          <Button type='button' variant='danger' onClick={goToHomePage}>
+            <ArrowLeftIcon className='w-7' /> Về trang chủ
           </Button>
           <UserAvatar imgURL={cookies?.imgURL} username={cookies?.username} onSignOut={handleSignOut} />
         </div>

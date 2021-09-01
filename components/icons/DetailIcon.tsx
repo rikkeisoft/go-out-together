@@ -1,5 +1,4 @@
 import React, { memo } from 'react'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { ClassNameProps } from 'lib/interfaces'
 

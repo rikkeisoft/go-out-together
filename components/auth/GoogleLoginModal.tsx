@@ -7,18 +7,13 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import { useMutation, useQueryClient } from 'react-query'
+import { LoginParams } from 'lib/interfaces'
 
-interface MutateProps {
-  uuid: string
-  username: string
-  avatar_url: string
-}
-
-function GoogleLoginModal() {
+function GoogleLoginModal(): JSX.Element {
   const queryClient = useQueryClient()
   const router = useRouter()
   const [cookies, setCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
-  const { mutate } = useMutation((userInfo: MutateProps) => login(userInfo), {
+  const { mutate } = useMutation((userInfo: LoginParams) => login(userInfo), {
     onSuccess: (data) => {
       setCookie('imgURL', data.data.avatarURL, { path: '/' })
       setCookie('accessToken', data.data.accessToken, { path: '/' })

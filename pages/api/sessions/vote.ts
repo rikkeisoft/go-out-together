@@ -2,6 +2,8 @@ import { mysql, cleanUp } from 'lib/db'
 import * as yup from 'yup'
 import messageCodes from 'consts/messageCodes'
 import ApiException from 'exceptions/ApiException'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { StringOrNumberGeneric, VoteSessionParams } from 'lib/interfaces'
 
 const schema = yup.object().shape({
   sid: yup.string().required(),
@@ -9,13 +11,13 @@ const schema = yup.object().shape({
   aid: yup.string().required(),
 })
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'POST') {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { sid, uid, aid } = req.body
+    const { sid, uid, aid } = req.body as unknown as VoteSessionParams
 
     try {
       await schema.validate({ uid, sid, aid })
@@ -23,7 +25,7 @@ export default async function handler(req, res) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    let queryString: string, values: string[], result: any
+    let queryString: string, values: StringOrNumberGeneric[], result
 
     queryString = `SELECT id FROM users WHERE uuid = ?`
     values = [uid]
@@ -37,7 +39,7 @@ export default async function handler(req, res) {
       cleanUp(mysql)
       throw new ApiException(500, 'Không tìm thấy user')
     }
-    const userId = result[0].id
+    const userId: number = result[0].id
 
     queryString = `SELECT id, expire_time FROM sessions WHERE sid = ?`
     values = [sid]
@@ -51,7 +53,7 @@ export default async function handler(req, res) {
       cleanUp(mysql)
       throw new ApiException(500, 'Không tìm thấy session')
     }
-    const sessionId = result[0].id
+    const sessionId: string = result[0].id
 
     queryString = `SELECT id FROM addresses WHERE aid = ?`
     values = [aid]

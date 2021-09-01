@@ -2,6 +2,8 @@ import { mysql, cleanUp } from 'lib/db'
 import * as yup from 'yup'
 import messageCodes from 'consts/messageCodes'
 import ApiException from 'exceptions/ApiException'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { StringOrNumberGeneric, UpdateSessionAddressesParams } from 'lib/interfaces'
 
 const schema = yup.object().shape({
   sid: yup.string().required(),
@@ -16,7 +18,7 @@ const schema = yup.object().shape({
   ),
 })
 
-const getUserId = (queryString, values, uuid) => {
+const getUserId = (queryString: string, values: StringOrNumberGeneric[], uuid: string) => {
   queryString = `SELECT id FROM users WHERE uuid = ?`
   values = [uuid]
   try {
@@ -28,7 +30,7 @@ const getUserId = (queryString, values, uuid) => {
   }
 }
 
-const findAddressID = (queryString, values, address) => {
+const findAddressID = (queryString: string, values: StringOrNumberGeneric[], address) => {
   queryString = `SELECT id FROM addresses WHERE aid = ?`
   values = [address.aid]
   try {
@@ -40,7 +42,7 @@ const findAddressID = (queryString, values, address) => {
   }
 }
 
-const insertAddress = (queryString, values, address) => {
+const insertAddress = (queryString: string, values: StringOrNumberGeneric[], address) => {
   queryString = `INSERT INTO addresses (aid, name, latitude, longitude) VALUES (?, ?, ?, ?)`
   values = [address.aid, address.name, address.latitude, address.longitude]
   try {
@@ -52,7 +54,7 @@ const insertAddress = (queryString, values, address) => {
   }
 }
 
-const getCurrentSessionID = (queryString, values, addressId) => {
+const getCurrentSessionID = (queryString: string, values: StringOrNumberGeneric[], addressId: number) => {
   queryString = `SELECT DISTINCT session_id FROM session_address WHERE address_id = ?`
   values = [addressId]
   try {
@@ -64,7 +66,13 @@ const getCurrentSessionID = (queryString, values, addressId) => {
   }
 }
 
-const insertToSessionAddress = (queryString, values, sessionId, addressId, userId) => {
+const insertToSessionAddress = (
+  queryString: string,
+  values: StringOrNumberGeneric[],
+  sessionId: string,
+  addressId: number,
+  userId: string,
+) => {
   queryString = `INSERT INTO session_address (session_id, address_id, added_user_id) VALUES (?, ?, ?)`
   values = [sessionId, addressId, userId]
   try {
@@ -76,13 +84,13 @@ const insertToSessionAddress = (queryString, values, sessionId, addressId, userI
   }
 }
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'POST') {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { sid, addresses } = req.body
+    const { sid, addresses } = req.body as unknown as UpdateSessionAddressesParams
 
     try {
       await schema.validate({ sid, addresses })
@@ -90,7 +98,7 @@ export default async function handler(req, res) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    let queryString, values, result
+    let queryString: string, values: StringOrNumberGeneric[], result
 
     queryString = `SELECT id FROM sessions WHERE sid = ?`
     values = [sid]
@@ -105,7 +113,7 @@ export default async function handler(req, res) {
     const addressPromises = addresses.map(async (address) => {
       result = await findAddressID(queryString, values, address)
 
-      let addressId
+      let addressId: number
       if (result.length === 0) {
         result = await insertAddress(queryString, values, address)
         addressId = result.insertId

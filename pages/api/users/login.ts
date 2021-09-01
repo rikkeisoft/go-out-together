@@ -3,6 +3,8 @@ import * as yup from 'yup'
 import messageCodes from 'consts/messageCodes'
 import jwt from 'jsonwebtoken'
 import ApiException from 'exceptions/ApiException'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { LoginParams } from 'lib/interfaces'
 
 const schema = yup.object().shape({
   uuid: yup.string().required(),
@@ -10,13 +12,13 @@ const schema = yup.object().shape({
   avatar_url: yup.string().required(),
 })
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'POST') {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { uuid, username, avatar_url } = req.body
+    const { uuid, username, avatar_url } = req.body as unknown as LoginParams
 
     try {
       await schema.validate({ uuid, username, avatar_url })
@@ -24,7 +26,7 @@ export default async function handler(req, res) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    let queryString, values, result, imgURL
+    let queryString: string, values: string[], result, imgURL: string
 
     queryString = 'SELECT username, avatar_url FROM users WHERE uuid = ?'
     values = [uuid]
@@ -60,7 +62,7 @@ export default async function handler(req, res) {
     }
 
     // generate jwt token
-    let accessToken
+    let accessToken: string
     try {
       accessToken = jwt.sign({ userId: uuid }, process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET, { expiresIn: '10h' })
     } catch (err) {

@@ -12,7 +12,7 @@ interface Props {
   data: (dataProps: Location | Location[]) => unknown
 }
 
-const MapBox = ({ listAddress, show, isOneLocation, data }: Props) => {
+const MapBox = ({ listAddress, show, isOneLocation, data }: Props): JSX.Element => {
   const [location, setLocation] = useState(null)
   const [dataLocation, setDataLocation] = useState<Location[]>(null)
   const [selectedLocation, setSelectedLocation] = useState<Location>(null)
@@ -122,18 +122,18 @@ const MapBox = ({ listAddress, show, isOneLocation, data }: Props) => {
     <>
       <Head>
         <title>Home</title>
-        <link rel="icon" href="/favicon.ico" />
-        <script async src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
-        <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
+        <link rel='icon' href='/favicon.ico' />
+        <script async src='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css' rel='stylesheet' />
       </Head>
-      <h1 className="text-center font-semibold text-xl">Hãy chọn địa điểm ở Hà Nội</h1>
-      <div className="w-full md:w-4/5 px-2 mb-2 relative mx-auto">
+      <h1 className='text-center font-semibold text-xl'>Hãy chọn địa điểm ở Hà Nội</h1>
+      <div className='w-full md:w-4/5 px-2 mb-2 relative mx-auto'>
         {listLocation.length > 4 ? (
-          <div className="flex justify-between">
-            <p className="text-red-500">Chỉ được tạo tối đa 5 địa điểm !</p>
+          <div className='flex justify-between'>
+            <p className='text-red-500'>Chỉ được tạo tối đa 5 địa điểm !</p>
             <Button
-              type="submit"
-              variant="primary"
+              type='submit'
+              variant='primary'
               onClick={() => {
                 if (isOneLocation) {
                   data(selectedLocation)
@@ -150,34 +150,34 @@ const MapBox = ({ listAddress, show, isOneLocation, data }: Props) => {
           <>
             {listAddress && (
               <>
-                <p className="text-center">Bạn chỉ được nhập tối đa {5 - listAddress.length} địa chỉ</p>
+                <p className='text-center'>Bạn chỉ được nhập tối đa {5 - listAddress.length} địa chỉ</p>
                 {isOneLocation
-                  ? listAddress.length + 1 >= 5 && <p className="text-red-500">Đã đủ 5 địa chỉ!!</p>
+                  ? listAddress.length + 1 >= 5 && <p className='text-red-500'>Đã đủ 5 địa chỉ!!</p>
                   : listAddress.length + listLocation.length >= 5 && (
-                      <p className="my-1 text-red-500">Đã đủ 5 địa chỉ!!</p>
+                      <p className='my-1 text-red-500'>Đã đủ 5 địa chỉ!!</p>
                     )}
-                <ul className="my-3">
+                <ul className='my-3'>
                   {listLocation.length !== 0 && <span>Danh sách địa điểm được thêm vào: </span>}
                   {listLocation.map((location) => (
-                    <li key={location.id} className="px-3 py-2 mb-2 border border-gray-400 bg-gray-100">
+                    <li key={location.id} className='px-3 py-2 mb-2 border border-gray-400 bg-gray-100'>
                       {location.place_name}
                       <span
-                        className="ml-2 cursor-pointer"
+                        className='ml-2 cursor-pointer'
                         onClick={() => {
                           handleDeleteAddressListLocation(location.id)
                           inputRef.current.focus()
                         }}
                       >
                         <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 inline"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
+                          xmlns='http://www.w3.org/2000/svg'
+                          className='h-5 w-5 inline'
+                          viewBox='0 0 20 20'
+                          fill='currentColor'
                         >
                           <path
-                            fillRule="evenodd"
-                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                            clipRule="evenodd"
+                            fillRule='evenodd'
+                            d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
+                            clipRule='evenodd'
                           />
                         </svg>
                       </span>
@@ -186,43 +186,43 @@ const MapBox = ({ listAddress, show, isOneLocation, data }: Props) => {
                 </ul>
               </>
             )}
-            <form className="mb-4 flex flex-col-reverse items-center md:flex-row md:justify-between">
-              <div className="relative w-full md:w-80 bg-white border md:border-0 border-gray-400">
+            <form className='mb-4 flex flex-col-reverse items-center md:flex-row md:justify-between'>
+              <div className='relative w-full md:w-80 bg-white border md:border-0 border-gray-400'>
                 <input
                   ref={inputRef}
-                  type="text"
+                  type='text'
                   value={location || ''}
-                  className="w-11/12 md:w-80 p-2 pr-10 inline outline-none whitespace-nowrap overflow-hidden overflow-ellipsis"
-                  placeholder="Nhập địa chỉ của bạn"
+                  className='w-11/12 md:w-80 p-2 pr-10 inline outline-none whitespace-nowrap overflow-hidden overflow-ellipsis'
+                  placeholder='Nhập địa chỉ của bạn'
                   onChange={(event) => {
                     setLocation(event.target.value)
                     setShowListLocation(true)
                   }}
                 />
                 <span
-                  className="absolute top-1.5 md:left-72 cursor-pointer"
+                  className='absolute top-1.5 md:left-72 cursor-pointer'
                   onClick={() => {
                     setLocation('')
                     inputRef.current.focus()
                   }}
                 >
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 inline"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='h-5 w-5 inline'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
                   >
                     <path
-                      fillRule="evenodd"
-                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clipRule="evenodd"
+                      fillRule='evenodd'
+                      d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
+                      clipRule='evenodd'
                     />
                   </svg>
                 </span>
               </div>
-              <div className="mb-2 md:mb-0">
+              <div className='mb-2 md:mb-0'>
                 <Button
-                  type="submit"
+                  type='submit'
                   variant={listLocation.length !== 0 ? 'primary' : 'danger'}
                   onClick={() => {
                     if (isOneLocation) {
@@ -241,12 +241,12 @@ const MapBox = ({ listAddress, show, isOneLocation, data }: Props) => {
           </>
         )}
         {dataLocation && dataLocation.length !== 0 && showListLocation && location && (
-          <ul className="border border-gray-400 bg-gray-100">
+          <ul className='border border-gray-400 bg-gray-100'>
             {dataLocation.map((item, index: number) => {
               return (
                 <li
                   key={index}
-                  className="cursor-pointer p-2"
+                  className='cursor-pointer p-2'
                   onClick={() => {
                     setSelectedLocation(item)
                     setLocation(item.place_name)
@@ -265,15 +265,15 @@ const MapBox = ({ listAddress, show, isOneLocation, data }: Props) => {
                   }}
                 >
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 inline mr-2"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='h-5 w-5 inline mr-2'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
                   >
                     <path
-                      fillRule="evenodd"
-                      d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                      clipRule="evenodd"
+                      fillRule='evenodd'
+                      d='M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z'
+                      clipRule='evenodd'
                     />
                   </svg>
                   {item.place_name}
@@ -282,7 +282,7 @@ const MapBox = ({ listAddress, show, isOneLocation, data }: Props) => {
             })}
           </ul>
         )}
-        <div id="map" className="w-full mb-8" style={{ height: '70vh' }}></div>
+        <div id='map' className='w-full mb-8' style={{ height: '70vh' }}></div>
       </div>
     </>
   )

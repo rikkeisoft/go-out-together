@@ -1,13 +1,8 @@
-import * as yup from 'yup'
 import { mysql, cleanUp } from 'lib/db'
 import messageCodes from 'consts/messageCodes'
 import withProtect from 'middware/withProtect'
 import ApiException from 'exceptions/ApiException'
 import { NextApiRequest, NextApiResponse } from 'next'
-
-const schema = yup.object().shape({
-  uuid: yup.string().required(),
-})
 
 interface Request {
   userId: string
@@ -20,11 +15,6 @@ async function handler(req: NextApiRequest & Request, res: NextApiResponse) {
     }
 
     const uuid = req.userId
-    try {
-      await schema.validate({ uuid })
-    } catch (err) {
-      throw new ApiException(400, 'Các thông tin không hợp lệ', err)
-    }
 
     let queryString: string, values: string[], result: any
     queryString = 'SELECT username, avatar_url FROM users WHERE uuid = ?'

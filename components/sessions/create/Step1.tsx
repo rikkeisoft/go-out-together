@@ -94,7 +94,7 @@ const Step1 = memo(({ formData, setFormData }: StepProps) => {
     <>
       <Head>
         <title>Bước 1</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel='icon' href='/favicon.ico' />
       </Head>
       {showMap ? (
         <MapBox
@@ -105,36 +105,36 @@ const Step1 = memo(({ formData, setFormData }: StepProps) => {
           }}
         />
       ) : (
-        <div className="w-full px-3 py-6 md:mt-14 md:w-6/12 md:mt-2/5 md:mx-auto md:px-10 md:py-10 font-bold">
+        <div className='w-full px-3 py-6 md:mt-14 md:w-6/12 md:mt-2/5 md:mx-auto md:px-10 md:py-10 font-bold'>
           <FormProvider {...methods}>
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <Field>
-                <Label htmlFor="name">
-                  <p className="mb-2 text-2xl">Tên:</p>
+                <Label htmlFor='name'>
+                  <p className='mb-2 text-2xl'>Tên:</p>
                 </Label>
-                <TextField id="name" name="name" />
+                <TextField id='name' name='name' />
                 <ErrorMessage
                   errors={methods.formState.errors}
-                  name="name"
+                  name='name'
                   render={({ message }) => <ErrorText>{message}</ErrorText>}
                 />
               </Field>
 
               <Field>
-                <Label htmlFor="address">Địa điểm hiện tại của bạn:</Label>
-                <div className="py-2 mb-6">
-                  <Button type="button" variant="primary" onClick={() => setShowMap(true)}>
+                <Label htmlFor='address'>Địa điểm hiện tại của bạn:</Label>
+                <div className='py-2 mb-6'>
+                  <Button type='button' variant='primary' onClick={() => setShowMap(true)}>
                     <p>Chọn địa điểm trên bản đồ</p>
                   </Button>
                 </div>
-                <AddressField name="address" />
+                <AddressField name='address' />
                 {!_.isNil(methods.formState.errors.address) && <ErrorText>Nhập vào địa chỉ</ErrorText>}
               </Field>
-              <div className="  mx-auto flex justify-between">
-                <Button type="button" variant="danger" onClick={() => router.back()}>
+              <div className='  mx-auto flex justify-between'>
+                <Button type='button' variant='danger' onClick={() => router.back()}>
                   Quay lại
                 </Button>
-                <Button type="submit" variant="primary" onClick={() => {}}>
+                <Button type='submit' variant='primary'>
                   Tiếp theo
                 </Button>
               </div>
@@ -142,7 +142,7 @@ const Step1 = memo(({ formData, setFormData }: StepProps) => {
           </FormProvider>
         </div>
       )}
-      <LoadingOverlay isOpen={isLoading} message="Đang xử lí..." />
+      <LoadingOverlay isOpen={isLoading} message='Đang xử lí...' />
     </>
   )
 })

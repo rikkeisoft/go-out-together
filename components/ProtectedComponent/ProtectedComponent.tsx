@@ -7,6 +7,7 @@ import Details from '../../pages/sessions/detail/[...all]'
 import { useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import { useQuery, useQueryClient } from 'react-query'
+import { ChildrenProps } from 'lib/interfaces'
 
 interface State {
   data: {
@@ -15,15 +16,15 @@ interface State {
   }
 }
 
-export default function ProtectedComponent({ children }) {
-  const [cookies, setCookie, removeCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
+export default function ProtectedComponent({ children }: ChildrenProps): JSX.Element {
+  const [, setCookie, removeCookie] = useCookies(['uid', 'username', 'imgURL', 'accessToken'])
   const router = useRouter()
   const queryClient = useQueryClient()
   const { isError, isLoading, refetch } = useQuery(
     queryKeys.CHECK_USER,
     async () => {
       try {
-        const data = await checkUser(cookies.uid)
+        const data = await checkUser()
         queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedIn: true })
         setCookie('imgURL', data?.data?.avatar_url)
         return
@@ -65,7 +66,7 @@ export default function ProtectedComponent({ children }) {
   }, [isLoading, isError])
 
   if (isLoading) {
-    return <LoadingOverlay isOpen={isLoading} message="Vui lòng chờ..." />
+    return <LoadingOverlay isOpen={isLoading} message='Vui lòng chờ...' />
   }
 
   if (isError && router.pathname === '/sessions/detail/[...all]') {
@@ -77,7 +78,7 @@ export default function ProtectedComponent({ children }) {
       {router.pathname === '/login' ? (
         children
       ) : isError ? (
-        <LoadingOverlay isOpen={router.pathname !== '/login'} message="Vui lòng chờ..." />
+        <LoadingOverlay isOpen={router.pathname !== '/login'} message='Vui lòng chờ...' />
       ) : (
         children
       )}

@@ -23,7 +23,12 @@ interface Props {
   destination: Destination
 }
 
-const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destination }: Props) => {
+interface CircleOption {
+  step?: number
+  units: Units
+}
+
+const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destination }: Props): JSX.Element => {
   const [distance, setDistance] = useState([])
   const [route, setRoute] = useState([])
   const [mapBox, setMapBox] = useState(null)
@@ -261,7 +266,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           const distanceRadius = getMaxRadius(points, from)
           let center = turf.point(centerCoordinates.geometry.coordinates)
           let radius = distanceRadius
-          let options = { steps: 50, units: 'kilometers' } as unknown as Units
+          let options = { steps: 50, units: 'kilometers' } as unknown as CircleOption
 
           let circle = turf.circle(center, radius, options)
 
@@ -290,7 +295,7 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
   }, [route, mapBox, listUserLocation])
 
   const getMaxRadius = (pointArray, fromPoint): number => {
-    const distanceOption = { units: 'kilometers' }
+    const distanceOption = { units: 'kilometers' } as unknown as CircleOption
     const distanceArray = pointArray.map((point) => {
       const newPoint = turf.point(point)
       return turf.distance(fromPoint, newPoint, distanceOption)
@@ -329,16 +334,16 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
     <>
       <Head>
         <title>Home</title>
-        <link rel="icon" href="/favicon.ico" />
-        <script async src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
-        <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
+        <link rel='icon' href='/favicon.ico' />
+        <script async src='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css' rel='stylesheet' />
       </Head>
-      <div className="mx-auto relative popup-direction">
-        <div className="flex justify-between items-center">
-          <p className="text-blue-600 text-xl font-semibold">Thông tin đường đi</p>
+      <div className='mx-auto relative popup-direction'>
+        <div className='flex justify-between items-center'>
+          <p className='text-blue-600 text-xl font-semibold'>Thông tin đường đi</p>
           <Button
-            type="submit"
-            variant="primary"
+            type='submit'
+            variant='primary'
             onClick={() => {
               showMap()
             }}
@@ -350,10 +355,10 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
           <Marker />
           Đến: {destination.address}
         </p>
-        <div className="my-2 p-2 h-32 overflow-y-scroll border border-gray-400">
+        <div className='my-2 p-2 h-32 overflow-y-scroll border border-gray-400'>
           {distance.length !== 0 &&
             distance.map((item) => (
-              <div key={item.userId} className="mb-2">
+              <div key={item.userId} className='mb-2'>
                 <p>
                   <Marker />
                   Từ: {item.address}
@@ -366,12 +371,12 @@ const DirectionRoutes = ({ showMap, currentLocation, listUserLocation, destinati
             ))}
         </div>
         {distance.length !== 0 && (
-          <p className="mb-3">
+          <p className='mb-3'>
             <ThreeDots />
             Chiều dài quãng đường trung bình: {(getAverageDistance() / 1000).toFixed(2)} KM
           </p>
         )}
-        <div id="map" className="w-full" style={{ height: '60vh' }} />
+        <div id='map' className='w-full' style={{ height: '60vh' }} />
       </div>
     </>
   )

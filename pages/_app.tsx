@@ -24,18 +24,18 @@ const metaData = {
   ogImage: 'https://images.wallpaperscraft.com/image/autumn_river_trees_nature_86232_1920x1080.jpg',
 }
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   const { description, ogDescription, ogSitename, ogTitle, ogUrl, ogImage } = metaData
 
   return (
     <>
       <Head>
-        <meta name="description" content={description} />
-        <meta property="og:site_name" content={ogSitename} key="ogsitename" />
-        <meta property="og:description" content={ogDescription} key="ogdesc" />
-        <meta property="og:title" content={ogTitle} key="ogtitle" />
-        <meta property="og:url" content={ogUrl} key="ogurl" />
-        <meta key="ogimage" property="og:image" content={ogImage} />
+        <meta name='description' content={description} />
+        <meta property='og:site_name' content={ogSitename} key='ogsitename' />
+        <meta property='og:description' content={ogDescription} key='ogdesc' />
+        <meta property='og:title' content={ogTitle} key='ogtitle' />
+        <meta property='og:url' content={ogUrl} key='ogurl' />
+        <meta key='ogimage' property='og:image' content={ogImage} />
       </Head>
       <QueryClientProvider client={queryClient}>
         <ProtectedComponent>

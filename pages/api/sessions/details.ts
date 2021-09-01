@@ -2,6 +2,8 @@ import { mysql, cleanUp } from 'lib/db'
 import * as yup from 'yup'
 import messageCodes from 'consts/messageCodes'
 import ApiException from 'exceptions/ApiException'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { SessionIdParams, StringOrNumberGeneric } from 'lib/interfaces'
 
 const schema = yup.object().shape({
   sid: yup.string().required(),
@@ -32,13 +34,13 @@ interface Data {
   addresses: Address[]
 }
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'GET') {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { sid } = req.query
+    const { sid } = req.query as unknown as SessionIdParams
 
     try {
       await schema.validate({ sid })
@@ -46,7 +48,7 @@ export default async function handler(req, res) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    let queryString, values, result
+    let queryString: string, values: StringOrNumberGeneric[], result
     let data: Data = {
       title: '',
       content: '',
@@ -72,12 +74,12 @@ export default async function handler(req, res) {
       cleanUp(mysql)
       throw new ApiException(500, 'Không tìm thấy session')
     }
-    const sessionId = result[0].id
+    const sessionId: number = result[0].id
 
     data.title = result[0].title
     data.content = result[0].content
     data.expireTime = result[0].expire_time
-    let userIds = result.map((row) => row.user_id)
+    let userIds: number[] = result.map((row) => row.user_id)
 
     const userPromises = userIds.map((userId) => {
       queryString = `SELECT id, name, username, avatar_url FROM users WHERE id = ?`
@@ -104,7 +106,7 @@ export default async function handler(req, res) {
       throw new ApiException(500, 'Không lấy được các địa điểm vui chơi từ session', err)
     }
 
-    let addressIds = result.map((row) => row.address_id)
+    let addressIds: number[] = result.map((row) => row.address_id)
     const addressPromises = addressIds.map((addressId) => {
       queryString = `
       SELECT addresses.id, addresses.aid, addresses.name, addresses.latitude, addresses.longitude, users.name as username,

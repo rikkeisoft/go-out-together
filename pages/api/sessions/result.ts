@@ -2,6 +2,8 @@ import { mysql, cleanUp } from 'lib/db'
 import * as yup from 'yup'
 import messageCodes from 'consts/messageCodes'
 import ApiException from 'exceptions/ApiException'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { SessionIdParams, StringOrNumberGeneric } from 'lib/interfaces'
 
 const schema = yup.object().shape({
   sid: yup.string().required(),
@@ -23,13 +25,13 @@ interface Data {
   expireTime?: Date
 }
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'GET') {
       throw new ApiException(405, 'Không tìm thấy api route')
     }
 
-    const { sid } = req.query
+    const { sid } = req.query as unknown as SessionIdParams
 
     try {
       await schema.validate({ sid })
@@ -37,7 +39,7 @@ export default async function handler(req, res) {
       throw new ApiException(400, 'Các thông tin không hợp lệ', err)
     }
 
-    let queryString: string, values: string[], result: any
+    let queryString: string, values: StringOrNumberGeneric[], result
     let data: Data = {
       voters: 0,
       addresses: [],
@@ -96,8 +98,8 @@ export default async function handler(req, res) {
         })
         return
       }
-      const voters = result[0].vote_count
-      const addressIds = result.map((row) => row.address_id)
+      const voters: number = result[0].vote_count
+      const addressIds: number[] = result.map((row) => row.address_id)
 
       const addressPromises = addressIds.map((id) => {
         queryString = `SELECT * FROM addresses WHERE id = ?`

@@ -2,6 +2,8 @@ import {
   CheckSessionParams,
   CreateSessionParams,
   DeleteSessionAddressParams,
+  GetOldSessionsParams,
+  OldSession,
   SessionIdParams,
   UpdateSessionAddressesParams,
   VoteSessionParams,
@@ -50,6 +52,11 @@ interface GetSessionDetailsResponse {
     members: Member[]
     addresses: Address[]
   }
+}
+
+// old session response
+interface GetOldSessionsResponse {
+  data: OldSession[]
 }
 
 // only message reponse
@@ -105,7 +112,7 @@ export const getSessionDetails = (data: SessionIdParams): Promise<GetSessionDeta
   return axiosClient.get(url)
 }
 
-export const getOldSessions = (data) => {
+export const getOldSessions = (data: GetOldSessionsParams): Promise<GetOldSessionsResponse> => {
   const url = `/sessions/get-old?uid=${data.uid}`
   return axiosClient.get(url)
 }
