@@ -1,10 +1,11 @@
 {
   "tabWidth": 2,
   "useTabs": false,
+  "parser": "typescript",
   "printWidth": 120,
   "arrowParens": "always",
   "bracketSpacing": true,
-  "eslintIntegration": false,
+  "eslintIntegration": true,
   "ignorePath": ".prettierignore",
   "jsxBracketSameLine": false,
   "proseWrap": "preserve",
@@ -12,5 +13,5 @@
   "singleQuote": true,
   "stylelintIntegration": false,
   "trailingComma": "all",
-  "jsxSingleQuote": false
+  "jsxSingleQuote": true
 }

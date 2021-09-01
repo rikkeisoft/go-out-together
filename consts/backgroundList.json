@@ -1,0 +1,47 @@
+[
+  {
+    "bgClassname": "bg-image3",
+    "imgSrc": "/assets/images/bg3.png",
+    "selected": false
+  },
+  {
+    "bgClassname": "bg-image7",
+    "imgSrc": "/assets/images/bg7.png",
+    "selected": false
+  },
+  {
+    "bgClassname": "bg-image13",
+    "imgSrc": "/assets/images/bg13.png",
+    "selected": false
+  },
+  {
+    "bgClassname": "bg-image14",
+    "imgSrc": "/assets/images/bg14.png",
+    "selected": false
+  },
+  {
+    "bgClassname": "bg-image15",
+    "imgSrc": "/assets/images/bg15.png",
+    "selected": false
+  },
+  {
+    "bgClassname": "bg-image25",
+    "imgSrc": "/assets/images/bg25.png",
+    "selected": false
+  },
+  {
+    "bgClassname": "bg-image32",
+    "imgSrc": "/assets/images/bg32.png",
+    "selected": false
+  },
+  {
+    "bgClassname": "bg-image34",
+    "imgSrc": "/assets/images/bg34.png",
+    "selected": false
+  },
+  {
+    "bgClassname": "bg-image36",
+    "imgSrc": "/assets/images/bg36.png",
+    "selected": false
+  }
+]
