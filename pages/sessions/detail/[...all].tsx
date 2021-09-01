@@ -18,15 +18,14 @@ import Step3 from 'components/sessions/details/Step3'
 import UserAvatar from 'components/avatar/UserAvatar'
 import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
 import GoogleLoginModal from 'components/auth/GoogleLoginModal'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import LoadingOverlay from 'components/common/LoadingOverlay'
-import socketIOClient from 'socket.io-client'
-
-const socket = socketIOClient(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
+import { SocketContext } from 'lib/SocketContext'
 
 export default function Details(): JSX.Element {
+  const { socket } = useContext(SocketContext)
   const [cookies, , removeCookie] = useCookies(['accessToken', 'imgURL', 'uid'])
-  const [sid, setSid] = useState(null)
+  const [sid, setSid] = useState<string>(null)
   const [bgClassname, setBgClassname] = useState(() => localStorage.getItem('bgClassname') ?? 'bg-image32 bg')
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -38,8 +37,11 @@ export default function Details(): JSX.Element {
   useEffect(() => {
     // new background image
     if (sid) {
-      // socket.emit('new_bg_image', { newBgClassname: bgClassname })
-      // return socket.off('new_bg_image')
+      socket.emit('new_user_coming', sid)
+      socket.emit('new_bg_image', { newBgClassname: bgClassname, sid })
+      return () => {
+        socket.off('new_bg_image')
+      }
     }
   }, [bgClassname])
 
