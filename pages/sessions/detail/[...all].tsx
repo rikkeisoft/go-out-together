@@ -7,29 +7,25 @@ import queryKeys from 'consts/queryKeys'
 import urls from 'consts/urls'
 import { auth } from 'lib/firebase'
 import MainLayout from 'layouts/MainLayout'
-import Container from '../../../components/common/Container'
-import Button from '../../../components/common/Button'
-import Center from '../../../components/common/Center'
-import TitleText from '../../../components/common/TitleText'
-import Step0 from '../../../components/sessions/details/Step0'
-import Step1 from '../../../components/sessions/details/Step1'
-import Step2 from '../../../components/sessions/details/Step2'
-import Step3 from '../../../components/sessions/details/Step3'
-import UserAvatar from '../../../components/avatar/UserAvatar'
-import ArrowLeftIcon from '../../../components/icons/ArrowLeftIcon'
-import GoogleLoginModal from '../../../components/auth/GoogleLoginModal'
+import Container from 'components/common/Container'
+import Button from 'components/common/Button'
+import Center from 'components/common/Center'
+import TitleText from 'components/common/TitleText'
+import Step0 from 'components/sessions/details/Step0'
+import Step1 from 'components/sessions/details/Step1'
+import Step2 from 'components/sessions/details/Step2'
+import Step3 from 'components/sessions/details/Step3'
+import UserAvatar from 'components/avatar/UserAvatar'
+import ArrowLeftIcon from 'components/icons/ArrowLeftIcon'
+import GoogleLoginModal from 'components/auth/GoogleLoginModal'
 import { useEffect, useState } from 'react'
-import LoadingOverlay from '../../../components/common/LoadingOverlay'
+import LoadingOverlay from 'components/common/LoadingOverlay'
 import socketIOClient from 'socket.io-client'
 
 const socket = socketIOClient(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
 
-interface Props {
-  isError: boolean
-}
-
-export default function Details({ isError }: Props): JSX.Element {
-  const [cookies, , removeCookie] = useCookies(['imgURL', 'uid'])
+export default function Details(): JSX.Element {
+  const [cookies, , removeCookie] = useCookies(['accessToken', 'imgURL', 'uid'])
   const [sid, setSid] = useState(null)
   const [bgClassname, setBgClassname] = useState(() => localStorage.getItem('bgClassname') ?? 'bg-image32 bg')
   const router = useRouter()
@@ -42,7 +38,7 @@ export default function Details({ isError }: Props): JSX.Element {
   useEffect(() => {
     // new background image
     if (sid) {
-      socket.emit('new_bg_image', { newBgClassname: bgClassname })
+      // socket.emit('new_bg_image', { newBgClassname: bgClassname })
       // return socket.off('new_bg_image')
     }
   }, [bgClassname])
@@ -122,7 +118,7 @@ export default function Details({ isError }: Props): JSX.Element {
             {sid}
           </span>
         </Center>
-        {isError ? (
+        {!cookies.accessToken ? (
           <div className='text-center'>
             <p className='font-semibold text-xl'>Đăng nhập ngay: </p>
             <GoogleLoginModal />

@@ -30,7 +30,7 @@ export default function Home(): JSX.Element {
   const router = useRouter()
   const queryClient = useQueryClient()
   sessionStorage.getItem('isSessionExpired') && sessionStorage.removeItem('isSessionExpired')
-  const url = sessionStorage.getItem('redirectURL')
+  const url = localStorage.getItem('redirectURL')
 
   const uid: string = cookies.uid
   const {

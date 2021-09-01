@@ -53,9 +53,9 @@ export default function ProtectedComponent({ children }: ChildrenProps): JSX.Ele
       router.pathname === '/sessions/detail/[...all]' &&
       !sessionStorage.getItem('checkOldSession')
     ) {
-      sessionStorage.setItem('redirectURL', `/sessions/detail/${router.query.all[0]}/${router.query.all[1]}`)
+      localStorage.setItem('redirectURL', `/sessions/detail/${router.query.all[0]}/${router.query.all[1]}`)
     } else if (router.pathname === '/sessions/create/1') {
-      sessionStorage.setItem('redirectURL', router.asPath)
+      localStorage.setItem('redirectURL', router.asPath)
     } else return
   }, [router.isReady, router.asPath])
 
@@ -63,6 +63,10 @@ export default function ProtectedComponent({ children }: ChildrenProps): JSX.Ele
     if (isError && router.pathname !== '/sessions/detail/[...all]') {
       router.push(`${urls.LOGIN}`)
     }
+    // else if (isError && router.pathname === '/sessions/detail/[...all]') {
+    //   const url = localStorage.getItem('redirectURL')
+    //   if (url !== null) router.push(url)
+    // }
   }, [isLoading, isError])
 
   if (isLoading) {
@@ -70,7 +74,7 @@ export default function ProtectedComponent({ children }: ChildrenProps): JSX.Ele
   }
 
   if (isError && router.pathname === '/sessions/detail/[...all]') {
-    return <Details isError={isError} />
+    return <Details />
   }
 
   return (

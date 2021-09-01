@@ -32,13 +32,13 @@ const Step3 = memo(({ sid, setFormData }: Step3Props) => {
       resultElement = (
         <Center>
           {votedAddress && (
-            <h4 className="text-xl my-3 font-semibold">
-              Bạn đã vote cho địa điểm: <span className="text-2xl font-bold text-red-500">{votedAddress.name}</span>
+            <h4 className='text-xl my-3 font-semibold'>
+              Bạn đã vote cho địa điểm: <span className='text-2xl font-bold text-red-500'>{votedAddress.name}</span>
             </h4>
           )}
           <MessageText>
             Đợi kết quả sau:{' '}
-            <span className="text-red-500 text-2xl">
+            <span className='text-red-500 text-2xl'>
               <Countdown
                 date={new Date(data.data.expireTime)}
                 onComplete={() => {
@@ -49,8 +49,8 @@ const Step3 = memo(({ sid, setFormData }: Step3Props) => {
             </span>
           </MessageText>
           <Button
-            type="button"
-            variant="danger"
+            type='button'
+            variant='danger'
             onClick={() => {
               voted ? router.back() : router.push(`${urls.SESSIONS}/${sid}/2`)
             }}
@@ -64,7 +64,7 @@ const Step3 = memo(({ sid, setFormData }: Step3Props) => {
         resultElement = (
           <Center>
             <MessageText>
-              <span className="text-red-500">Không có địa điểm nào được vote</span>
+              <span className='text-red-500'>Không có địa điểm nào được vote</span>
             </MessageText>
           </Center>
         )
@@ -74,17 +74,17 @@ const Step3 = memo(({ sid, setFormData }: Step3Props) => {
             <MessageText>
               Địa điểm được vote nhiều nhất là
               {data.data.addresses.map((address) => (
-                <p key={address.aid} className="text-red-500">
+                <p key={address.aid} className='text-red-500'>
                   {address.name} ({data.data.voters} người vote)
                 </p>
               ))}
             </MessageText>
             <Button
-              type="button"
-              variant="primary"
+              type='button'
+              variant='primary'
               onClick={() => {
                 setFormData()
-                sessionStorage.removeItem('redirectURL')
+                localStorage.removeItem('redirectURL')
                 router.push(`${urls.SESSIONS_CREATE}/1`)
               }}
             >
@@ -99,9 +99,9 @@ const Step3 = memo(({ sid, setFormData }: Step3Props) => {
     <>
       <Head>
         <title>Bước 3</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel='icon' href='/favicon.ico' />
       </Head>
-      <LoadingOverlay isOpen={isLoading} message="Đang lấy thông tin session..." />
+      <LoadingOverlay isOpen={isLoading} message='Đang lấy thông tin session...' />
       {resultElement}
     </>
   )

@@ -127,7 +127,7 @@ const MapBox = ({ listAddress, show, isOneLocation, data }: Props): JSX.Element 
         <link href='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css' rel='stylesheet' />
       </Head>
       <h1 className='text-center font-semibold text-xl'>Hãy chọn địa điểm ở Hà Nội</h1>
-      <div className='w-full md:w-4/5 px-2 mb-2 relative mx-auto'>
+      <div className='w-full md:w-4/5 px-2 pb-4 relative mx-auto'>
         {listLocation.length > 4 ? (
           <div className='flex justify-between'>
             <p className='text-red-500'>Chỉ được tạo tối đa 5 địa điểm !</p>
@@ -282,7 +282,7 @@ const MapBox = ({ listAddress, show, isOneLocation, data }: Props): JSX.Element 
             })}
           </ul>
         )}
-        <div id='map' className='w-full mb-8' style={{ height: '70vh' }}></div>
+        <div id='map' className='w-full' style={{ height: '70vh' }}></div>
       </div>
     </>
   )

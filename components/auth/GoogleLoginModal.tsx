@@ -33,7 +33,7 @@ function GoogleLoginModal(): JSX.Element {
         setCookie('uid', uid, { path: '/' })
         setCookie('username', displayName, { path: '/' })
         queryClient.setQueryData(queryKeys.CHECK_USER, { isSignedIn: true })
-        const url = sessionStorage.getItem('redirectURL')
+        const url = localStorage.getItem('redirectURL')
         if (url !== null) router.push(url)
         else router.push(`${urls.HOME}`)
       }
