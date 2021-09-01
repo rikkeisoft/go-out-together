@@ -4,6 +4,7 @@ import Head from 'next/head'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import 'tailwindcss/tailwind.css'
 import '../style/home.css'
+import SocketContextProvider from 'lib/SocketContext'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,9 +39,11 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
         <meta key='ogimage' property='og:image' content={ogImage} />
       </Head>
       <QueryClientProvider client={queryClient}>
-        <ProtectedComponent>
-          <Component {...pageProps} />
-        </ProtectedComponent>
+        <SocketContextProvider>
+          <ProtectedComponent>
+            <Component {...pageProps} />
+          </ProtectedComponent>
+        </SocketContextProvider>
       </QueryClientProvider>
     </>
   )

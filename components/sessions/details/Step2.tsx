@@ -11,15 +11,16 @@ import messageCodes from 'consts/messageCodes'
 import queryKeys from 'consts/queryKeys'
 import urls from 'consts/urls'
 import { Address, Location } from 'lib/interfaces'
+import { SocketContext } from 'lib/SocketContext'
 import _ from 'lodash'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import { useContext } from 'react'
 import { lazy, memo, Suspense, useEffect, useState } from 'react'
 import { useCookies } from 'react-cookie'
 import Countdown from 'react-countdown'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import socketIOClient from 'socket.io-client'
 import * as yup from 'yup'
 import bgList from '../../../consts/backgroundList.json'
 import AddressVoter from '../../common/AddressVoter'
@@ -37,8 +38,6 @@ import MessageText from '../../common/MessageText'
 import Popup from '../../common/Popup'
 
 const MapBox = lazy(() => import('../../common/MapBox'))
-
-const socket = socketIOClient(process.env.NEXT_PUBLIC_SOCKET_IO_URL)
 
 const schema = yup.object().shape({
   votedAddress: yup.object({
@@ -59,6 +58,7 @@ interface FormProps {
 }
 
 const Step2 = memo(({ sid, onChangeBg }: Step2Props) => {
+  const { socket } = useContext(SocketContext)
   const [cookies] = useCookies()
   const [openSelectBgPopup, setOpenSelectBgPopup] = useState(false)
   const [backgroundList, setBackgroundList] = useState(bgList)
@@ -77,12 +77,14 @@ const Step2 = memo(({ sid, onChangeBg }: Step2Props) => {
   const queryClient = useQueryClient()
   const { isLoading: isLoadingList, mutateAsync } = useMutation(updateSessionAddresses, {
     onSuccess: () => {
+      socket.emit('new_user_coming', sid)
       socket.emit('add_location', sid)
     },
   })
   // delete a location
   const { isLoading: isLoadingAdress, mutateAsync: deleteAsync } = useMutation(deleteSessionAddress, {
     onSuccess: () => {
+      socket.emit('new_user_coming', sid)
       socket.emit('delete_location', sid)
     },
   })
@@ -118,7 +120,8 @@ const Step2 = memo(({ sid, onChangeBg }: Step2Props) => {
 
   const voteSessionMutation = useMutation(voteSession, {
     onSuccess: () => {
-      socket.emit('vote', sid)
+      socket.emit('new_user_coming', sid)
+      socket.emit('vote')
       router.push(`${urls.SESSIONS}/${sid}/3`)
     },
     onError: () => alert('An error happen...'),
@@ -218,7 +221,7 @@ const Step2 = memo(({ sid, onChangeBg }: Step2Props) => {
     <>
       <Head>
         <title>Bước 2</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel='icon' href='/favicon.ico' />
       </Head>
 
       {showMap && (
@@ -234,14 +237,14 @@ const Step2 = memo(({ sid, onChangeBg }: Step2Props) => {
           />
         </Suspense>
       )}
-      <LoadingOverlay isOpen={isLoading} message="Đang lấy thông tin session..." />
+      <LoadingOverlay isOpen={isLoading} message='Đang lấy thông tin session...' />
       {!isSessionNotExpired ? (
         <Center>
           <MessageText>
-            <p className="mt-3">Địa điểm được vote nhiều nhất</p>
+            <p className='mt-3'>Địa điểm được vote nhiều nhất</p>
             {(voteResult?.data?.addresses?.length !== 0 &&
               voteResult?.data?.addresses?.map((address) => (
-                <p key={address.aid} className="text-red-500 mt-2">
+                <p key={address.aid} className='text-red-500 mt-2'>
                   {address.name} ({voteResult.data.voters} người vote)
                 </p>
               ))) ||
@@ -250,8 +253,8 @@ const Step2 = memo(({ sid, onChangeBg }: Step2Props) => {
         </Center>
       ) : null}
       {!showMap && isSuccess && data.messageCode === messageCodes.SUCCESS && (
-        <div className="p-1 md:mx-auto w-full md:w-5/6 md:mt-10 transition duration-500">
-          <div className="flex flex-col lg:flex-row lg:justify-between border-b-2 border-fuchsia-600  pt-6">
+        <div className='p-1 md:mx-auto w-full md:w-5/6 md:mt-10 transition duration-500'>
+          <div className='flex flex-col lg:flex-row lg:justify-between border-b-2 border-fuchsia-600  pt-6'>
             <div>
               <MessageText>Tiêu đề: {data.data.title}</MessageText>
               <MessageText>Nội dung: {data.data.content}</MessageText>
@@ -260,7 +263,7 @@ const Step2 = memo(({ sid, onChangeBg }: Step2Props) => {
               {isSessionNotExpired ? (
                 <MessageText>
                   Vote sẽ kết thúc sau:
-                  <span className="text-red-500 ml-1">
+                  <span className='text-red-500 ml-1'>
                     <Countdown
                       date={new Date(data.data.expireTime)}
                       onComplete={() => {
@@ -299,24 +302,24 @@ const Step2 = memo(({ sid, onChangeBg }: Step2Props) => {
             </Popup>
           </div>
           {isSessionNotExpired ? (
-            <div className="mt-2 flex flex-col md:flex-row items-center justify-between">
+            <div className='mt-2 flex flex-col md:flex-row items-center justify-between'>
               <FacebookShare sharedLink={sharedLink} title={data.data.title} memberCount={data.data.members.length} />
-              <Button type="button" variant="primary" onClick={() => setOpenSelectBgPopup(true)}>
+              <Button type='button' variant='primary' onClick={() => setOpenSelectBgPopup(true)}>
                 Đổi ảnh nền
               </Button>
             </div>
           ) : null}
 
-          <div className="px-1 pt-4">
+          <div className='px-1 pt-4'>
             <FormProvider {...methods}>
               <form onSubmit={methods.handleSubmit(onSubmit)}>
                 {data.data.addresses.length >= 5 ? (
-                  <p className="text-red-500 text-xl">Chỉ giới hạn tối đa 5 địa điểm!</p>
+                  <p className='text-red-500 text-xl'>Chỉ giới hạn tối đa 5 địa điểm!</p>
                 ) : (
                   isSessionNotExpired && (
                     <Button
-                      type="button"
-                      variant="primary"
+                      type='button'
+                      variant='primary'
                       onClick={() => {
                         setShowMap(true)
                       }}
@@ -325,17 +328,17 @@ const Step2 = memo(({ sid, onChangeBg }: Step2Props) => {
                     </Button>
                   )
                 )}
-                <LoadingOverlay isOpen={isLoadingList} message="Đang thêm địa điểm..." />
+                <LoadingOverlay isOpen={isLoadingList} message='Đang thêm địa điểm...' />
                 <Field>
-                  <Label htmlFor="votedAddress">
+                  <Label htmlFor='votedAddress'>
                     {isSessionNotExpired ? (
-                      <p className="text-xl text-black-600 font-bold my-4">Chọn địa điểm ăn chơi:</p>
+                      <p className='text-xl text-black-600 font-bold my-4'>Chọn địa điểm ăn chơi:</p>
                     ) : (
-                      <p className="text-xl text-black-600 font-bold my-4">Các địa điểm ăn chơi:</p>
+                      <p className='text-xl text-black-600 font-bold my-4'>Các địa điểm ăn chơi:</p>
                     )}
                   </Label>
                   <AddressVoter
-                    name="votedAddress"
+                    name='votedAddress'
                     showDelete={isSessionNotExpired}
                     data={data.data.addresses}
                     onOpenModalMap={(item) => {
@@ -345,34 +348,34 @@ const Step2 = memo(({ sid, onChangeBg }: Step2Props) => {
                     onClick={(item) => setVoteAddress(item)}
                     onDelete={deleteAddress}
                   />
-                  <LoadingOverlay isOpen={isLoadingAdress} message="Đang xóa địa điểm..." />
+                  <LoadingOverlay isOpen={isLoadingAdress} message='Đang xóa địa điểm...' />
                   {!_.isNil(methods.formState.errors.votedAddress) && isSessionNotExpired && (
                     <ErrorText>
                       {' '}
-                      <p className="font-bold">Chọn địa chỉ để vote</p>
+                      <p className='font-bold'>Chọn địa chỉ để vote</p>
                     </ErrorText>
                   )}
                 </Field>
                 {new Date(data.data.expireTime).getTime() > new Date().getTime() ? (
                   <ButtonGroup>
                     <Button
-                      type="button"
-                      variant="danger"
+                      type='button'
+                      variant='danger'
                       onClick={() => {
                         router.back()
                       }}
                     >
                       Trước đó
                     </Button>
-                    <Button type="submit" variant="primary">
+                    <Button type='submit' variant='primary'>
                       Vote ngay
                     </Button>
-                    <LoadingOverlay isOpen={voteSessionMutation.isLoading} message="Đang xử lí..." />
+                    <LoadingOverlay isOpen={voteSessionMutation.isLoading} message='Đang xử lí...' />
                   </ButtonGroup>
                 ) : (
                   <Button
-                    type="button"
-                    variant="danger"
+                    type='button'
+                    variant='danger'
                     onClick={() => {
                       router.back()
                     }}
@@ -387,13 +390,13 @@ const Step2 = memo(({ sid, onChangeBg }: Step2Props) => {
       )}
       <Popup isOpen={openSelectBgPopup} onRequestClose={() => setOpenSelectBgPopup(false)}>
         <div>
-          <h2 className="mb-4 text-xl font-bold">Hãy chọn một hình bên dưới:</h2>
-          <div className="px-4 h-96 overflow-y-auto flex flex-col md:flex-row md:items-center md:justify-between md:flex-wrap">
+          <h2 className='mb-4 text-xl font-bold'>Hãy chọn một hình bên dưới:</h2>
+          <div className='px-4 h-96 overflow-y-auto flex flex-col md:flex-row md:items-center md:justify-between md:flex-wrap'>
             {backgroundList.map((bg) => (
-              <p key={bg.imgSrc} className="w-full md:w-4/12 mb-4 flex items-center justify-center">
+              <p key={bg.imgSrc} className='w-full md:w-4/12 mb-4 flex items-center justify-center'>
                 <img
                   src={bg.imgSrc}
-                  alt="bg"
+                  alt='bg'
                   className={
                     bg.selected
                       ? 'w-full h-full md:w-3/5 md:h-64 border-4 border-blue-600 cursor-pointer'
@@ -412,13 +415,13 @@ const Step2 = memo(({ sid, onChangeBg }: Step2Props) => {
               </p>
             ))}
           </div>
-          <div className="mt-4 flex items-center justify-around">
-            <Button type="button" variant="danger" onClick={() => setOpenSelectBgPopup(false)}>
+          <div className='mt-4 flex items-center justify-around'>
+            <Button type='button' variant='danger' onClick={() => setOpenSelectBgPopup(false)}>
               Hủy
             </Button>
             <Button
-              type="button"
-              variant="primary"
+              type='button'
+              variant='primary'
               onClick={() => {
                 const selectedBg = backgroundList.find((ele) => ele.selected === true)
                 onChangeBg(`${selectedBg.bgClassname} bg`)
