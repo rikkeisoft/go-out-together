@@ -2,8 +2,9 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
   min-width: 100%;
-  padding-top: 20px;
+  padding: 20px 0px;
 }
 .bg-image3 {
   background-image: url('/assets/images/bg3.png');
