@@ -87,13 +87,13 @@ export default function Home(): JSX.Element {
         </div>
         <Center>
           <div className='flex justify-center text-xl font-bold'>Thông tin các nhóm đã tham gia</div>
-          <div className='md:w-8/12 mt-8 mx-auto border-gray-200'>
+          <div className='md:w-8/12 mt-8 px-2 md:mx-auto border-gray-200'>
             {isLoading ? (
               <div className='flex justify-center items-center py-3'>
                 <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900'></div>
               </div>
             ) : dataOldSessions.length !== 0 && !isError ? (
-              <table className='min-w-full break-all bg-white border-r text-center table-auto'>
+              <table className='min-w-full break-all bg-white border-r text-center table-auto max-h-96 overflow-y-scroll'>
                 <thead className='bg-gray-800 text-white '>
                   <tr className=' sm:table-row  '>
                     <th className='w-2/6 py-3 px-4 uppercase font-semibold text-sm border-r'>ID Nhóm</th>
