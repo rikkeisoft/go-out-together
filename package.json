@@ -17,7 +17,7 @@
     "boring-avatars": "^1.5.8",
     "classnames": "^2.3.1",
     "firebase": "^8.8.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "mapbox-gl": "^2.3.1",
     "nanoid": "^3.1.23",
     "next": "latest",
